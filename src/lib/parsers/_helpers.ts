@@ -223,11 +223,13 @@ export function extractCargosFromPatterns(
 // "Total a pagar" tolerante a:
 //   - mayúsculas/minúsculas (flag /i)
 //   - "á" con o sin acento ("a"/"á")
-//   - "Total Boleta", "Total Neto", "Total Final" como aliases
+//   - "Total Boleta", "Total Final" como aliases
 //   - 1-3 espacios entre tokens, dos puntos opcionales
 //   - $ opcional pegado al número
+//
+// `\b` antes de `Total` para no matchear "Sub`Total`" o "elec`total`".
 const TOTAL_A_PAGAR_REGEX = new RegExp(
-  `(?:Total\\s+a\\s+pagar|Total\\s+Boleta|Total\\s+Final|Total\\s+\\$|TOTAL\\s+A\\s+PAGAR|TOTAL\\s+\\$)[\\s:$]*${CL_NUMBER}`,
+  `\\b(?:Total\\s+a\\s+pagar|Total\\s+Boleta|Total\\s+Final|Total\\s+\\$|TOTAL\\s+A\\s+PAGAR|TOTAL\\s+\\$)[\\s:$]*${CL_NUMBER}`,
   'i',
 )
 

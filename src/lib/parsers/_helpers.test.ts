@@ -12,8 +12,10 @@ import { describe, expect, it } from 'vitest'
 import {
   extractFechaEmision,
   extractFechaVencimiento,
+  extractIVA,
   extractNumeroCliente,
   extractPeriodo,
+  extractTotal,
   normalizeOcrText,
 } from './_helpers'
 import { isValidDate } from '@/lib/dates'
@@ -151,8 +153,6 @@ describe('normalizeOcrText (patrones extendidos)', () => {
   })
 })
 
-import { extractTotal, extractIVA } from './_helpers'
-
 describe('extractTotal (con fallback)', () => {
   it('extrae con label estándar "Total a pagar"', () => {
     expect(extractTotal('Total a pagar $ 28.533')).toBe(28533)
@@ -180,6 +180,18 @@ describe('extractTotal (con fallback)', () => {
 
   it('devuelve 0 si no hay ningún "Total" en el texto', () => {
     expect(extractTotal('Recibo de papelería $1.000')).toBe(0)
+  })
+
+  it('NO matchea "Subtotal" como si fuera "Total" (regression)', () => {
+    // Sin \b antes de "Total", el regex matcheaba "Total" dentro de
+    // "Subtotal" y agarraba el monto del subtotal como total.
+    expect(extractTotal('Subtotal $ 5.000')).toBe(0)
+  })
+
+  it('cuando hay Subtotal y Total, agarra el Total', () => {
+    expect(
+      extractTotal('Subtotal $ 5.000\nTotal a pagar $ 10.000'),
+    ).toBe(10000)
   })
 })
 

@@ -13,11 +13,65 @@ import type { EmpresaElectrica, EmpresaGas, EmpresaSanitaria } from './types'
 let workerInitialized = false
 
 /**
- * Umbral mínimo de texto para considerar que un PDF tiene capa de texto
- * legible. Un PDF escaneado (imagen-only) suele entregar 0-30 chars de
- * metadata; un PDF nativo con boleta entrega cientos.
+ * Mínimo de caracteres alfanuméricos contables para asumir que un PDF
+ * tiene capa de texto utilizable. Un PDF escaneado entrega 0-30 chars
+ * (metadata: nombre del scanner, fecha); un PDF nativo de boleta
+ * entrega cientos.
+ *
+ * Contamos sólo alphanumerics + acentos para evitar que metadata estilo
+ * "// ===== Metadata =====" o whitespace dispare el threshold sin
+ * tener contenido real.
  */
 const PDF_TEXT_LAYER_THRESHOLD = 50
+
+/**
+ * Tipos MIME que aceptamos en el pipeline.  Centralizado para no divergir
+ * entre FileDrop, upload-hub y este engine.
+ */
+export const ACCEPTED_MIME_TYPES = [
+  'application/pdf',
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+] as const
+
+/**
+ * Lista de extensiones HEIC/HEIF que iOS pone por default cuando sacás
+ * fotos. Ningún navegador decodifica HEIC nativamente al 2026 sin
+ * convertir antes; lo detectamos para dar mensaje claro al usuario.
+ */
+const HEIC_EXTENSIONS = ['.heic', '.heif']
+
+export function isHeicFile(file: { name: string; type: string }): boolean {
+  if (file.type === 'image/heic' || file.type === 'image/heif') return true
+  const name = file.name.toLowerCase()
+  return HEIC_EXTENSIONS.some((ext) => name.endsWith(ext))
+}
+
+/**
+ * Cuenta caracteres alfanuméricos (incluye acentos castellanos) en un
+ * string. Más robusto que `text.length` para detectar texto real vs
+ * metadata: un PDF escaneado puede tener "/Producer (Adobe Acrobat 23)"
+ * que pasaría un threshold ingenuo de 50 chars pero no es contenido.
+ */
+export function countAlphanumeric(text: string): number {
+  let n = 0
+  for (let i = 0; i < text.length; i++) {
+    const code = text.charCodeAt(i)
+    // 0-9
+    if (code >= 48 && code <= 57) n++
+    // A-Z
+    else if (code >= 65 && code <= 90) n++
+    // a-z
+    else if (code >= 97 && code <= 122) n++
+    // Acentos castellanos comunes (á é í ó ú ñ ü y mayúsculas)
+    else if (code === 225 || code === 233 || code === 237 || code === 243 ||
+             code === 250 || code === 241 || code === 252 || code === 193 ||
+             code === 201 || code === 205 || code === 211 || code === 218 ||
+             code === 209 || code === 220) n++
+  }
+  return n
+}
 
 async function loadPdfJs() {
   const pdfjs = await import('pdfjs-dist')
@@ -54,41 +108,87 @@ export async function extractTextFromPDF(file: File): Promise<string> {
 }
 
 /**
- * Renderiza la primera página del PDF a PNG. Usado como fallback cuando
- * un PDF no tiene capa de texto (escaneo) y debemos pasarlo por OCR.
+ * Renderiza TODAS las páginas del PDF a PNG y las une como un canvas
+ * vertical único. Usado como fallback cuando un PDF no tiene capa de
+ * texto (escaneo) y debemos pasarlo por OCR.
  *
  * Render a 2x escala (~144 DPI desde el viewport por defecto de 72):
  * suficiente para Tesseract sin inflar memoria desproporcionadamente.
+ *
+ * Cap de páginas: 5. Una boleta chilena típica son 1-2 páginas; >5
+ * son sospechosas (alguien subió un PDF de un libro entero) y la
+ * memoria explota.
  */
-async function rasterizePdfFirstPage(file: File): Promise<Blob | null> {
+const MAX_PDF_PAGES_TO_RASTERIZE = 5
+const PDF_RASTERIZE_SCALE = 2
+const MAX_RASTERIZED_HEIGHT_PX = 12_000
+
+async function rasterizePdfPages(file: File): Promise<Blob | null> {
   if (typeof window === 'undefined') return null
   const pdfjs = await loadPdfJs()
   const arrayBuffer = await file.arrayBuffer()
   const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise
   if (pdf.numPages < 1) return null
-  const page = await pdf.getPage(1)
-  const viewport = page.getViewport({ scale: 2 })
 
-  const canvas = document.createElement('canvas')
-  canvas.width = viewport.width
-  canvas.height = viewport.height
-  const ctx = canvas.getContext('2d')
-  if (!ctx) return null
+  const pagesToRender = Math.min(pdf.numPages, MAX_PDF_PAGES_TO_RASTERIZE)
+  const pageCanvases: HTMLCanvasElement[] = []
+  let totalHeight = 0
+  let maxWidth = 0
 
-  await page.render({ canvasContext: ctx, viewport, canvas }).promise
+  for (let i = 1; i <= pagesToRender; i++) {
+    const page = await pdf.getPage(i)
+    const viewport = page.getViewport({ scale: PDF_RASTERIZE_SCALE })
+    const canvas = document.createElement('canvas')
+    canvas.width = viewport.width
+    canvas.height = viewport.height
+    const ctx = canvas.getContext('2d')
+    if (!ctx) continue
+
+    await page.render({ canvasContext: ctx, viewport, canvas }).promise
+
+    pageCanvases.push(canvas)
+    totalHeight += canvas.height
+    maxWidth = Math.max(maxWidth, canvas.width)
+
+    // Cap defensivo: si la altura acumulada explota, frenamos.
+    if (totalHeight > MAX_RASTERIZED_HEIGHT_PX) break
+  }
+
+  if (pageCanvases.length === 0) return null
+  if (pageCanvases.length === 1) {
+    // Caso único, evitamos copia adicional al canvas combinado.
+    return new Promise<Blob | null>((resolve) => {
+      pageCanvases[0].toBlob((blob) => resolve(blob), 'image/png')
+    })
+  }
+
+  // Combinar verticalmente.
+  const combined = document.createElement('canvas')
+  combined.width = maxWidth
+  combined.height = totalHeight
+  const cctx = combined.getContext('2d')
+  if (!cctx) return null
+  cctx.fillStyle = '#ffffff'
+  cctx.fillRect(0, 0, combined.width, combined.height)
+  let y = 0
+  for (const c of pageCanvases) {
+    cctx.drawImage(c, 0, y)
+    y += c.height
+  }
 
   return new Promise<Blob | null>((resolve) => {
-    canvas.toBlob((blob) => resolve(blob), 'image/png')
+    combined.toBlob((blob) => resolve(blob), 'image/png')
   })
 }
 
 /**
- * Extrae texto de un archivo de boleta, PDF nativo o imagen (jpg/png).
+ * Extrae texto de un archivo de boleta, PDF nativo o imagen (jpg/png/webp).
  *
  *   - PDF con capa de texto: extracción directa con pdfjs.
- *   - PDF escaneado (sin capa de texto): rasteriza la primera página
- *     y la pasa por Tesseract.
- *   - Imagen JPG/PNG: directo a Tesseract.
+ *   - PDF escaneado (sin capa de texto): rasteriza hasta 5 páginas y
+ *     las pasa por Tesseract como una imagen vertical combinada.
+ *   - Imagen JPG/PNG/WebP: directo a Tesseract.
+ *   - HEIC/HEIF (iOS): error claro con instrucción para convertir.
  *
  * `onProgress` recibe actualizaciones útiles para UI en el caso OCR.
  */
@@ -96,22 +196,42 @@ export async function extractTextFromBoleta(
   file: File,
   onProgress?: (p: OcrProgress) => void,
 ): Promise<string> {
+  if (isHeicFile(file)) {
+    throw new Error(
+      'iOS guarda fotos en formato HEIC, que el navegador no puede leer. En tu iPhone: Ajustes > Cámara > Formatos > "Más compatible" (JPEG). O convertí la foto a JPG antes de subirla.',
+    )
+  }
+
   if (file.type === 'application/pdf') {
     const text = await extractTextFromPDF(file)
-    if (text.trim().length >= PDF_TEXT_LAYER_THRESHOLD) return text
+    if (countAlphanumeric(text) >= PDF_TEXT_LAYER_THRESHOLD) return text
 
     // Fallback: PDF parece escaneo. Rasterizar y OCR.
-    const rasterized = await rasterizePdfFirstPage(file)
-    if (!rasterized) return text
+    const rasterized = await rasterizePdfPages(file)
+    if (!rasterized) {
+      throw new Error(
+        'No pudimos leer el PDF. Si es un escaneo, probá con la versión digital descargada del sitio de la empresa.',
+      )
+    }
     const asFile = new File([rasterized], 'pdf-page.png', {
       type: 'image/png',
     })
     return extractTextFromImage(asFile, onProgress)
   }
-  if (file.type.startsWith('image/'))
+
+  if (
+    file.type === 'image/jpeg' ||
+    file.type === 'image/png' ||
+    file.type === 'image/webp' ||
+    // Algunos navegadores Android mandan MIME genérico; aceptamos por
+    // extensión si el header dice "image/*" o si está vacío.
+    (file.type.startsWith('image/') && file.type.length > 0)
+  ) {
     return extractTextFromImage(file, onProgress)
+  }
+
   throw new Error(
-    `Formato no soportado: ${file.type || 'desconocido'}. Solo PDF, JPG o PNG.`,
+    `Formato no soportado: ${file.type || 'desconocido'}. Aceptamos PDF, JPG, PNG y WebP.`,
   )
 }
 

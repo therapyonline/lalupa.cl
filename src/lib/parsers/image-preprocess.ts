@@ -1,25 +1,34 @@
 /**
- * Pipeline mínimo de preprocesado para fotos de boleta:
+ * Pipeline de preprocesado para fotos de boleta.
  *
- *   1. Decode con ImageBitmap (más rápido y privado que Image+URL).
- *   2. Convierte a grayscale (luminance Rec.709).
- *   3. Aplica contrast stretch sobre el percentil 5/95 (similar a "auto contrast"
+ *   1. Decode con ImageBitmap (rápido y privado: no usa Image+URL.createObjectURL).
+ *   2. Si la imagen excede MAX_LONG_SIDE px, la downscalea para evitar OOM
+ *      en mobile. Tesseract no necesita más de ~2400px para leer texto
+ *      de boleta correctamente; iPhone 14 saca fotos a 4032px.
+ *   3. Convierte a grayscale (luminance Rec.709).
+ *   4. Aplica contrast stretch sobre el percentil 5/95 (similar a "auto contrast"
  *      de Photoshop), saca el efecto de papel térmico desteñido o sombra
  *      uniforme sin convertir las áreas brillantes en blancos puros.
  *
  * Devuelve un `Blob` PNG listo para pasarle al worker de Tesseract.
  *
- * Heurística: solo procesamos si la imagen es ≥ 800px de lado mayor, ahí
- * casi seguro es foto de celular y vale la pena. Imágenes chicas
- * (capturas de pantalla, miniaturas) se devuelven tal cual.
+ * Heurística: solo procesamos si la imagen es ≥ MIN_LONG_SIDE px de lado
+ * mayor. Imágenes chicas (capturas, miniaturas) se devuelven tal cual.
  */
 
 const MIN_LONG_SIDE_FOR_PREPROCESS = 800
+/**
+ * Cap superior para evitar Out-of-Memory en mobile. Una imagen de
+ * 4032×3024 (iPhone 14) son ~48MB en RAM como ImageData (RGBA 4 bytes).
+ * Con 2 copias (canvas + imageData) sube a ~100MB, suficiente para
+ * crashear el tab en Safari mobile. Bajamos a 2400px de lado mayor:
+ * ~17MB por copia, manejable.
+ */
+const MAX_LONG_SIDE = 2400
 
 export async function preprocessImageForOcr(file: File): Promise<Blob> {
   if (typeof window === 'undefined') return file
   if (!file.type.startsWith('image/')) return file
-  // PNG sin compresión a veces son screenshots, no las preprocesamos.
 
   let bitmap: ImageBitmap
   try {
@@ -30,22 +39,43 @@ export async function preprocessImageForOcr(file: File): Promise<Blob> {
   }
 
   const longSide = Math.max(bitmap.width, bitmap.height)
-  if (longSide < MIN_LONG_SIDE_FOR_PREPROCESS) {
-    bitmap.close?.()
+
+  // Downscale si excede el cap.
+  let workingBitmap: ImageBitmap = bitmap
+  if (longSide > MAX_LONG_SIDE) {
+    const scale = MAX_LONG_SIDE / longSide
+    const targetW = Math.round(bitmap.width * scale)
+    const targetH = Math.round(bitmap.height * scale)
+    try {
+      workingBitmap = await createImageBitmap(bitmap, {
+        resizeWidth: targetW,
+        resizeHeight: targetH,
+        resizeQuality: 'high',
+      })
+      bitmap.close?.()
+    } catch {
+      // Si el resize falla, seguimos con la original; el preprocesado
+      // todavía puede correr aunque consuma más memoria.
+    }
+  }
+
+  const longSideAfter = Math.max(workingBitmap.width, workingBitmap.height)
+  if (longSideAfter < MIN_LONG_SIDE_FOR_PREPROCESS) {
+    workingBitmap.close?.()
     return file
   }
 
   const canvas = document.createElement('canvas')
-  canvas.width = bitmap.width
-  canvas.height = bitmap.height
+  canvas.width = workingBitmap.width
+  canvas.height = workingBitmap.height
   const ctx = canvas.getContext('2d', { willReadFrequently: true })
   if (!ctx) {
-    bitmap.close?.()
+    workingBitmap.close?.()
     return file
   }
 
-  ctx.drawImage(bitmap, 0, 0)
-  bitmap.close?.()
+  ctx.drawImage(workingBitmap, 0, 0)
+  workingBitmap.close?.()
 
   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
   const { data } = imageData
@@ -61,7 +91,7 @@ export async function preprocessImageForOcr(file: File): Promise<Blob> {
   }
 
   // Percentiles 5 y 95 → contrast stretch
-  const totalPixels = (data.length / 4)
+  const totalPixels = data.length / 4
   const lowCount = totalPixels * 0.05
   const highCount = totalPixels * 0.95
   let cumulative = 0
@@ -89,12 +119,9 @@ export async function preprocessImageForOcr(file: File): Promise<Blob> {
   ctx.putImageData(imageData, 0, 0)
 
   return new Promise<Blob>((resolve) => {
-    canvas.toBlob(
-      (blob) => {
-        if (blob) resolve(blob)
-        else resolve(file) // fallback
-      },
-      'image/png',
-    )
+    canvas.toBlob((blob) => {
+      if (blob) resolve(blob)
+      else resolve(file) // fallback
+    }, 'image/png')
   })
 }

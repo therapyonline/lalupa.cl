@@ -4,8 +4,21 @@ import * as React from 'react'
 import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-const ACCEPT = 'application/pdf,image/jpeg,image/png'
-const ACCEPTED_TYPES = ['application/pdf', 'image/jpeg', 'image/png']
+// Aceptamos PDF, JPG, PNG y WebP. HEIC/HEIF (iOS) los aceptamos en el
+// input para que extractTextFromBoleta tire un error claro con la
+// instrucción de cambiar formato; sin esto, iOS muestra "no compatible"
+// silenciosamente y el usuario no entiende.
+const ACCEPT =
+  'application/pdf,image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif'
+const ACCEPTED_TYPES = [
+  'application/pdf',
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/heic',
+  'image/heif',
+]
+const HEIC_EXTENSIONS = ['.heic', '.heif']
 const MAX_SIZE = 10 * 1024 * 1024 // 10 MB
 
 type FileDropState = 'idle' | 'dragOver' | 'processing' | 'error'
@@ -23,11 +36,23 @@ export function FileDrop({ onFile, className, statusMessage }: FileDropProps) {
   const [error, setError] = React.useState<string | null>(null)
 
   const validate = (file: File): string | null => {
-    if (!ACCEPTED_TYPES.includes(file.type)) {
-      return 'Formato no soportado. Solo PDF, JPG o PNG.'
+    const lowerName = file.name.toLowerCase()
+    const looksHeicByExt = HEIC_EXTENSIONS.some((ext) =>
+      lowerName.endsWith(ext),
+    )
+    const accepted =
+      ACCEPTED_TYPES.includes(file.type) ||
+      // Algunos navegadores Android dejan type vacío y mandan extensión.
+      (file.type === '' && /\.(jpe?g|png|webp|pdf)$/i.test(lowerName)) ||
+      looksHeicByExt
+    if (!accepted) {
+      return 'Formato no soportado. Aceptamos PDF, JPG, PNG y WebP.'
     }
     if (file.size > MAX_SIZE) {
       return 'Archivo muy grande. El máximo es 10 MB.'
+    }
+    if (file.size === 0) {
+      return 'El archivo está vacío.'
     }
     return null
   }
@@ -137,7 +162,7 @@ export function FileDrop({ onFile, className, statusMessage }: FileDropProps) {
             O toca para elegir el PDF o una foto desde tu galería
           </p>
           <p className="mt-3 text-[11px] uppercase tracking-wide text-soft">
-            PDF, JPG o PNG · Máx 10 MB · OCR en tu navegador
+            PDF, JPG, PNG o WebP · Máx 10 MB · OCR en tu navegador
           </p>
           {error && (
             <p

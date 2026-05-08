@@ -50,6 +50,26 @@ async function getWorker(
 /** Timeout total del pipeline OCR (worker boot + preprocesado + recognize). */
 const OCR_TIMEOUT_MS = 90_000
 
+/**
+ * Mínimo de caracteres alfanuméricos para considerar el resultado OCR
+ * "tiene contenido". Una boleta chilena (incluso medio rota) tiene >200
+ * letras y números; <30 es ruido o foto fallida.
+ */
+const OCR_MIN_MEANINGFUL_CHARS = 30
+
+function countAlphanumeric(text: string): number {
+  let n = 0
+  for (let i = 0; i < text.length; i++) {
+    const code = text.charCodeAt(i)
+    if (
+      (code >= 48 && code <= 57) ||
+      (code >= 65 && code <= 90) ||
+      (code >= 97 && code <= 122)
+    ) n++
+  }
+  return n
+}
+
 function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
   return new Promise<T>((resolve, reject) => {
     const timer = setTimeout(() => {
@@ -98,8 +118,22 @@ export async function extractTextFromImage(
     const result = await worker.recognize(preprocessed)
     // tesseract.js v7's RecognizeResult exposes the text on `data.text` (or
     // `data.blocks[*].text`). We normalize defensively.
-    const data = (result as { data: { text?: string } }).data
-    return data?.text ?? ''
+    const data = (result as {
+      data: { text?: string; confidence?: number }
+    }).data
+    const text = data?.text ?? ''
+
+    // Validación post-OCR: si Tesseract devuelve básicamente nada o
+    // confidence muy baja, mejor avisar al usuario que dejarle ver una
+    // detección fallida más adelante con un error críptico.
+    const meaningfulChars = countAlphanumeric(text)
+    if (meaningfulChars < OCR_MIN_MEANINGFUL_CHARS) {
+      throw new Error(
+        `El OCR no logró leer texto en la imagen (${meaningfulChars} chars reconocibles). Probá con una foto más nítida, mejor iluminada y sin recortes que tapen el texto. Si el original es PDF, subí el PDF directamente.`,
+      )
+    }
+
+    return text
   })()
 
   try {

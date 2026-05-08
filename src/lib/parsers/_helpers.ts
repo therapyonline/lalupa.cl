@@ -23,11 +23,15 @@ export const CL_NUMBER = '\\b((?:\\d{1,3}(?:\\.\\d{3})+|\\d+)(?:,\\d+)?)\\b'
  *   - "AUT" cuando luce como label de RUT (al inicio de línea o
  *     después de espacio, antes de espacio/dos puntos) → "RUT".
  *     Letra A se confunde frecuentemente con R en OCR Tesseract.
- *   - "Pl[áa]T" / "VlT" → "RUT" en contextos similares.
- *   - Múltiples espacios consecutivos → un solo espacio.
+ *   - "PUT" / "FtUT" / "FlUT" → "RUT" en contextos similares.
+ *   - "Vlo." → "Vto." (vencimiento abreviado mangled).
+ *   - "Tota1" / "Total " → "Total" (digit en lugar de letra).
+ *   - "T0tal" → "Total" (cero en lugar de O).
+ *   - "Pen0do" / "Per1odo" → "Período" (típico OCR errors).
+ *   - Quita BOM y zero-width spaces que pdfjs a veces inserta.
  *
  * NO corrige:
- *   - Nombres y direcciones (riesgo de falsos cambios).
+ *   - Nombres propios y direcciones (riesgo de falsos cambios).
  *   - Mayúsculas/minúsculas en general (los regex usan /i flag).
  *
  * Idempotente: pasar el resultado de nuevo no cambia nada.
@@ -35,17 +39,36 @@ export const CL_NUMBER = '\\b((?:\\d{1,3}(?:\\.\\d{3})+|\\d+)(?:,\\d+)?)\\b'
 export function normalizeOcrText(text: string): string {
   let out = text
 
-  // "AUT:" o "AUT " al inicio de línea o después de whitespace, antes
-  // de digito o espacio + digito. Sólo si "RUT" no ya está en la línea
-  // (evita doble corrección en boletas que tienen ambos).
+  // BOM y zero-width chars que rompen comparaciones.
+  out = out.replace(/[﻿​-‍]/g, '')
+
+  // "AUT:", "AUT ", al inicio de línea o después de whitespace, antes
+  // de espacio o dos puntos. La A inicial se confunde con R cuando la
+  // tipografía tiene serif redondeado.
   out = out.replace(
     /(^|\n|\s)AUT([\s:.])/g,
-    (match, before, after) => `${before}RUT${after}`,
+    (_m, before, after) => `${before}RUT${after}`,
   )
 
-  // "Vlo." o "Vto" → "Vto" (vencimiento abreviado).  Ya está cubierto
-  // por la regex de fecha pero normalizar ayuda.
-  out = out.replace(/\bVlo\.?\b/g, 'Vto.')
+  // Variantes de "RUT" con primera letra mangled: "PUT", "FtUT",
+  // "FlUT", "ItUT" — solo si seguido por dos puntos o espacio antes
+  // de un patrón numérico.
+  out = out.replace(
+    /(^|\n|\s)(?:PUT|FtUT|FlUT|ItUT|RUI)([\s:.])(?=\s*\d)/g,
+    (_m, before, after) => `${before}RUT${after}`,
+  )
+
+  // "Vlo.", "Vto" sin punto, "Vlt" → "Vto." (vencimiento abreviado)
+  out = out.replace(/\bV[lI][o0t]\.?(?=\s|$)/g, 'Vto.')
+
+  // "Tota1" o "T0tal" → "Total" cuando se confunde l con 1, O con 0.
+  out = out.replace(/\bT[o0]ta[1l]\b/gi, 'Total')
+
+  // "Per1odo", "Pen0do", "Per[ií]odo" mangled.
+  out = out.replace(/\bPe[rn][il10][o0]do\b/gi, 'Período')
+
+  // "kvvh" → "kWh" cuando OCR confunde W con vv.
+  out = out.replace(/\bkvvh\b/gi, 'kWh')
 
   return out
 }
@@ -197,25 +220,60 @@ export function extractCargosFromPatterns(
   return cargos
 }
 
+// "Total a pagar" tolerante a:
+//   - mayúsculas/minúsculas (flag /i)
+//   - "á" con o sin acento ("a"/"á")
+//   - "Total Boleta", "Total Neto", "Total Final" como aliases
+//   - 1-3 espacios entre tokens, dos puntos opcionales
+//   - $ opcional pegado al número
 const TOTAL_A_PAGAR_REGEX = new RegExp(
-  `(?:Total\\s+a\\s+pagar|TOTAL\\s+A\\s+PAGAR|TOTAL\\s+\\$|Total\\s+\\$)[^\\n]*?${CL_NUMBER}`,
+  `(?:Total\\s+a\\s+pagar|Total\\s+Boleta|Total\\s+Final|Total\\s+\\$|TOTAL\\s+A\\s+PAGAR|TOTAL\\s+\\$)[\\s:$]*${CL_NUMBER}`,
   'i',
 )
 
 const IVA_REGEX = new RegExp(
-  `(?:IVA(?:\\s*19\\s*%)?|IVA\\s+de\\s+(?:esta|este).*?(?:Boleta|documento))[^\\n]*?${CL_NUMBER}`,
+  `(?:I\\.?\\s*V\\.?\\s*A\\.?(?:\\s*19\\s*%)?|IVA\\s+de\\s+(?:esta|este).*?(?:Boleta|documento))[\\s:$]*${CL_NUMBER}`,
   'i',
 )
 
-/** Extrae el "Total a pagar" más explícito de la boleta. */
+/**
+ * Extrae el "Total a pagar" más explícito de la boleta. Estrategia:
+ *
+ *   1. Match con label estándar ("Total a pagar", "Total Boleta", etc.).
+ *   2. Si el label match falla, fallback: el monto en CLP más grande
+ *      del texto que NO sea "$22.816 vía BANCO ESTADO" (último pago) ni
+ *      RUT-like. Asumimos que el total a pagar es el número más alto en
+ *      una boleta típica.
+ */
 export function extractTotal(text: string): number {
   const m = text.match(TOTAL_A_PAGAR_REGEX)
-  if (!m) return 0
-  const v = parseChileanNumber(m[1])
-  return Number.isFinite(v) ? v : 0
+  if (m) {
+    const v = parseChileanNumber(m[1])
+    if (Number.isFinite(v) && v > 0) return v
+  }
+
+  // Fallback: scan numéricos $NNN.NNN, descartar "Último pago" y RUTs.
+  // Solo si el texto tiene ≥1 mención de "Total" para evitar agarrar
+  // un número en otro contexto (ej. histórico).
+  if (!/\btotal\b/i.test(text)) return 0
+  const numericPattern = /\$\s*((?:\d{1,3}(?:\.\d{3})+|\d+)(?:,\d+)?)/g
+  const SKIP_LABEL_REGEX = /[úu]ltimo\s+pago|saldo\s+anterior|deuda\s+anterior/i
+  let max = 0
+  for (const match of text.matchAll(numericPattern)) {
+    const idx = match.index ?? 0
+    // Skip si la MISMA línea (no las 60 chars previas, que pueden
+    // alcanzar líneas anteriores) contiene un label de descarte.
+    const lineStart = text.lastIndexOf('\n', idx - 1) + 1
+    const lineEnd = text.indexOf('\n', idx)
+    const line = text.slice(lineStart, lineEnd === -1 ? text.length : lineEnd)
+    if (SKIP_LABEL_REGEX.test(line)) continue
+    const v = parseChileanNumber(match[1])
+    if (Number.isFinite(v) && v > max) max = v
+  }
+  return max
 }
 
-/** Extrae el monto de IVA si aparece. */
+/** Extrae el monto de IVA si aparece (tolera "I.V.A.", "IVA", etc.). */
 export function extractIVA(text: string): number {
   const m = text.match(IVA_REGEX)
   if (!m) return 0

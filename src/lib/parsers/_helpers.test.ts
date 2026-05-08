@@ -127,3 +127,72 @@ describe('extractNumeroCliente (OCR-tolerante)', () => {
     expect(extractNumeroCliente('N° Cliente: 1234567-K')).toBe('1234567-K')
   })
 })
+
+describe('normalizeOcrText (patrones extendidos)', () => {
+  it('corrige "Tota1" → "Total"', () => {
+    expect(normalizeOcrText('Tota1 a pagar $1000')).toContain('Total')
+  })
+
+  it('corrige "T0tal" → "Total" (cero en lugar de O)', () => {
+    expect(normalizeOcrText('T0tal a pagar $1000')).toContain('Total')
+  })
+
+  it('corrige "Per1odo" → "Período"', () => {
+    expect(normalizeOcrText('Per1odo facturado: 01/05')).toContain('Período')
+  })
+
+  it('corrige "kvvh" → "kWh"', () => {
+    expect(normalizeOcrText('Consumo: 100 kvvh')).toContain('kWh')
+  })
+
+  it('quita BOM (U+FEFF) y zero-width chars', () => {
+    const withBom = '﻿CHILQUINTA'
+    expect(normalizeOcrText(withBom)).toBe('CHILQUINTA')
+  })
+})
+
+import { extractTotal, extractIVA } from './_helpers'
+
+describe('extractTotal (con fallback)', () => {
+  it('extrae con label estándar "Total a pagar"', () => {
+    expect(extractTotal('Total a pagar $ 28.533')).toBe(28533)
+  })
+
+  it('extrae "Total Boleta" como alias', () => {
+    expect(extractTotal('Total Boleta $ 45.000')).toBe(45000)
+  })
+
+  it('fallback: agarra el número más grande con $ cuando label falla', () => {
+    // Si el label "Total a pagar" se mangle a "Total a paqar", el regex
+    // estándar falla. El fallback busca "Total" + número más grande.
+    const text =
+      'Total mensual\nÚltimo pago: $22.816\n... cargos varios ...\nMonto del mes: $45.000'
+    expect(extractTotal(text)).toBe(45000)
+  })
+
+  it('fallback descarta "Último pago" del scan', () => {
+    const text =
+      'Cargos: $5.000\nTotal del mes: $50.000\nÚltimo pago: $99.999'
+    // Aunque $99.999 sea más grande, se descarta por estar cerca de
+    // "Último pago".
+    expect(extractTotal(text)).toBe(50000)
+  })
+
+  it('devuelve 0 si no hay ningún "Total" en el texto', () => {
+    expect(extractTotal('Recibo de papelería $1.000')).toBe(0)
+  })
+})
+
+describe('extractIVA (tolerante)', () => {
+  it('extrae "IVA 19%" estándar', () => {
+    expect(extractIVA('IVA 19% $ 5.000')).toBe(5000)
+  })
+
+  it('extrae "I.V.A." con dots', () => {
+    expect(extractIVA('I.V.A. $ 5.000')).toBe(5000)
+  })
+
+  it('extrae "I V A" con espacios', () => {
+    expect(extractIVA('I V A 19% $ 5.000')).toBe(5000)
+  })
+})

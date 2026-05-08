@@ -17,13 +17,19 @@ const AGUASANDINAS_KEYWORDS = [
 ]
 
 /**
- * Regex específica: requiere razón social completa, dominio, RUT o
- * dirección legal, NO matchea con menciones genéricas de "Aguas Andinas"
- * que aparecen como referencia en boletas de otras sanitarias (ej. SMAPA
- * que contrata tratamiento a Aguas Andinas).
+ * Regex específica: requiere razón social completa (con S.A. tolerando
+ * variantes OCR), dominio, RUT o dirección legal. NO matchea con
+ * menciones genéricas de "Aguas Andinas" que aparecen como referencia
+ * en boletas de otras sanitarias (ej. SMAPA que contrata tratamiento a
+ * Aguas Andinas vía "TRATAM. AGUAS ANDINAS").
+ *
+ * Tolerancias OCR:
+ *   - "S.A." con dots opcionales y espacios extras
+ *   - "5.A." cuando OCR confunde S con 5
+ *   - RUT con separadores variables (espacio, coma, punto)
  */
 const AGUASANDINAS_DETECT_REGEX =
-  /AGUAS\s+ANDINAS\s+S\.A\.|aguasandinas\.cl|61\.808\.000-5|Balmaceda\s+1398/i
+  /AGUAS\s+ANDINAS\s+[S5][.\s]*A\.?|aguasandinas\.cl|61[.,\s]?808[.,\s]?000\s*[-:]?\s*5|Balmaceda\s+1398/i
 
 const AGUASANDINAS_MARKERS_REGEX = AGUASANDINAS_DETECT_REGEX
 

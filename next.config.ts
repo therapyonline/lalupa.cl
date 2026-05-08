@@ -86,6 +86,9 @@ const nextConfig: NextConfig = {
   // y solo importamos format/parseISO/etc.
   experimental: {
     optimizePackageImports: ['lucide-react', 'date-fns'],
+    // Inlinea el CSS crítico en <style> dentro del <head> para evitar
+    // bloqueo de render. Tailwind v4 ya purga, esto solo cambia transporte.
+    inlineCss: true,
   },
 
   async headers() {

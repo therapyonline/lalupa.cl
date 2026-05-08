@@ -5,6 +5,8 @@ import { Inter_Tight, JetBrains_Mono } from 'next/font/google'
 // JetBrains Mono: 400 base, 500 medium para eyebrow/kickers.
 // `display: swap` evita FOIT y deja el texto visible mientras carga la fuente.
 // `preload: true` en sans porque es la fuente del LCP (h1 hero).
+// next/font calcula size-adjust automáticamente para que la fallback tenga
+// la misma métrica vertical que la web font, evitando CLS al swapear.
 
 export const interTight = Inter_Tight({
   weight: ['400', '500', '600', '700'],

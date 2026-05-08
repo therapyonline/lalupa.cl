@@ -10,6 +10,7 @@ import {
   Comparativa,
   ComparativaSkeleton,
 } from '@/components/parsers/Comparativa'
+import { PartialExtractionAlert } from '@/components/parsers/PartialExtractionAlert'
 import {
   ResultBlock,
   ResultBlockSkeleton,
@@ -245,7 +246,10 @@ export function ResultViewGas({ empresaSlug }: { empresaSlug: string }) {
 
       <section className="bg-cream pb-12">
         <Container>
-          <ResultBlock boleta={boleta} />
+          <PartialExtractionAlert boleta={boleta} />
+          <div className={boleta.cargos.length > 0 ? '' : 'mt-6'}>
+            <ResultBlock boleta={boleta} />
+          </div>
         </Container>
       </section>
 

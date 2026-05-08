@@ -14,6 +14,42 @@ import type { Cargo } from './types'
 /** Patrón para un número chileno (miles con punto, decimales con coma). */
 export const CL_NUMBER = '\\b((?:\\d{1,3}(?:\\.\\d{3})+|\\d+)(?:,\\d+)?)\\b'
 
+/**
+ * Pre-procesa texto recién extraído de OCR, corrige errores comunes
+ * antes de pasarlo a los parsers. Mejor hacerlo acá que en cada
+ * parser individual (que se acumularían).
+ *
+ * Patrones cubiertos:
+ *   - "AUT" cuando luce como label de RUT (al inicio de línea o
+ *     después de espacio, antes de espacio/dos puntos) → "RUT".
+ *     Letra A se confunde frecuentemente con R en OCR Tesseract.
+ *   - "Pl[áa]T" / "VlT" → "RUT" en contextos similares.
+ *   - Múltiples espacios consecutivos → un solo espacio.
+ *
+ * NO corrige:
+ *   - Nombres y direcciones (riesgo de falsos cambios).
+ *   - Mayúsculas/minúsculas en general (los regex usan /i flag).
+ *
+ * Idempotente: pasar el resultado de nuevo no cambia nada.
+ */
+export function normalizeOcrText(text: string): string {
+  let out = text
+
+  // "AUT:" o "AUT " al inicio de línea o después de whitespace, antes
+  // de digito o espacio + digito. Sólo si "RUT" no ya está en la línea
+  // (evita doble corrección en boletas que tienen ambos).
+  out = out.replace(
+    /(^|\n|\s)AUT([\s:.])/g,
+    (match, before, after) => `${before}RUT${after}`,
+  )
+
+  // "Vlo." o "Vto" → "Vto" (vencimiento abreviado).  Ya está cubierto
+  // por la regex de fecha pero normalizar ayuda.
+  out = out.replace(/\bVlo\.?\b/g, 'Vto.')
+
+  return out
+}
+
 const MONTHS_ES: Record<string, number> = {
   ene: 0, enero: 0,
   feb: 1, febrero: 1,
@@ -92,6 +128,13 @@ const PERIODO_REGEX_SLASH =
 const PERIODO_REGEX_MONTH_ONLY =
   /(?:Monto\s+del\s+(?:per[íi]odo|Per[íi]odo))\s+(\d{1,2})\s+([a-záéíóúñ]+)\s*[-–y]\s*(\d{1,2})\s+([a-záéíóúñ]+)/i
 
+// Fallback OCR-tolerante: dos fechas DD month YYYY conectadas con
+// `-` / `–` / `al` / `hasta`, sin importar el label antes. El OCR a
+// veces destroza el label "Monto del período" → "Monto del RA" pero
+// las fechas suelen sobrevivir.
+const DATE_RANGE_GENERIC =
+  /(\d{1,2}[\s/-][a-záéíóúñA-ZÁÉÍÓÚÑ\d]+[\s/-]\d{2,4})\s*(?:al?|hasta|-|–|y)\s*(\d{1,2}[\s/-][a-záéíóúñA-ZÁÉÍÓÚÑ\d]+[\s/-]\d{2,4})/i
+
 /** Extrae período facturado en formatos heterogéneos. */
 export function extractPeriodo(
   text: string,
@@ -111,6 +154,23 @@ export function extractPeriodo(
     const desde = parseChileanDate(`${m2[1]}-${normalizeMonth(m2[2])}-${year}`)
     const hasta = parseChileanDate(`${m2[3]}-${normalizeMonth(m2[4])}-${year}`)
     if (desde && hasta) return { desde, hasta }
+  }
+
+  // Fallback: cualquier rango de fechas válidas en el texto, asumiendo
+  // que es el período (suelen ser las únicas dos fechas con month-name
+  // próximas en una boleta). Filtra por separación máxima 90 días para
+  // descartar pares espurios (ej. fecha emisión + fecha último pago de
+  // hace 2 años).
+  const matches = Array.from(text.matchAll(new RegExp(DATE_RANGE_GENERIC.source, 'gi')))
+  for (const mm of matches) {
+    const desde = parseChileanDate(mm[1])
+    const hasta = parseChileanDate(mm[2])
+    if (!desde || !hasta) continue
+    const diffDays = (hasta.getTime() - desde.getTime()) / (1000 * 60 * 60 * 24)
+    // Boleta típica: 28-32 días (mensual) o 60 (bimestral). Aceptamos
+    // hasta 90 para colchón. Negativos o ≥ 90 → probablemente no es
+    // período sino otra cosa.
+    if (diffDays >= 0 && diffDays <= 90) return { desde, hasta }
   }
 
   return { desde: new Date(NaN), hasta: new Date(NaN) }
@@ -163,19 +223,37 @@ export function extractIVA(text: string): number {
   return Number.isFinite(v) ? v : 0
 }
 
+// `N[°º]` requiere ° o º — el OCR a veces los destroza a apóstrofo
+// (`N'`), backtick (`` N` ``) o "No" / "Nro" / "Num". Toleramos todos.
+//
+// Capture restringido a "número/RUT-like": solo dígitos, guiones, puntos
+// y K/k (último dígito de RUT chileno). Esto evita falsos positivos
+// cuando OCR pega "Fecha" como capture si el label no tiene separador
+// claro (ej. "N'Cliente Fecha de vencimiento").
 const NUMERO_CLIENTE_REGEX =
-  /(?:N[°º]?\s*Cliente|N[°º]?\s*Servicio|C[óo]digo\s+Cliente|N[úu]mero\s+de\s+Cliente)[\s:]*([\w\d.-]+)/i
+  /(?:N[°º'`]?\s*(?:Cliente|Servicio)|N(?:ro|um)\.?\s*Cliente|C[óo]digo\s+Cliente|N[úu]mero\s+de\s+Cliente|Cliente\s*N[°º'`]?)[\s:.\-–—]*(\d[\d.\-/kK]{2,})/i
 
 export function extractNumeroCliente(text: string): string | undefined {
   const m = text.match(NUMERO_CLIENTE_REGEX)
-  return m ? m[1].trim() : undefined
+  if (!m) return undefined
+  // Limpia separadores espurios al final.
+  return m[1].replace(/[.-]+$/, '').trim() || undefined
 }
 
-const FECHA_EMISION_REGEX =
-  /(?:Fecha de emisi[óo]n|Emisi[óo]n|Boleta\s+Emitida|Fecha\s+Emisi[óo]n)[\s:]*(\d{1,2}[\s/-][a-záéíóúñA-ZÁÉÍÓÚÑ\d]+[\s/-]\d{2,4})/i
+// Separadores entre label y valor: cualquier whitespace, dos puntos,
+// puntos, em-dash, en-dash, hyphen. El OCR mete em-dashes (`——`) entre
+// label y date típicamente.
+const LABEL_VALUE_SEP = '[\\s:.\\-–—]*'
 
-const FECHA_VENCIMIENTO_REGEX =
-  /(?:Fecha de vencimiento|Vence|Vencimiento|VENCIMIENTO)[\s:]*(\d{1,2}[\s/-][a-záéíóúñA-ZÁÉÍÓÚÑ\d]+[\s/-]\d{2,4})/i
+const FECHA_EMISION_REGEX = new RegExp(
+  `(?:Fecha de emisi[óo]n|Emisi[óo]n|Boleta\\s+Emitida|Fecha\\s+Emisi[óo]n)${LABEL_VALUE_SEP}(\\d{1,2}[\\s/-][a-záéíóúñA-ZÁÉÍÓÚÑ\\d]+[\\s/-]\\d{2,4})`,
+  'i',
+)
+
+const FECHA_VENCIMIENTO_REGEX = new RegExp(
+  `(?:Fecha de vencimiento|Vence|Vencimiento|VENCIMIENTO|Venc\\.|Vto\\.)${LABEL_VALUE_SEP}(\\d{1,2}[\\s/-][a-záéíóúñA-ZÁÉÍÓÚÑ\\d]+[\\s/-]\\d{2,4})`,
+  'i',
+)
 
 export function extractFechaEmision(text: string): Date | undefined {
   const m = text.match(FECHA_EMISION_REGEX)

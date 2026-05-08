@@ -12,6 +12,7 @@ import {
   formatPeriod,
 } from '@/components/parsers/ResultBlock'
 import { Comparativa, ComparativaSkeleton } from '@/components/parsers/Comparativa'
+import { PartialExtractionAlert } from '@/components/parsers/PartialExtractionAlert'
 import {
   type EmpresaElectrica,
   type EmpresaSlug,
@@ -241,7 +242,10 @@ export function ResultView({ empresaSlug }: { empresaSlug: string }) {
 
       <section className="bg-cream pb-12">
         <Container>
-          <ResultBlock boleta={boleta} />
+          <PartialExtractionAlert boleta={boleta} />
+          <div className={boleta.cargos.length > 0 ? '' : 'mt-6'}>
+            <ResultBlock boleta={boleta} />
+          </div>
         </Container>
       </section>
 

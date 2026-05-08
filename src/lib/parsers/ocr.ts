@@ -7,6 +7,7 @@
  * (grayscale + contrast stretch), mejora la precisión en fotos de
  * celular con sombras o papel térmico desteñido.
  */
+import { normalizeOcrText } from './_helpers'
 import { preprocessImageForOcr } from './image-preprocess'
 
 export type OcrProgress = {
@@ -121,19 +122,21 @@ export async function extractTextFromImage(
     const data = (result as {
       data: { text?: string; confidence?: number }
     }).data
-    const text = data?.text ?? ''
+    const rawText = data?.text ?? ''
 
     // Validación post-OCR: si Tesseract devuelve básicamente nada o
     // confidence muy baja, mejor avisar al usuario que dejarle ver una
     // detección fallida más adelante con un error críptico.
-    const meaningfulChars = countAlphanumeric(text)
+    const meaningfulChars = countAlphanumeric(rawText)
     if (meaningfulChars < OCR_MIN_MEANINGFUL_CHARS) {
       throw new Error(
         `El OCR no logró leer texto en la imagen (${meaningfulChars} chars reconocibles). Prueba con una foto más nítida, mejor iluminada y sin recortes que tapen el texto. Si el original es PDF, sube el PDF directamente.`,
       )
     }
 
-    return text
+    // Corrige errores típicos de Tesseract antes de pasarle el texto a
+    // los parsers (ej. "AUT:" → "RUT:" cuando OCR confunde A con R).
+    return normalizeOcrText(rawText)
   })()
 
   try {

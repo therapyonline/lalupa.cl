@@ -59,4 +59,26 @@ describe('detectParser → Chilquinta tolerancia variantes', () => {
     // CGE detect prima por RUT (paso 1 del cascade), no Chilquinta.
     expect(result?.empresa).toBe('CGE')
   })
+
+  // Regression: usuario reportó este OCR exacto que el detect estricto
+  // anterior rechazaba. El logo de Chilquinta sale como "cHILQUINTA" (c
+  // minúscula al inicio porque la mayúscula tiene tipografía con liga),
+  // y el RUT viene mangled a "AUT: como" (el dígito y guión se pierden).
+  // Sin RUT extraíble, detect() es el único camino que queda.
+  it('detectParser() funciona con OCR mangled real (regression)', () => {
+    const ocrText = `AUT: como
+BOLETA ELECTRÓNICA
+($)cHILQUINTA TA ELECTA
+distribución
+EI ICE — 0000000
+GIRO: atacó d vr ca
+CASA MATRIZ A Aena Nu Vabwao Fecha de emisión: 07 jul 2023
+Sr.(a)
+Dirección de Envío:
+N* RUTA: 07 448 1260
+, Total a pagar $28.533
+¿Cuánto debo? Monto del RA 27 may 2023-29 jun 2023`
+    const result = detectParser(ocrText)
+    expect(result?.empresa).toBe('Chilquinta')
+  })
 })

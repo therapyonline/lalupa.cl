@@ -15,7 +15,14 @@ export type {
   UnidadConsumo,
 } from './types'
 
-export { AGUA_SLUGS, EMPRESA_SLUGS, GAS_SLUGS } from './types'
+export {
+  AGUA_SLUGS,
+  EMPRESA_SLUGS,
+  GAS_SLUGS,
+  SLUG_TO_EMPRESA_ELECTRICA,
+  SLUG_TO_EMPRESA_SANITARIA,
+  SLUG_TO_EMPRESA_GAS,
+} from './types'
 
 export { ParserError, type ParserErrorCode } from './errors'
 

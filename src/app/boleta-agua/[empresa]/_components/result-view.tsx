@@ -19,6 +19,7 @@ import {
   type AguaSlug,
   type EmpresaSanitaria,
   type ParsedBoleta,
+  SLUG_TO_EMPRESA_SANITARIA,
   parseAgua,
 } from '@/lib/parsers'
 import { safeISOString } from '@/lib/dates'
@@ -99,10 +100,29 @@ export function ResultViewAgua({ empresaSlug }: { empresaSlug: string }) {
       return
     }
 
-    if (payload.servicio !== 'agua' || payload.slug !== empresaSlug) {
-      router.replace(`/boleta-agua/${payload.slug}`)
+    if (payload.servicio !== 'agua') {
+      // Servicio mismatch: el usuario navegó a /boleta-agua con payload
+      // de luz/gas. Mejor empezar limpio.
+      router.replace('/boleta-agua')
       setState({ kind: 'redirecting' })
       return
+    }
+
+    if (payload.slug !== empresaSlug) {
+      // Manual override: usuario clickeó otra sanitaria desde el chip.
+      // Reusamos el rawText pero parseamos con la empresa de la URL.
+      const empresaFromUrl =
+        SLUG_TO_EMPRESA_SANITARIA[empresaSlug as AguaSlug]
+      if (!empresaFromUrl) {
+        router.replace('/boleta-agua')
+        setState({ kind: 'redirecting' })
+        return
+      }
+      payload = {
+        ...payload,
+        empresa: empresaFromUrl,
+        slug: empresaSlug as AguaSlug,
+      }
     }
 
     try {

@@ -19,6 +19,7 @@ import {
   type EmpresaGas,
   type GasSlug,
   type ParsedBoleta,
+  SLUG_TO_EMPRESA_GAS,
   parseGas,
 } from '@/lib/parsers'
 import { safeISOString } from '@/lib/dates'
@@ -98,10 +99,26 @@ export function ResultViewGas({ empresaSlug }: { empresaSlug: string }) {
       return
     }
 
-    if (payload.servicio !== 'gas' || payload.slug !== empresaSlug) {
-      router.replace(`/boleta-gas/${payload.slug}`)
+    if (payload.servicio !== 'gas') {
+      router.replace('/boleta-gas')
       setState({ kind: 'redirecting' })
       return
+    }
+
+    if (payload.slug !== empresaSlug) {
+      // Manual override: usuario clickeó otra empresa de gas desde chip.
+      // Reusamos el rawText pero parseamos con la empresa de la URL.
+      const empresaFromUrl = SLUG_TO_EMPRESA_GAS[empresaSlug as GasSlug]
+      if (!empresaFromUrl) {
+        router.replace('/boleta-gas')
+        setState({ kind: 'redirecting' })
+        return
+      }
+      payload = {
+        ...payload,
+        empresa: empresaFromUrl,
+        slug: empresaSlug as GasSlug,
+      }
     }
 
     try {

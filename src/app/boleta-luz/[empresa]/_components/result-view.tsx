@@ -16,6 +16,7 @@ import {
   type EmpresaElectrica,
   type EmpresaSlug,
   type ParsedBoleta,
+  SLUG_TO_EMPRESA_ELECTRICA,
   parseElectricidad,
 } from '@/lib/parsers'
 import { safeISOString } from '@/lib/dates'
@@ -100,9 +101,24 @@ export function ResultView({ empresaSlug }: { empresaSlug: string }) {
     }
 
     if (payload.slug !== empresaSlug) {
-      router.replace(`/boleta-luz/${payload.slug}`)
-      setState({ kind: 'redirecting' })
-      return
+      // Slug en URL distinto al del payload: el usuario clickeó un chip
+      // de otra distribuidora intencionalmente. Tratamos como manual
+      // override: reusamos el rawText pero lo parseamos con la empresa
+      // de la URL. Si el texto no calza, el parser lanza WRONG_EMPRESA
+      // y mostramos error claro.
+      const empresaFromUrl =
+        SLUG_TO_EMPRESA_ELECTRICA[empresaSlug as EmpresaSlug]
+      if (!empresaFromUrl) {
+        // Slug inválido (no debería pasar dado VALID_SLUGS en page.tsx).
+        router.replace('/boleta-luz')
+        setState({ kind: 'redirecting' })
+        return
+      }
+      payload = {
+        ...payload,
+        empresa: empresaFromUrl,
+        slug: empresaSlug as EmpresaSlug,
+      }
     }
 
     try {

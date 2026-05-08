@@ -62,6 +62,15 @@ export const EMPRESA_SLUGS: Record<EmpresaElectrica, EmpresaSlug> = {
   Chilquinta: 'chilquinta',
 }
 
+/** Reverse map slug → empresa (para manual override desde URL chip). */
+export const SLUG_TO_EMPRESA_ELECTRICA: Record<EmpresaSlug, EmpresaElectrica> = {
+  cge: 'CGE',
+  enel: 'Enel',
+  saesa: 'SAESA',
+  frontel: 'Frontel',
+  chilquinta: 'Chilquinta',
+}
+
 export type AguaSlug =
   | 'aguas-andinas'
   | 'esval'
@@ -77,6 +86,15 @@ export const AGUA_SLUGS: Record<EmpresaSanitaria, AguaSlug> = {
   SMAPA: 'smapa',
 }
 
+/** Reverse map para manual override desde chip. */
+export const SLUG_TO_EMPRESA_SANITARIA: Record<AguaSlug, EmpresaSanitaria> = {
+  'aguas-andinas': 'Aguas Andinas',
+  esval: 'Esval',
+  essbio: 'ESSBio',
+  nuevosur: 'Nuevosur',
+  smapa: 'SMAPA',
+}
+
 export type GasSlug = 'metrogas' | 'lipigas' | 'abastible' | 'gasco-glp'
 
 export const GAS_SLUGS: Record<EmpresaGas, GasSlug> = {
@@ -84,6 +102,14 @@ export const GAS_SLUGS: Record<EmpresaGas, GasSlug> = {
   Lipigas: 'lipigas',
   Abastible: 'abastible',
   'Gasco GLP': 'gasco-glp',
+}
+
+/** Reverse map para manual override desde chip. */
+export const SLUG_TO_EMPRESA_GAS: Record<GasSlug, EmpresaGas> = {
+  metrogas: 'Metrogas',
+  lipigas: 'Lipigas',
+  abastible: 'Abastible',
+  'gasco-glp': 'Gasco GLP',
 }
 
 export interface Fingerprint {

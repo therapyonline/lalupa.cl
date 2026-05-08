@@ -22,6 +22,11 @@ import {
   parseGas,
 } from '@/lib/parsers'
 import {
+  safeSessionGet,
+  safeSessionRemove,
+  safeSessionSet,
+} from '@/lib/session-storage'
+import {
   type BoletaGuardada,
   exportarHistorial,
   guardarBoleta,
@@ -58,12 +63,16 @@ export function ResultViewGas({ empresaSlug }: { empresaSlug: string }) {
     // efecto lee el payload del upload-hub anterior y deriva el ViewState.
     // Es un one-shot en mount, no genera cascading renders.
     /* eslint-disable react-hooks/set-state-in-effect */
-    const raw = sessionStorage.getItem(SESSION_KEY)
+    const raw = safeSessionGet(SESSION_KEY)
     if (!raw) {
-      sessionStorage.setItem(
-        REDIRECT_MESSAGE_KEY,
-        'No encontramos una boleta procesada. Subila de nuevo.',
-      )
+      try {
+        safeSessionSet(
+          REDIRECT_MESSAGE_KEY,
+          'No encontramos una boleta procesada. Subila de nuevo.',
+        )
+      } catch {
+        // ignore
+      }
       router.replace('/boleta-gas')
       setState({ kind: 'redirecting' })
       return
@@ -72,8 +81,17 @@ export function ResultViewGas({ empresaSlug }: { empresaSlug: string }) {
     let payload: PayloadShape
     try {
       payload = JSON.parse(raw) as PayloadShape
+      if (
+        !payload ||
+        typeof payload !== 'object' ||
+        typeof payload.rawText !== 'string' ||
+        typeof payload.empresa !== 'string' ||
+        typeof payload.slug !== 'string'
+      ) {
+        throw new Error('Payload con shape inválido.')
+      }
     } catch {
-      sessionStorage.removeItem(SESSION_KEY)
+      safeSessionRemove(SESSION_KEY)
       router.replace('/boleta-gas')
       setState({ kind: 'redirecting' })
       return
@@ -105,7 +123,11 @@ export function ResultViewGas({ empresaSlug }: { empresaSlug: string }) {
             razon: c.razonSospecha,
           })),
       }
-      sessionStorage.setItem(RECLAMO_KEY, JSON.stringify(reclamoPayload))
+      try {
+        safeSessionSet(RECLAMO_KEY, JSON.stringify(reclamoPayload))
+      } catch {
+        // ignore
+      }
       setState({ kind: 'parsed', boleta, payload })
     } catch (err) {
       const message =

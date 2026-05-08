@@ -214,7 +214,66 @@ test.describe('OCR pipeline', () => {
     })
     // Buscamos el Alert de upload-hub específico (excluye route-announcer
     // de Next que también usa role=alert).
-    const alert = page.locator('main [role="alert"]:has([data-slot="alert-title"])')
+    const alert = page.locator(
+      'main [role="alert"]:has([data-slot="alert-title"])',
+    )
     await expect(alert).toBeVisible({ timeout: 30_000 })
+  })
+
+  // Happy path completo OCR: imagen sintética → redirect a result page.
+  // El parse con texto sintético mínimo puede caer en "parser-error"
+  // (porque la boleta de prueba no tiene cargos reales detectables); lo
+  // que importa para este test es que la cascada upload → detect → redirect
+  // funciona y la result page renderiza algún estado válido.
+  test('happy path completo: CGE PNG llega a result page (parsed o parser-error, no skeleton infinito)', async ({
+    page,
+  }) => {
+    test.setTimeout(120_000)
+    await page.goto('/boleta-luz')
+    await uploadSyntheticBoleta(page, CASES[0].spec.lines, 'png')
+    await page.waitForURL(CASES[0].spec.expected, { timeout: 90_000 })
+    // Result view debe mostrar uno de: cargos parseados, error de parser,
+    // o estado unsupported. Lo que NO debe pasar es quedarse en skeleton
+    // infinitamente (eso indicaría hidratación rota o parser que cuelga).
+    await page.waitForFunction(
+      () => {
+        const visible = document.body.innerText
+        return (
+          /Resultado/i.test(visible) ||
+          /No pudimos analizar/i.test(visible) ||
+          /Aún no analizamos/i.test(visible)
+        )
+      },
+      { timeout: 30_000 },
+    )
+  })
+
+  // Empresa desconocida: detect devuelve null, no redirige y muestra
+  // alerta + selector manual.
+  test('boleta de empresa desconocida: alerta + selector manual visible', async ({
+    page,
+  }) => {
+    test.setTimeout(90_000)
+    await page.goto('/boleta-luz')
+    await uploadSyntheticBoleta(
+      page,
+      [
+        'EMPRESA INEXISTENTE S.A.',
+        'RUT: 11.111.111-1',
+        'Boleta servicio mensual',
+        'Cliente Numero 1234',
+        'Total a pagar 50000',
+      ],
+      'png',
+    )
+    // Queda en /boleta-luz con alerta y selector visible.
+    const alert = page.locator(
+      'main [role="alert"]:has([data-slot="alert-title"])',
+    )
+    await expect(alert).toBeVisible({ timeout: 90_000 })
+    // El selector de empresas (chips de CGE/Enel/etc) sigue visible.
+    await expect(
+      page.getByRole('link', { name: /CGE|Enel|SAESA/i }).first(),
+    ).toBeVisible()
   })
 })

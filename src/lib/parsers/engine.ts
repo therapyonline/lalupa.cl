@@ -83,9 +83,20 @@ async function loadPdfJs() {
 }
 
 /**
+ * Cap de páginas que leemos al extraer texto. Una boleta chilena son
+ * 1-3 páginas; >10 páginas es probablemente un PDF bomb o un manual.
+ */
+const MAX_PDF_PAGES_FOR_TEXT = 10
+
+/**
  * Extrae el texto de un PDF en el navegador. Carga `pdfjs-dist` con un
  * dynamic import para que `next build` no intente evaluarlo en SSR
  * (donde `DOMMatrix` no existe).
+ *
+ * Errores comunes y su traducción a mensajes de usuario:
+ *   - PDF protegido con password: pdfjs lanza PasswordException.
+ *   - PDF corrupto: pdfjs lanza InvalidPDFException.
+ *   - PDF vacío (0 páginas): devolvemos string vacío.
  */
 export async function extractTextFromPDF(file: File): Promise<string> {
   if (typeof window === 'undefined') {
@@ -94,9 +105,29 @@ export async function extractTextFromPDF(file: File): Promise<string> {
 
   const pdfjs = await loadPdfJs()
   const arrayBuffer = await file.arrayBuffer()
-  const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise
+
+  let pdf
+  try {
+    pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise
+  } catch (err) {
+    const name = (err as { name?: string })?.name ?? ''
+    const msg = (err as { message?: string })?.message ?? String(err)
+    if (name === 'PasswordException' || /password/i.test(msg)) {
+      throw new Error(
+        'Este PDF está protegido con contraseña. Remové la protección antes de subirlo (en Acrobat: Archivo > Propiedades > Seguridad > Sin seguridad).',
+      )
+    }
+    if (name === 'InvalidPDFException' || /invalid/i.test(msg)) {
+      throw new Error(
+        'El PDF parece estar corrupto o incompleto. Probá descargarlo de nuevo desde el sitio de la empresa.',
+      )
+    }
+    throw new Error(`No pudimos abrir el PDF: ${msg}`)
+  }
+
+  const pagesToRead = Math.min(pdf.numPages, MAX_PDF_PAGES_FOR_TEXT)
   const pages: string[] = []
-  for (let i = 1; i <= pdf.numPages; i++) {
+  for (let i = 1; i <= pagesToRead; i++) {
     const page = await pdf.getPage(i)
     const content = await page.getTextContent()
     const txt = content.items

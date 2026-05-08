@@ -5,8 +5,13 @@ export interface ReclamoBoletaPayload {
   empresaSlug: string
   empresaNombre: string
   servicio: string
-  periodoDesde: string
-  periodoHasta: string
+  /**
+   * ISO strings opcionales. El parser puede no haber logrado extraer
+   * fechas en boletas con formatos heterogéneos; el template del
+   * reclamo usa placeholders en ese caso.
+   */
+  periodoDesde?: string
+  periodoHasta?: string
   fechaEmision?: string
   fechaVencimiento?: string
   numeroCliente?: string
@@ -49,7 +54,11 @@ function formatCLP(n: number): string {
   return `$ ${Math.round(n).toLocaleString('es-CL')}`
 }
 
-function formatPeriodoDesdeHasta(desde: string, hasta: string): string {
+function formatPeriodoDesdeHasta(
+  desde: string | undefined,
+  hasta: string | undefined,
+): string {
+  if (!desde || !hasta) return 'período no detectado'
   const d = new Date(desde)
   const h = new Date(hasta)
   if (Number.isNaN(d.getTime()) || Number.isNaN(h.getTime())) {

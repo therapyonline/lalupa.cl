@@ -21,6 +21,7 @@ import {
   type ParsedBoleta,
   parseGas,
 } from '@/lib/parsers'
+import { safeISOString } from '@/lib/dates'
 import {
   safeSessionGet,
   safeSessionRemove,
@@ -109,10 +110,10 @@ export function ResultViewGas({ empresaSlug }: { empresaSlug: string }) {
         empresaSlug: payload.slug,
         empresaNombre: boleta.empresa,
         servicio: boleta.servicio,
-        periodoDesde: boleta.periodo.desde.toISOString(),
-        periodoHasta: boleta.periodo.hasta.toISOString(),
-        fechaEmision: boleta.fechaEmision?.toISOString(),
-        fechaVencimiento: boleta.fechaVencimiento?.toISOString(),
+        periodoDesde: safeISOString(boleta.periodo.desde),
+        periodoHasta: safeISOString(boleta.periodo.hasta),
+        fechaEmision: safeISOString(boleta.fechaEmision),
+        fechaVencimiento: safeISOString(boleta.fechaVencimiento),
         numeroCliente: boleta.cliente.numeroCliente,
         total: boleta.totales.total,
         cargosSospechosos: boleta.cargos

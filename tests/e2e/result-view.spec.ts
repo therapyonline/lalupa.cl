@@ -141,6 +141,55 @@ test.describe('Boleta result view', () => {
     await page.waitForURL('/boleta-luz', { timeout: 10_000 })
   })
 
+  // Regression: parser que devuelve periodo Invalid Date (cuando no
+  // logra extraer fechas) ya NO crashea con "Invalid time value" al
+  // serializar. Renderiza igual con "Período no detectado".
+  test('boleta con período no extraíble renderiza sin crash', async ({
+    page,
+  }) => {
+    test.setTimeout(30_000)
+    await page.goto('/boleta-luz')
+    // Texto que tiene marcadores de CGE pero formato distinto (no calza
+    // con PERIODO_REGEX). El parser detectará CGE y creará periodo con
+    // dates Invalid (new Date(NaN)).
+    const textoSinPeriodo = `
+COMPAÑIA GENERAL DE ELECTRICIDAD S.A.
+RUT: 99.513.400-4
+www.cge.cl
+
+N° Cliente: 12345678-9
+Total a pagar ................ $ 50.000
+
+Cargo fijo BT1 ............... $ 1.000
+Cargo por energía ............ $ 30.000
+`
+    await page.evaluate(
+      ({ key, payload }) => {
+        sessionStorage.setItem(key, JSON.stringify(payload))
+      },
+      {
+        key: SESSION_KEY,
+        payload: {
+          servicio: 'electricidad',
+          empresa: 'CGE',
+          slug: 'cge',
+          rawText: textoSinPeriodo,
+          timestamp: Date.now(),
+        },
+      },
+    )
+    await page.goto('/boleta-luz/cge')
+    // Debe llegar a la página de resultado, NO mostrar parser-error con
+    // "Invalid time value".
+    await expect(page.getByText(/Resultado.*CGE/i)).toBeVisible({
+      timeout: 30_000,
+    })
+    // No debe aparecer el error de RangeError.
+    await expect(page.getByText(/Invalid time value|invalid date/i)).not.toBeVisible()
+    // Debe mostrar "Período no detectado" o un fallback razonable.
+    await expect(page.getByText(/no detectado|Resultado/i).first()).toBeVisible()
+  })
+
   test('result view es noindex (privacidad: ruta del usuario)', async ({
     page,
   }) => {

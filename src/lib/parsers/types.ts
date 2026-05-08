@@ -1,0 +1,100 @@
+export type EmpresaElectrica =
+  | 'CGE'
+  | 'Enel'
+  | 'SAESA'
+  | 'Frontel'
+  | 'Chilquinta'
+
+export type EmpresaSanitaria =
+  | 'Aguas Andinas'
+  | 'Esval'
+  | 'ESSBio'
+  | 'Nuevosur'
+  | 'SMAPA'
+
+export type EmpresaGas = 'Metrogas' | 'Lipigas' | 'Abastible' | 'Gasco GLP'
+
+export type Empresa = EmpresaElectrica | EmpresaSanitaria | EmpresaGas
+
+export type Servicio = 'electricidad' | 'agua' | 'gas'
+
+export type UnidadConsumo = 'kWh' | 'm3' | 'kg' | 'unidades'
+
+/**
+ * Discrimina si la boleta corresponde a un consumo medido por período
+ * (electricidad BT-1, agua potable, gas natural por red) o a una venta
+ * directa de productos (cilindros de gas licuado).
+ *
+ * Default `'consumo'` para mantener backward compat con parsers viejos.
+ */
+export type TipoVenta = 'consumo' | 'producto'
+
+export interface Cargo {
+  concepto: string
+  monto: number
+  detalle?: string
+  sospechoso?: boolean
+  razonSospecha?: string
+}
+
+export interface ParsedBoleta {
+  empresa: Empresa
+  servicio: Servicio
+  /** Por defecto 'consumo'. Para boletas de cilindro / venta directa, usar 'producto'. */
+  tipoVenta?: TipoVenta
+  periodo: { desde: Date; hasta: Date }
+  cliente: { nombre?: string; direccion?: string; numeroCliente?: string }
+  consumo: { unidad: UnidadConsumo; valor: number; tarifa?: string }
+  cargos: Cargo[]
+  totales: { subtotal: number; iva: number; total: number }
+  fechaEmision?: Date
+  fechaVencimiento?: Date
+  raw: string
+}
+
+export type EmpresaSlug = 'cge' | 'enel' | 'saesa' | 'frontel' | 'chilquinta'
+
+export const EMPRESA_SLUGS: Record<EmpresaElectrica, EmpresaSlug> = {
+  CGE: 'cge',
+  Enel: 'enel',
+  SAESA: 'saesa',
+  Frontel: 'frontel',
+  Chilquinta: 'chilquinta',
+}
+
+export type AguaSlug =
+  | 'aguas-andinas'
+  | 'esval'
+  | 'essbio'
+  | 'nuevosur'
+  | 'smapa'
+
+export const AGUA_SLUGS: Record<EmpresaSanitaria, AguaSlug> = {
+  'Aguas Andinas': 'aguas-andinas',
+  Esval: 'esval',
+  ESSBio: 'essbio',
+  Nuevosur: 'nuevosur',
+  SMAPA: 'smapa',
+}
+
+export type GasSlug = 'metrogas' | 'lipigas' | 'abastible' | 'gasco-glp'
+
+export const GAS_SLUGS: Record<EmpresaGas, GasSlug> = {
+  Metrogas: 'metrogas',
+  Lipigas: 'lipigas',
+  Abastible: 'abastible',
+  'Gasco GLP': 'gasco-glp',
+}
+
+export interface Fingerprint {
+  keywords: string[]
+  format: string
+}
+
+export interface ParserModule {
+  empresa: string
+  servicio: Servicio
+  detect(text: string): boolean
+  parse(text: string): ParsedBoleta
+  fingerprint: Fingerprint
+}

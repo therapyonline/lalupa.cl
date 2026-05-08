@@ -1,0 +1,8 @@
+<svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg" fill="none">
+  <!-- handle -->
+  <line x1="20" y1="20" x2="26" y2="26" stroke="#222222" stroke-width="3" stroke-linecap="round"/>
+  <!-- lens outer ring -->
+  <circle cx="12" cy="12" r="9" stroke="#222222" stroke-width="2"/>
+  <!-- lens inner accent (coral / lupa target) -->
+  <circle cx="12" cy="12" r="4" fill="#FF6B35"/>
+</svg>

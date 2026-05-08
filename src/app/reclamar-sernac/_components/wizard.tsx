@@ -3,6 +3,13 @@
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { z } from 'zod'
+
+// Zod 4 usa `new Function()` para JIT de validación, lo cual viola la CSP
+// `script-src 'self'` (sin `unsafe-eval`). Zod cachea el resultado del probe
+// y siempre cae al evaluador interpretado, pero el intent inicial dispara
+// un Content-Security-Policy issue en DevTools (Lighthouse lo cuenta como
+// best practice). `jitless: true` salta el probe.
+z.config({ jitless: true })
 import { Container } from '@/components/layout/Container'
 import { Alert } from '@/components/ui/Alert'
 import { Button } from '@/components/ui/Button'

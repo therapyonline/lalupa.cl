@@ -279,7 +279,7 @@ test.describe('SEO metadata', () => {
     await page.goto('/guias/por-que-subio-mi-cuenta-de-luz')
     const heading = page.getByRole('heading', { name: /guías relacionadas/i })
     await expect(heading).toBeVisible()
-    // Cards link to other guides — should be 3 and not include the current slug
+    // Cards link to other guides , should be 3 and not include the current slug
     const links = page.locator(
       'main a[href^="/guias/"]:not([href="/guias"]):not([href="/guias/por-que-subio-mi-cuenta-de-luz"])',
     )
@@ -296,7 +296,7 @@ test.describe('SEO metadata', () => {
     const body = await res.text()
     expect(body).toContain('<rss version="2.0"')
     expect(body).toContain('<channel>')
-    expect(body).toContain('<title>Lalupa.cl — Guías</title>')
+    expect(body).toContain('<title>Lalupa.cl, Guías</title>')
     expect(body).toContain('<language>es-CL</language>')
     // At least one guide is listed
     expect(body).toMatch(/<item>[\s\S]*<\/item>/)

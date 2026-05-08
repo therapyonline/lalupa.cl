@@ -6,7 +6,7 @@ import { expect, test } from '@playwright/test'
  *
  * Cubre WCAG 2.1 A + AA (default rules de axe). Excluimos `color-contrast`
  * en algunas vistas con bullshit gradients (hero "En cifras") porque axe
- * a veces reporta falsos positivos con gradientes — verificable visualmente
+ * a veces reporta falsos positivos con gradientes , verificable visualmente
  * pero no por axe.
  *
  * Si una violación nueva aparece, este test bloquea el deploy y obliga a

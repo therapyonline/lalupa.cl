@@ -101,7 +101,7 @@ async function uploadSyntheticBoleta(page: Page, lines: readonly string[]) {
 }
 
 test.describe('OCR pipeline', () => {
-  test.skip(!SHOULD_RUN, 'Skipped — set OCR_E2E to enable')
+  test.skip(!SHOULD_RUN, 'Skipped , set OCR_E2E to enable')
 
   for (const { name, spec } of CASES) {
     test(`${name}: imagen sintética → detect → redirect`, async ({ page }) => {

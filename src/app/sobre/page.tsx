@@ -60,7 +60,7 @@ export default function SobrePage() {
                 propósito. Tarifas reguladas que cambian dos veces al año,
                 cargos por reposición, recargos por mora ya pagada,
                 refacturaciones retroactivas, lecturas estimadas que después
-                «se ajustan», todo dentro de un PDF de tres páginas que
+                “se ajustan”, todo dentro de un PDF de tres páginas que
                 nadie lee.
               </p>
               <p className={P}>
@@ -84,7 +84,7 @@ export default function SobrePage() {
               <p className={P}>
                 Porque cobrar le quitaría sentido al proyecto. La gente que
                 más necesita revisar su boleta es la que menos puede pagar
-                por una herramienta. Si fuera gratis solo en el «tier free»,
+                por una herramienta. Si fuera gratis solo en el “tier free”,
                 la mitad de los usuarios chocarían contra un paywall en el
                 peor momento.
               </p>
@@ -181,7 +181,7 @@ export default function SobrePage() {
                   Asesoría legal o financiera.
                 </li>
                 <li className="leading-[1.65] text-body">
-                  Un servicio de «recuperación de plata» o intermediación.
+                  Un servicio de “recuperación de plata” o intermediación.
                 </li>
               </ul>
             </div>

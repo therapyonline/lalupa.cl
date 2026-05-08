@@ -151,7 +151,7 @@ export default function TerminosPage() {
                 5. Sin responsabilidad por decisiones tomadas con esta data
               </h2>
               <p className={P}>
-                lalupa se ofrece «tal cual». No garantizamos que el resultado
+                lalupa se ofrece “tal cual”. No garantizamos que el resultado
                 sea exhaustivo ni libre de errores.{' '}
                 <strong className="text-ink">
                   No nos hacemos responsables de decisiones financieras,

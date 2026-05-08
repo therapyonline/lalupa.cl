@@ -169,7 +169,7 @@ export default function PrivacidadPage() {
                 </li>
                 <li className={LI}>
                   <strong className="text-ink">
-                    Firefox con Enhanced Tracking Protection en modo «Strict»
+                    Firefox con Enhanced Tracking Protection en modo “Strict”
                   </strong>
                   : bloquea ambos.
                 </li>

@@ -154,10 +154,10 @@ export function SubsidioWizard() {
             Subsidio eléctrico Ley 21.667
           </p>
           <h1 className="mt-4 max-w-[20ch] text-[clamp(36px,5vw,64px)] font-medium leading-[1.05] tracking-tight text-ink">
-            ¿Calificás al subsidio eléctrico?
+            ¿Calificas al subsidio eléctrico?
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-body">
-            13 preguntas. Te tomamos 2 minutos y te decimos si calificás +
+            13 preguntas. Te tomamos 2 minutos y te decimos si calificas +
             cómo postular. Tus respuestas viven solo en este celular.
           </p>
           <Stepper current={step + 1} total={TOTAL} />
@@ -391,17 +391,17 @@ function ResultView({
             className="mt-4 self-start"
           >
             {tone === 'califica'
-              ? 'Calificás'
+              ? 'Calificas'
               : tone === 'parcial'
-                ? 'Calificás, con condiciones'
-                : 'No calificás'}
+                ? 'Calificas, con condiciones'
+                : 'No calificas'}
           </Pill>
           <h1 className="mt-6 max-w-[24ch] text-[clamp(36px,5vw,64px)] font-medium leading-[1.05] tracking-tight text-ink">
             {tone === 'califica'
-              ? 'Sí calificás al subsidio eléctrico.'
+              ? 'Sí calificas al subsidio eléctrico.'
               : tone === 'parcial'
-                ? 'Calificás, pero hay cosas a verificar.'
-                : 'Esta convocatoria no calificás.'}
+                ? 'Calificas, pero hay cosas a verificar.'
+                : 'Esta convocatoria no calificas.'}
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-body">
             {resultado.motivo}
@@ -520,7 +520,7 @@ function BloqueadoresCard({ bloqueadores }: { bloqueadores: string[] }) {
   return (
     <div className="rounded-[20px] border border-danger/30 bg-danger-soft p-6 md:p-8">
       <p className="font-mono text-xs uppercase tracking-[0.1em] text-danger">
-        Por qué no calificás
+        Por qué no calificas
       </p>
       <ul className="mt-4 flex flex-col gap-3 text-sm leading-relaxed text-ink">
         {bloqueadores.map((b) => (
@@ -566,7 +566,7 @@ function PasosCard({
   return (
     <div className="mt-6 rounded-[20px] border border-border bg-white p-6 md:p-8">
       <p className="font-mono text-xs uppercase tracking-[0.1em] text-soft">
-        {califica ? 'Cómo postular' : 'Qué podés hacer ahora'}
+        {califica ? 'Cómo postular' : 'Qué puedes hacer ahora'}
       </p>
       <ol className="mt-5 flex flex-col gap-4">
         {pasos.map((paso, i) => (

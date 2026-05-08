@@ -69,7 +69,7 @@ export function ResultViewGas({ empresaSlug }: { empresaSlug: string }) {
       try {
         safeSessionSet(
           REDIRECT_MESSAGE_KEY,
-          'No encontramos una boleta procesada. Subila de nuevo.',
+          'No encontramos una boleta procesada. Súbela de nuevo.',
         )
       } catch {
         // ignore
@@ -172,7 +172,7 @@ export function ResultViewGas({ empresaSlug }: { empresaSlug: string }) {
     return (
       <ErrorView
         title="No pudimos analizar tu boleta"
-        description="El parser detectó la empresa pero no logró extraer los datos. Probá con la versión digital del PDF (no escaneada)."
+        description="El parser detectó la empresa pero no logró extraer los datos. Prueba con la versión digital del PDF (no escaneada)."
         detail={state.error}
       />
     )
@@ -182,7 +182,7 @@ export function ResultViewGas({ empresaSlug }: { empresaSlug: string }) {
     return (
       <ErrorView
         title={`Aún no analizamos boletas de ${state.empresa}`}
-        description={`El parser de ${state.empresa} todavía no está implementado, necesitamos una boleta real para mapear el formato exacto. Mientras tanto podés volver a subir o probar con otra herramienta.`}
+        description={`El parser de ${state.empresa} todavía no está implementado, necesitamos una boleta real para mapear el formato exacto. Mientras tanto puedes volver a subir o probar con otra herramienta.`}
       />
     )
   }
@@ -215,7 +215,7 @@ export function ResultViewGas({ empresaSlug }: { empresaSlug: string }) {
                 {flags.length} {flags.length === 1 ? 'cargo' : 'cargos'} que
                 merecen tu atención
               </strong>
-              . Revisalos abajo y, si querés, generá un reclamo formal.
+              . Revísalos abajo y, si quieres, genera un reclamo formal.
             </p>
           ) : (
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-body">

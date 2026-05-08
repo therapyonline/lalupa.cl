@@ -119,7 +119,7 @@ export async function extractTextFromPDF(file: File): Promise<string> {
     }
     if (name === 'InvalidPDFException' || /invalid/i.test(msg)) {
       throw new Error(
-        'El PDF parece estar corrupto o incompleto. Probá descargarlo de nuevo desde el sitio de la empresa.',
+        'El PDF parece estar corrupto o incompleto. Prueba descargarlo de nuevo desde el sitio de la empresa.',
       )
     }
     throw new Error(`No pudimos abrir el PDF: ${msg}`)
@@ -241,7 +241,7 @@ export async function extractTextFromBoleta(
     const rasterized = await rasterizePdfPages(file)
     if (!rasterized) {
       throw new Error(
-        'No pudimos leer el PDF. Si es un escaneo, probá con la versión digital descargada del sitio de la empresa.',
+        'No pudimos leer el PDF. Si es un escaneo, prueba con la versión digital descargada del sitio de la empresa.',
       )
     }
     const asFile = new File([rasterized], 'pdf-page.png', {

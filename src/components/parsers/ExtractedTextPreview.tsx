@@ -51,7 +51,7 @@ export function ExtractedTextPreview({
             {copied ? 'Copiado ✓' : 'Copiar texto'}
           </button>
           <span className="text-xs text-soft">
-            Útil si querés reportar el caso a bugs@lalupa.cl
+            Útil si quieres reportar el caso a bugs@lalupa.cl
           </span>
         </div>
       </div>

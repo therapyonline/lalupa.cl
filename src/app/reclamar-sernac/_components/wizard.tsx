@@ -53,7 +53,7 @@ const stepSchemas = {
   1: z.object({
     tipoReclamo: z
       .string()
-      .min(1, 'Elegí un tipo de reclamo')
+      .min(1, 'Elige un tipo de reclamo')
       .refine((v) => (TIPOS_RECLAMO as readonly string[]).includes(v), 'Opción inválida'),
   }),
   2: z.object({
@@ -580,7 +580,7 @@ function Step2({
           value={data.telefono}
           onChange={(e) => onChange('telefono', e.target.value)}
           error={errors.telefono}
-          hint="Con código de país si vivís fuera"
+          hint="Con código de país si vives fuera"
         />
         <div className="md:col-span-2">
           <Input
@@ -615,7 +615,7 @@ function Step3({
       </h2>
       <p className="mt-2 text-body">
         Pre-rellenamos con los datos públicos de la empresa detectada en tu
-        boleta. Podés corregir si no calzan.
+        boleta. Puedes corregir si no calzan.
       </p>
       <div className="mt-6 grid grid-cols-1 gap-5">
         <Input
@@ -686,7 +686,7 @@ function Step5({
         Petición
       </h2>
       <p className="mt-2 text-body">
-        Qué le pedís a SERNAC y a la empresa.
+        Qué le pides a SERNAC y a la empresa.
       </p>
       <Textarea
         value={value}

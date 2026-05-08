@@ -68,7 +68,7 @@ export function GuiasList({ guias }: { guias: GuiaMeta[] }) {
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="¿Qué andás buscando?"
+          placeholder="¿Qué andas buscando?"
           className="mt-2 w-full rounded-md border-[1.5px] border-border bg-white px-4 py-3 text-base text-ink placeholder:text-soft focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/15"
         />
 
@@ -99,7 +99,7 @@ export function GuiasList({ guias }: { guias: GuiaMeta[] }) {
 
         {filtered.length === 0 ? (
           <p className="mt-6 text-body">
-            Sin resultados para esos filtros. Probá quitando el texto o
+            Sin resultados para esos filtros. Prueba quitando el texto o
             cambiando la categoría.
           </p>
         ) : (

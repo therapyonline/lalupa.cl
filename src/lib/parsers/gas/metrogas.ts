@@ -82,7 +82,7 @@ const REPOSICION_CONTEXTO_REGEX = /(corte|suspensi[óo]n|reposici[óo]n)/i
 
 function detectarSospecha(cargo: Cargo, text: string): string | null {
   if (cargo.concepto === 'Reposición' && !REPOSICION_CONTEXTO_REGEX.test(text)) {
-    return 'Reposición sin que la boleta mencione un corte. Pedí desglose.'
+    return 'Reposición sin que la boleta mencione un corte. Pide desglose.'
   }
   return null
 }

@@ -110,9 +110,9 @@ test.describe('A11y essentials', () => {
   }) => {
     await page.goto('/tracker')
     // El nodo aria-live aparece durante la carga; luego se reemplaza por
-    // empty state ("Subí tu primera boleta") o por la grilla de meses.
+    // empty state ("Sube tu primera boleta") o por la grilla de meses.
     const statusOrEmpty = page.locator(
-      'p[role="status"], h2:has-text("Subí tu primera boleta")',
+      'p[role="status"], h2:has-text("Sube tu primera boleta")',
     )
     await expect(statusOrEmpty.first()).toBeAttached({ timeout: 5000 })
   })

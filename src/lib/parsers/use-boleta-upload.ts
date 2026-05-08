@@ -148,8 +148,8 @@ export function useBoletaUpload(servicio: 'luz' | 'agua' | 'gas') {
       if (!extractedText.trim()) {
         throw new Error(
           isImage
-            ? 'No pudimos leer texto en la imagen. Probá con una foto más nítida y derecha, o subí el PDF.'
-            : 'No pudimos extraer texto del PDF. Probá con la versión digital descargada del sitio de la empresa.',
+            ? 'No pudimos leer texto en la imagen. Prueba con una foto más nítida y derecha, o sube el PDF.'
+            : 'No pudimos extraer texto del PDF. Prueba con la versión digital descargada del sitio de la empresa.',
         )
       }
 
@@ -173,7 +173,7 @@ export function useBoletaUpload(servicio: 'luz' | 'agua' | 'gas') {
         if (e instanceof StorageQuotaError || e instanceof StorageBlockedError) {
           throw e
         }
-        throw new Error('No pudimos guardar la boleta para mostrarte el resultado. Reintentá refrescando la pestaña.')
+        throw new Error('No pudimos guardar la boleta para mostrarte el resultado. Reintenta refrescando la pestaña.')
       }
 
       // Si el componente se desmontó mientras serializábamos, no navegar.

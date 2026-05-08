@@ -65,7 +65,7 @@ export default function PrivacidadPage() {
                   <strong className="text-ink">
                     No subimos tus boletas a ningún servidor.
                   </strong>{' '}
-                  Todo se procesa en este navegador. El PDF o foto que subís
+                  Todo se procesa en este navegador. El PDF o foto que subes
                   nunca se transmite a internet.
                 </li>
                 <li className={LI}>
@@ -124,13 +124,13 @@ export default function PrivacidadPage() {
                 <strong className="text-ink">enmascarar todos los inputs</strong>{' '}
                 de formularios. Lo que vemos es por dónde se mueve el cursor
                 y dónde la gente se atasca, útil para mejorar la UX. Lo que{' '}
-                <em>no</em> vemos es: qué escribís, tu nombre, RUT, ni
+                <em>no</em> vemos es: qué escribes, tu nombre, RUT, ni
                 ningún campo de tu boleta. Nunca capturamos texto de inputs.
               </p>
 
               <h3 className={H3}>Datos en tu propio navegador (IndexedDB)</h3>
               <p className={P}>
-                Si guardás boletas en tu histórico (en{' '}
+                Si guardas boletas en tu histórico (en{' '}
                 <a
                   href="/tracker"
                   className="text-primary underline underline-offset-4 hover:no-underline"
@@ -140,7 +140,7 @@ export default function PrivacidadPage() {
                 ), esos datos viven en{' '}
                 <strong className="text-ink">IndexedDB</strong> dentro de
                 tu navegador. Solo tu dispositivo tiene acceso, ni siquiera
-                nosotros podemos leerlo. Si borrás los datos del sitio, el
+                nosotros podemos leerlo. Si borras los datos del sitio, el
                 histórico se borra junto. Y nunca se sincroniza a otros
                 dispositivos automáticamente, solo si vos exportás manualmente.
               </p>
@@ -198,9 +198,9 @@ export default function PrivacidadPage() {
                 acá qué hacemos y qué no.
               </p>
               <p className={P}>
-                Si querés ejercer tus derechos ARCO (acceso, rectificación,
+                Si quieres ejercer tus derechos ARCO (acceso, rectificación,
                 cancelación, oposición) sobre cualquier dato que pudiéramos
-                tener tuyo, escribinos a{' '}
+                tener tuyo, escríbenos a{' '}
                 <a
                   href="mailto:privacidad@lalupa.cl"
                   className="text-primary underline underline-offset-4 hover:no-underline"

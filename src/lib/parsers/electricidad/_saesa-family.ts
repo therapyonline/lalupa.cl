@@ -63,10 +63,10 @@ const CONTEXTO_CORTE_REGEX =
 
 function detectarSospecha(cargo: Cargo, text: string): string | null {
   if (cargo.concepto === 'Reposición' && !CONTEXTO_CORTE_REGEX.test(text)) {
-    return 'Reposición sin que la boleta mencione un corte. Pedí desglose.'
+    return 'Reposición sin que la boleta mencione un corte. Pide desglose.'
   }
   if (cargo.concepto === 'Cargo único') {
-    return 'Cargo único no es un componente estándar de la tarifa BT-1. Pedí detalle del concepto.'
+    return 'Cargo único no es un componente estándar de la tarifa BT-1. Pide detalle del concepto.'
   }
   return null
 }

@@ -72,9 +72,9 @@ export default function SobrePage() {
                 <strong className="text-ink">
                   Eso es lo que lalupa intenta arreglar.
                 </strong>{' '}
-                Subís tu boleta, la procesamos en tu propio celular (nunca
+                Subes tu boleta, la procesamos en tu propio celular (nunca
                 sale de tu dispositivo), te marcamos lo que merece atención,
-                y te armamos la carta de reclamo SERNAC si querés. Todo
+                y te armamos la carta de reclamo SERNAC si quieres. Todo
                 gratis, todo en tu idioma, todo sin tracking.
               </p>
             </div>
@@ -105,9 +105,9 @@ export default function SobrePage() {
                 SISS o SUBTEL, somos independientes.
               </p>
               <p className={P}>
-                Si querés que apliquemos a un fondo de software cívico,
+                Si quieres que apliquemos a un fondo de software cívico,
                 contribuyas con código, o aportes con investigación de
-                tarifas, escribinos a{' '}
+                tarifas, escríbenos a{' '}
                 <a
                   href="mailto:contacto@lalupa.cl"
                   className="text-primary underline underline-offset-4 hover:no-underline"
@@ -196,10 +196,10 @@ export default function SobrePage() {
               Listo para probar
             </p>
             <h2 className="mt-3 text-2xl font-medium tracking-tight text-ink md:text-3xl">
-              Subí tu primera boleta
+              Sube tu primera boleta
             </h2>
             <p className="mt-4 max-w-prose text-body">
-              30 segundos, sin login. Si todo cuadra, salís tranquilo. Si no,
+              30 segundos, sin login. Si todo cuadra, sales tranquilo. Si no,
               te decimos qué cargo merece tu atención.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">

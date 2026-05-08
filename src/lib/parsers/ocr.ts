@@ -75,7 +75,7 @@ function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise
     const timer = setTimeout(() => {
       reject(
         new Error(
-          `${label} excedió el timeout de ${Math.round(ms / 1000)}s. Probá con una imagen más chica o el PDF original.`,
+          `${label} excedió el timeout de ${Math.round(ms / 1000)}s. Prueba con una imagen más chica o el PDF original.`,
         ),
       )
     }, ms)
@@ -129,7 +129,7 @@ export async function extractTextFromImage(
     const meaningfulChars = countAlphanumeric(text)
     if (meaningfulChars < OCR_MIN_MEANINGFUL_CHARS) {
       throw new Error(
-        `El OCR no logró leer texto en la imagen (${meaningfulChars} chars reconocibles). Probá con una foto más nítida, mejor iluminada y sin recortes que tapen el texto. Si el original es PDF, subí el PDF directamente.`,
+        `El OCR no logró leer texto en la imagen (${meaningfulChars} chars reconocibles). Prueba con una foto más nítida, mejor iluminada y sin recortes que tapen el texto. Si el original es PDF, sube el PDF directamente.`,
       )
     }
 

@@ -109,7 +109,7 @@ export default function TerminosPage() {
                 Antes de usar cualquier alerta de lalupa como base de un
                 reclamo formal,{' '}
                 <strong className="text-ink">
-                  verificá la boleta original
+                  verifica la boleta original
                 </strong>{' '}
                 contra los valores publicados por SEC/SISS o por la propia
                 empresa. lalupa es un primer filtro para detectar cosas
@@ -135,7 +135,7 @@ export default function TerminosPage() {
                 </li>
               </ul>
               <p className={P}>
-                Si encontrás un error, mandanos un correo a{' '}
+                Si encuentras un error, mándanos un correo a{' '}
                 <a
                   href="mailto:bugs@lalupa.cl"
                   className="text-primary underline underline-offset-4 hover:no-underline"
@@ -191,7 +191,7 @@ export default function TerminosPage() {
             <div className={SECTION} id="uso-aceptable">
               <h2 className={H2}>7. Uso aceptable</h2>
               <p className={P}>
-                Podés usar lalupa para revisar tus propias boletas, ayudar a
+                Puedes usar lalupa para revisar tus propias boletas, ayudar a
                 familiares, o uso académico. Está prohibido raspar el sitio
                 automatizadamente, alterar el código en producción, o usar
                 la herramienta para fines ilegales. La generación de cartas
@@ -205,7 +205,7 @@ export default function TerminosPage() {
               <p className={P}>
                 Estos términos pueden cambiar. Lo significativo se reflejará
                 en la fecha de actualización abajo. Si no estás de acuerdo
-                con algún cambio, dejá de usar la herramienta.
+                con algún cambio, deja de usar la herramienta.
               </p>
               <p className="mt-8 text-xs text-soft">
                 Última actualización: {ULTIMA_ACTUALIZACION}.

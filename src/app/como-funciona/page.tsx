@@ -41,13 +41,13 @@ const PRINCIPLES: Array<{
     Icon: Lock,
     title: 'Tu histórico es local',
     description:
-      'IndexedDB. Es la base de datos de tu navegador, no nuestra. Si borrás los datos del sitio, se borra todo.',
+      'IndexedDB. Es la base de datos de tu navegador, no nuestra. Si borras los datos del sitio, se borra todo.',
   },
   {
     Icon: Cpu,
     title: 'Open por diseño',
     description:
-      'El parser se ejecuta como JavaScript que vos podés inspeccionar. Validamos contra tarifas SEC/SISS oficiales públicas.',
+      'El parser se ejecuta como JavaScript que vos puedes inspeccionar. Validamos contra tarifas SEC/SISS oficiales públicas.',
   },
 ]
 
@@ -58,27 +58,27 @@ const FAQS: Array<{ q: string; a: string }> = [
   },
   {
     q: '¿Necesito crear una cuenta?',
-    a: 'No. Lalupa no tiene sistema de cuentas. Cuando guardás boletas en tu histórico, esos datos quedan en IndexedDB en tu propio dispositivo.',
+    a: 'No. Lalupa no tiene sistema de cuentas. Cuando guardas boletas en tu histórico, esos datos quedan en IndexedDB en tu propio dispositivo.',
   },
   {
     q: '¿Puedo usar lalupa sin conexión?',
-    a: 'La primera vez necesitás conexión para cargar el sitio. Una vez cargado, el parser de PDF funciona offline porque corre en el navegador. Si subís una foto, la primera vez se descargan el motor de OCR y el modelo de español (todos desde lalupa.cl, sin terceros); después de eso también quedan en cache. El sitio no es PWA por ahora, eso quiere decir que si cerrás la pestaña, la próxima vez vas a necesitar conexión para reabrirlo.',
+    a: 'La primera vez necesitas conexión para cargar el sitio. Una vez cargado, el parser de PDF funciona offline porque corre en el navegador. Si subes una foto, la primera vez se descargan el motor de OCR y el modelo de español (todos desde lalupa.cl, sin terceros); después de eso también quedan en cache. El sitio no es PWA por ahora, eso quiere decir que si cierras la pestaña, la próxima vez vas a necesitar conexión para reabrirlo.',
   },
   {
     q: '¿Qué tan precisas son las alertas?',
-    a: 'Las alertas son referenciales. Comparamos tu boleta contra tarifas SEC/SISS publicadas y contra tu histórico local. Pueden equivocarse, el formato de boleta cambia y a veces las tarifas se actualizan después de una resolución oficial. Verificá siempre la boleta original antes de usar una alerta como base de un reclamo formal.',
+    a: 'Las alertas son referenciales. Comparamos tu boleta contra tarifas SEC/SISS publicadas y contra tu histórico local. Pueden equivocarse, el formato de boleta cambia y a veces las tarifas se actualizan después de una resolución oficial. Verifica siempre la boleta original antes de usar una alerta como base de un reclamo formal.',
   },
   {
     q: '¿Por qué confiar en una herramienta gratuita?',
-    a: 'Buena pregunta. La razón es que no necesitamos tu información para que el negocio funcione: lalupa es un proyecto de defensa al consumidor, sin uploads y sin tracking. La forma de validar la promesa es abrir las DevTools del navegador y mirar la pestaña Network: vas a ver cero requests al backend cuando subís un PDF.',
+    a: 'Buena pregunta. La razón es que no necesitamos tu información para que el negocio funcione: lalupa es un proyecto de defensa al consumidor, sin uploads y sin tracking. La forma de validar la promesa es abrir las DevTools del navegador y mirar la pestaña Network: vas a ver cero requests al backend cuando subes un PDF.',
   },
   {
     q: '¿Puedo exportar mi histórico?',
-    a: 'Sí. Desde la pantalla de resultado podés exportar como JSON. Ese archivo podés moverlo a otro dispositivo y volver a importarlo, o guardarlo de respaldo.',
+    a: 'Sí. Desde la pantalla de resultado puedes exportar como JSON. Ese archivo puedes moverlo a otro dispositivo y volver a importarlo, o guardarlo de respaldo.',
   },
   {
     q: '¿Qué hago si la herramienta se equivoca?',
-    a: 'Mandanos un correo a bugs@lalupa.cl con la empresa, la fecha de la boleta y qué fue lo que falló. Mejoramos los parsers a partir de reportes reales (sin necesidad de que nos mandes la boleta, solo lo necesario para reproducir).',
+    a: 'Mándanos un correo a bugs@lalupa.cl con la empresa, la fecha de la boleta y qué fue lo que falló. Mejoramos los parsers a partir de reportes reales (sin necesidad de que nos mandes la boleta, solo lo necesario para reproducir).',
   },
 ]
 
@@ -161,23 +161,23 @@ export default function ComoFuncionaPage() {
               Cómo verificarlo vos mismo
             </p>
             <h2 className="mt-3 text-2xl font-medium tracking-tight text-ink md:text-3xl">
-              Abrí las DevTools y mirá la pestaña Network
+              Abrí las DevTools y mira la pestaña Network
             </h2>
             <ol className="mt-5 list-decimal space-y-3 pl-6 text-body">
               <li>
-                Andá a <Link href="/boleta-luz" className="font-medium text-primary underline underline-offset-4 hover:no-underline">/boleta-luz</Link> en tu navegador.
+                Anda a <Link href="/boleta-luz" className="font-medium text-primary underline underline-offset-4 hover:no-underline">/boleta-luz</Link> en tu navegador.
               </li>
               <li>
                 Apretá <kbd className="rounded border border-border bg-cream-warm px-1.5 py-0.5 font-mono text-xs">F12</kbd>{' '}
-                (o <kbd className="rounded border border-border bg-cream-warm px-1.5 py-0.5 font-mono text-xs">Cmd+Opt+I</kbd> en Mac) y andá a la pestaña Network.
+                (o <kbd className="rounded border border-border bg-cream-warm px-1.5 py-0.5 font-mono text-xs">Cmd+Opt+I</kbd> en Mac) y anda a la pestaña Network.
               </li>
-              <li>Limpiá el log y subí un PDF de prueba.</li>
+              <li>Limpiá el log y sube un PDF de prueba.</li>
               <li>
-                Verificá: vas a ver requests para los chunks de JS, fonts y un par de cosas estáticas. <strong className="text-ink">No vas a ver ningún POST con tu PDF como payload.</strong>
+                Verifica: vas a ver requests para los chunks de JS, fonts y un par de cosas estáticas. <strong className="text-ink">No vas a ver ningún POST con tu PDF como payload.</strong>
               </li>
             </ol>
             <p className="mt-5 text-sm text-soft">
-              Ese es el contrato: si alguna vez ves un request sospechoso saliendo a un servidor, mandanos un bug y lo arreglamos.
+              Ese es el contrato: si alguna vez ves un request sospechoso saliendo a un servidor, mándanos un bug y lo arreglamos.
             </p>
           </div>
         </Container>
@@ -247,10 +247,10 @@ export default function ComoFuncionaPage() {
               Lista para empezar
             </p>
             <h2 className="mt-3 text-2xl font-medium tracking-tight text-ink md:text-3xl">
-              Subí tu primera boleta
+              Sube tu primera boleta
             </h2>
             <p className="mt-3 max-w-2xl text-body">
-              Si llegaste hasta acá, ya sabés cómo funciona. La forma más rápida
+              Si llegaste hasta acá, ya sabes cómo funciona. La forma más rápida
               de probarlo es con una boleta tuya.
             </p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">

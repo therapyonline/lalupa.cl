@@ -68,7 +68,7 @@ export function ResultView({ empresaSlug }: { empresaSlug: string }) {
       try {
         safeSessionSet(
           REDIRECT_MESSAGE_KEY,
-          'No encontramos una boleta procesada. Subila de nuevo.',
+          'No encontramos una boleta procesada. Súbela de nuevo.',
         )
       } catch {
         // ignore
@@ -176,7 +176,7 @@ export function ResultView({ empresaSlug }: { empresaSlug: string }) {
     return (
       <ErrorView
         title="No pudimos analizar tu boleta"
-        description="El parser detectó la distribuidora pero no logró extraer los datos. Probá con la versión digital del PDF (no escaneada)."
+        description="El parser detectó la distribuidora pero no logró extraer los datos. Prueba con la versión digital del PDF (no escaneada)."
         detail={state.error}
       />
     )
@@ -186,7 +186,7 @@ export function ResultView({ empresaSlug }: { empresaSlug: string }) {
     return (
       <ErrorView
         title={`Aún no analizamos boletas de ${state.empresa}`}
-        description={`Estamos trabajando en el parser de ${state.empresa}. Por ahora, CGE es la única distribuidora con análisis completo. Subí una boleta de CGE o esperá la próxima versión.`}
+        description={`Estamos trabajando en el parser de ${state.empresa}. Por ahora, CGE es la única distribuidora con análisis completo. Sube una boleta de CGE o espera la próxima versión.`}
       />
     )
   }
@@ -212,7 +212,7 @@ export function ResultView({ empresaSlug }: { empresaSlug: string }) {
                 {flags.length} {flags.length === 1 ? 'cargo' : 'cargos'} que
                 merecen tu atención
               </strong>
-              . Revisalos abajo y, si querés, generá un reclamo formal.
+              . Revísalos abajo y, si quieres, genera un reclamo formal.
             </p>
           ) : (
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-body">

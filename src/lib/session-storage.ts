@@ -15,7 +15,7 @@
 export class StorageQuotaError extends Error {
   constructor() {
     super(
-      'No queda espacio en este navegador para guardar tu boleta. Probá refrescar la pestaña o subir un archivo más chico.',
+      'No queda espacio en este navegador para guardar tu boleta. Prueba refrescar la pestaña o subir un archivo más chico.',
     )
     this.name = 'StorageQuotaError'
   }

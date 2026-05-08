@@ -122,13 +122,13 @@ export function Comparador() {
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-body">
             Comparamos planes de fibra y cable de las 7 principales empresas
-            chilenas. Filtrá por lo que necesitás y mirá la letra chica antes
+            chilenas. Filtra por lo que necesitas y mira la letra chica antes
             de firmar.
           </p>
 
           <div className="mt-8" aria-label="Filtros sugeridos">
             <p className="font-mono text-xs uppercase tracking-[0.1em] text-soft">
-              Empezá rápido con un perfil
+              Empieza rápido con un perfil
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               {PRESETS.map((p) => (
@@ -176,7 +176,7 @@ export function Comparador() {
                 <Alert variant="info" className="mt-6">
                   <Alert.Title>Sin matches con esos filtros</Alert.Title>
                   <Alert.Body>
-                    Probá subir el presupuesto o bajar la velocidad mínima.
+                    Prueba subir el presupuesto o bajar la velocidad mínima.
                     Los precios promo van desde ~$10.000 (WOM) hasta ~$30.000
                     (triple pack).
                   </Alert.Body>
@@ -194,7 +194,7 @@ export function Comparador() {
                 <Alert.Body>
                   Los precios cambian seguido (típicamente bimestral) y la
                   cobertura por comuna depende de factibilidad técnica que
-                  cada empresa valida con tu dirección. Verificá el precio
+                  cada empresa valida con tu dirección. Verifica el precio
                   vigente en el sitio oficial antes de contratar.{' '}
                   {comuna && (
                     <>
@@ -439,7 +439,7 @@ function PlanCard({ plan, comuna }: { plan: PlanScored; comuna: string }) {
           })}
           {comuna && plan.empresa === 'VTR' && (
             <Pill variant="warning">
-              Verificá cobertura en {comuna}
+              Verifica cobertura en {comuna}
             </Pill>
           )}
         </div>

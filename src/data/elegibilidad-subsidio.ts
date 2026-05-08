@@ -287,12 +287,12 @@ function pasosCalificas(r: RespuestasUsuario): string[] {
     'Iniciá sesión con tu ClaveÚnica',
     'Tené a mano tu boleta de luz para copiar el número de cliente exacto (con dígito verificador, puntos y guiones)',
     'Completá: región, comuna, empresa eléctrica, número de cliente, correo y teléfono',
-    'Declará si vivís en agrupación de viviendas (varias casas con un solo empalme)',
+    'Declará si vives en agrupación de viviendas (varias casas con un solo empalme)',
   ];
 
   if (r.hayElectrodependiente) {
     pasos.unshift(
-      'Tu postulación es automática por persona electrodependiente. Verificá igual en el portal por seguridad.',
+      'Tu postulación es automática por persona electrodependiente. Verifica igual en el portal por seguridad.',
     );
   }
 
@@ -315,7 +315,7 @@ function pasosNoCalificas(r: RespuestasUsuario): string[] {
       'Si tu situación socioeconómica cambió, actualizá tu RSH: https://www.ventanillaunicasocial.gob.cl/',
     );
     pasos.push(
-      'Si en tu hogar hay una persona electrodependiente, inscribila en el Registro de Personas Electrodependientes con tu empresa eléctrica (necesitás certificado médico).',
+      'Si en tu hogar hay una persona electrodependiente, inscríbela en el Registro de Personas Electrodependientes con tu empresa eléctrica (necesitas certificado médico).',
     );
   }
 
@@ -327,7 +327,7 @@ function pasosNoCalificas(r: RespuestasUsuario): string[] {
 
   if (!r.esClienteResidencial) {
     pasos.push(
-      'Verificá con tu empresa eléctrica si tu cuenta puede pasar a cliente residencial.',
+      'Verifica con tu empresa eléctrica si tu cuenta puede pasar a cliente residencial.',
     );
   }
 

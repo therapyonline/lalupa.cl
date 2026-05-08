@@ -59,7 +59,7 @@ export default async function GuiasPage() {
             Guías editoriales
           </p>
           <h1 className="mt-4 max-w-[20ch] text-[clamp(36px,5vw,64px)] font-medium leading-[1.05] tracking-tight text-ink">
-            Lo que necesitás saber, sin paja.
+            Lo que necesitas saber, sin paja.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-body">
             Artículos cortos sobre cómo leer tus boletas, cómo defenderte cuando

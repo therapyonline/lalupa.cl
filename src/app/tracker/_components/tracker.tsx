@@ -229,10 +229,10 @@ export function Tracker() {
                 Sin boletas todavía
               </p>
               <h2 className="mt-3 text-2xl font-medium tracking-tight text-ink md:text-3xl">
-                Subí tu primera boleta
+                Sube tu primera boleta
               </h2>
               <p className="mt-3 max-w-md mx-auto text-body">
-                Guardá una y vamos armando tu histórico mes a mes. El detalle,
+                Guarda una y vamos armando tu histórico mes a mes. El detalle,
                 la comparativa y la alerta de subidas viven solo en este
                 celular.
               </p>
@@ -877,8 +877,8 @@ function ManagementPanel({ onChanged }: { onChanged: () => void }) {
         <Alert.Title>Privacidad</Alert.Title>
         <Alert.Body>
           Todo se guarda en IndexedDB de tu navegador (db `lalupa`). No hay
-          servidor que sincronice. Si limpiás los datos del navegador o
-          cambiás de celular, se pierde, usá Exportar para hacer respaldo.
+          servidor que sincronice. Si limpias los datos del navegador o
+          cambias de celular, se pierde, usá Exportar para hacer respaldo.
         </Alert.Body>
       </Alert>
     </div>

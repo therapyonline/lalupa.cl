@@ -167,7 +167,7 @@ export default async function CategoriaPage({
         <Container>
           {guias.length === 0 ? (
             <p className="text-body">
-              Todavía no publicamos guías en esta categoría. Volvé pronto.
+              Todavía no publicamos guías en esta categoría. Vuelve pronto.
             </p>
           ) : (
             <ul className="grid grid-cols-1 gap-6 md:grid-cols-2">

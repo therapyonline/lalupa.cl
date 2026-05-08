@@ -15,14 +15,14 @@ const CANALES = [
   {
     eyebrow: 'Sugerencias y reportes',
     title: 'Sugerir distribuidora o algo en general',
-    body: '¿Una empresa que querés que soportemos? ¿Una guía que falta? ¿Algo que mejorar?',
+    body: '¿Una empresa que quieres que soportemos? ¿Una guía que falta? ¿Algo que mejorar?',
     email: 'contacto@lalupa.cl',
     subject: 'Sugerencia / feedback lalupa',
   },
   {
     eyebrow: 'Bugs',
     title: 'El parser falló o algo se rompió',
-    body: 'Contanos qué empresa, qué pasó, y si podés sumá una captura sin datos personales.',
+    body: 'Cuéntanos qué empresa, qué pasó, y si puedes sumá una captura sin datos personales.',
     email: 'bugs@lalupa.cl',
     subject: 'Bug en lalupa',
   },
@@ -62,11 +62,11 @@ export default function ContactoPage() {
             Contacto
           </p>
           <h1 className="mt-4 max-w-[20ch] text-[clamp(36px,5vw,64px)] font-medium leading-[1.05] tracking-tight text-ink">
-            Si algo no calza, escribinos.
+            Si algo no calza, escríbenos.
           </h1>
           <p className="mt-6 max-w-2xl text-[17px] leading-[1.65] text-body">
             Sin formulario, sin almacenamiento de datos. Solo email, vos
-            controlás qué compartís y nosotros mantenemos la promesa
+            controlas qué compartes y nosotros mantenemos la promesa
             privacy-first hasta el final del flujo.
           </p>
         </Container>
@@ -112,7 +112,7 @@ export default function ContactoPage() {
             <p className="mt-4 text-body">
               Si tu reclamo es contra una empresa de servicios básicos, las
               vías formales con poder regulatorio son SERNAC, SEC, SISS y
-              SUBTEL, no nosotros. Podés generar tu carta SERNAC en{' '}
+              SUBTEL, no nosotros. Puedes generar tu carta SERNAC en{' '}
               <Link
                 href="/reclamar-sernac"
                 className="font-medium text-primary underline underline-offset-4 hover:no-underline"

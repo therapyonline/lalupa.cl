@@ -216,7 +216,7 @@ function detectarSospecha(
       return `Cargo fijo ${result.desviacionPct > 0 ? 'sobre' : 'bajo'} lo regulado por SEC en ${Math.abs(result.desviacionPct).toFixed(1)}%. ${result.mensaje}`
     }
     if (result.alerta === 'sospechoso') {
-      return `Cargo fijo difiere ${Math.abs(result.desviacionPct).toFixed(1)}% del valor SEC publicado ($${CGE_CARGO_FIJO_REGULATORIO_CLP.toFixed(0)}). Verificá tu sector tarifario.`
+      return `Cargo fijo difiere ${Math.abs(result.desviacionPct).toFixed(1)}% del valor SEC publicado ($${CGE_CARGO_FIJO_REGULATORIO_CLP.toFixed(0)}). Verifica tu sector tarifario.`
     }
   }
 

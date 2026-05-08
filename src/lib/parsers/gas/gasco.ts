@@ -86,7 +86,7 @@ export function parseGasco(text: string): ParsedBoleta {
     const cargo = cargos.find((c) => c.concepto === 'Recargo de delivery')!
     cargo.sospechoso = true
     cargo.razonSospecha =
-      'Recargo de delivery extraordinario, no es un cargo estándar. Pedí desglose y compará con el precio publicado en gasco.cl para tu zona.'
+      'Recargo de delivery extraordinario, no es un cargo estándar. Pide desglose y compará con el precio publicado en gasco.cl para tu zona.'
   }
 
   const totalMatch = text.match(TOTAL_REGEX)

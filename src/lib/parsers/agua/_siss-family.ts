@@ -107,7 +107,7 @@ function detectarSospecha(
   consumoM3: number,
 ): string | null {
   if (cargo.concepto === 'Reposición' && !REPOSICION_CONTEXTO_REGEX.test(text)) {
-    return 'Cargo por reposición pero la boleta no menciona ningún corte previo. Pedí desglose.'
+    return 'Cargo por reposición pero la boleta no menciona ningún corte previo. Pide desglose.'
   }
 
   const tarifaKey = TARIFA_KEY[empresa]
@@ -120,7 +120,7 @@ function detectarSospecha(
       return `Cargo fijo ${r.desviacionPct > 0 ? 'sobre' : 'bajo'} lo regulado por SISS en ${Math.abs(r.desviacionPct).toFixed(1)}%. ${r.mensaje}`
     }
     if (r.alerta === 'sospechoso') {
-      return `Cargo fijo difiere ${Math.abs(r.desviacionPct).toFixed(1)}% del valor SISS publicado ($${tarifa.cargoFijoCLP}). Verificá tu grupo tarifario.`
+      return `Cargo fijo difiere ${Math.abs(r.desviacionPct).toFixed(1)}% del valor SISS publicado ($${tarifa.cargoFijoCLP}). Verifica tu grupo tarifario.`
     }
   }
 
@@ -136,7 +136,7 @@ function detectarSospecha(
       return `Consumo agua potable ${r.desviacionPct > 0 ? 'sobre' : 'bajo'} lo esperado en ${Math.abs(r.desviacionPct).toFixed(1)}% (${consumoM3} m³ × $${tarifa.aguaPotableNoPuntaCLPM3.toFixed(2)} ≈ $${Math.round(esperado).toLocaleString('es-CL')}). ${r.mensaje}`
     }
     if (r.alerta === 'sospechoso') {
-      return `Consumo agua potable difiere ${Math.abs(r.desviacionPct).toFixed(1)}% del valor esperado según tarifa SISS. Pedí desglose.`
+      return `Consumo agua potable difiere ${Math.abs(r.desviacionPct).toFixed(1)}% del valor esperado según tarifa SISS. Pide desglose.`
     }
   }
 
@@ -152,7 +152,7 @@ function detectarSospecha(
       return `Alcantarillado ${r.desviacionPct > 0 ? 'sobre' : 'bajo'} lo esperado en ${Math.abs(r.desviacionPct).toFixed(1)}% (${consumoM3} m³ × $${tarifa.alcantarilladoCLPM3.toFixed(2)} ≈ $${Math.round(esperado).toLocaleString('es-CL')}). ${r.mensaje}`
     }
     if (r.alerta === 'sospechoso') {
-      return `Alcantarillado difiere ${Math.abs(r.desviacionPct).toFixed(1)}% del valor esperado según tarifa SISS. Pedí desglose.`
+      return `Alcantarillado difiere ${Math.abs(r.desviacionPct).toFixed(1)}% del valor esperado según tarifa SISS. Pide desglose.`
     }
   }
 

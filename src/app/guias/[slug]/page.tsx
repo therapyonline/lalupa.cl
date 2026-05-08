@@ -260,7 +260,7 @@ function Footer({ updatedAt, author }: { updatedAt: string; author?: string }) {
                 por <strong className="text-ink">{author}</strong>
               </>
             )}
-            . Si encontrás un error o algo desactualizado, escribinos.
+            . Si encuentras un error o algo desactualizado, escríbenos.
           </p>
         </div>
         <ThumbsFeedback />

@@ -69,7 +69,7 @@ export interface PreguntaWizard {
 export const PREGUNTAS_2026: ReadonlyArray<PreguntaWizard> = [
   {
     id: 'esMayorDeEdad',
-    pregunta: '¿Tenés 18 años o más?',
+    pregunta: '¿Tienes 18 años o más?',
     descripcion:
       'Solo personas mayores de edad pueden postular en representación de su hogar.',
     tipo: 'boolean',
@@ -79,7 +79,7 @@ export const PREGUNTAS_2026: ReadonlyArray<PreguntaWizard> = [
     pregunta:
       '¿Estás en el Registro Social de Hogares y en qué tramo de Calificación Socioeconómica?',
     descripcion:
-      'Podés consultar tu tramo en ventanillaunicasocial.gob.cl con tu ClaveÚnica.',
+      'Puedes consultar tu tramo en ventanillaunicasocial.gob.cl con tu ClaveÚnica.',
     tipo: 'select',
     opciones: [
       { value: 'no_registrado', label: 'No estoy registrado en el RSH' },
@@ -114,16 +114,16 @@ export const PREGUNTAS_2026: ReadonlyArray<PreguntaWizard> = [
   {
     id: 'estaAlDia',
     pregunta:
-      '¿Estás al día en el pago de tu cuenta de luz, o tenés convenio de pago vigente?',
+      '¿Estás al día en el pago de tu cuenta de luz, o tienes convenio de pago vigente?',
     descripcion:
-      'Si tenés deuda, podés regularizarla antes del 22 de junio de 2026 para postular.',
+      'Si tienes deuda, puedes regularizarla antes del 22 de junio de 2026 para postular.',
     tipo: 'boolean',
   },
   {
     id: 'tieneClaveUnica',
-    pregunta: '¿Tenés ClaveÚnica activa?',
+    pregunta: '¿Tienes ClaveÚnica activa?',
     descripcion:
-      'Si no tenés, podés tramitar el subsidio presencialmente en Chile Atiende.',
+      'Si no tienes, puedes tramitar el subsidio presencialmente en Chile Atiende.',
     tipo: 'boolean',
   },
   {

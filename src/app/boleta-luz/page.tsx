@@ -66,19 +66,19 @@ const FAQ_ITEMS = [
   },
   {
     q: '¿Funciona si la boleta es una foto?',
-    a: 'Sí. Analizamos PDFs nativos (los que descargás del sitio de tu empresa eléctrica) y también fotos JPG o PNG con OCR, el reconocimiento corre en tu propio navegador. Para fotos, una imagen nítida y derecha mejora muchísimo la precisión.',
+    a: 'Sí. Analizamos PDFs nativos (los que descargas del sitio de tu empresa eléctrica) y también fotos JPG o PNG con OCR, el reconocimiento corre en tu propio navegador. Para fotos, una imagen nítida y derecha mejora muchísimo la precisión.',
   },
   {
     q: '¿Por qué no detectó mi distribuidora?',
-    a: 'Algunas boletas tienen el logo en imagen y el resto es texto, pero el header puede venir distinto en boletas viejas. Si no detectamos, podés elegirla a mano abajo.',
+    a: 'Algunas boletas tienen el logo en imagen y el resto es texto, pero el header puede venir distinto en boletas viejas. Si no detectamos, puedes elegirla a mano abajo.',
   },
   {
     q: '¿Qué hago si la lupa encuentra un problema?',
-    a: 'Te mostramos qué línea de la boleta llamó la atención y por qué. Podés generar un reclamo SERNAC con los antecedentes ya armados, o llamar a tu empresa eléctrica con los datos en mano.',
+    a: 'Te mostramos qué línea de la boleta llamó la atención y por qué. Puedes generar un reclamo SERNAC con los antecedentes ya armados, o llamar a tu empresa eléctrica con los datos en mano.',
   },
   {
     q: '¿Es gratis?',
-    a: 'Sí. Sin login, sin registro, sin paywall. Si la herramienta te ayuda, lo mejor que podés hacer es pasársela a alguien más.',
+    a: 'Sí. Sin login, sin registro, sin paywall. Si la herramienta te ayuda, lo mejor que puedes hacer es pasársela a alguien más.',
   },
 ] as const
 
@@ -121,7 +121,7 @@ export default function BoletaLuzPage() {
 
           <div className="mt-8">
             <p className="text-xs font-medium uppercase tracking-wide text-soft">
-              O elegí tu distribuidora
+              O elige tu distribuidora
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               {DISTRIBUIDORAS.map((d) => (

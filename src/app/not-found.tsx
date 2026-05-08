@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button'
 export const metadata: Metadata = {
   title: 'Página no encontrada',
   description:
-    'Esta página no existe o se movió. Volvé al inicio o probá una de nuestras herramientas para revisar tus boletas.',
+    'Esta página no existe o se movió. Vuelve al inicio o prueba una de nuestras herramientas para revisar tus boletas.',
   robots: { index: false, follow: false },
 }
 

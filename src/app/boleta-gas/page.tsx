@@ -69,11 +69,11 @@ const FAQ_ITEMS = [
   },
   {
     q: '¿De dónde saco una boleta de cilindro en PDF?',
-    a: 'Lipigas, Abastible y Gasco generan boleta digital cuando el delivery se paga con tarjeta. Si pagaste en efectivo y solo tenés la boleta en papel, sacale una foto nítida (JPG o PNG) y subila, corremos OCR en tu navegador para extraer los datos.',
+    a: 'Lipigas, Abastible y Gasco generan boleta digital cuando el delivery se paga con tarjeta. Si pagaste en efectivo y solo tienes la boleta en papel, sacale una foto nítida (JPG o PNG) y súbela, corremos OCR en tu navegador para extraer los datos.',
   },
   {
     q: '¿Qué hago si la lupa encuentra un problema?',
-    a: 'Te mostramos qué línea llamó la atención y por qué. Podés generar un reclamo SERNAC con los antecedentes, o contactar a tu empresa con los datos en mano. Para gas red también podés acudir a la SEC.',
+    a: 'Te mostramos qué línea llamó la atención y por qué. Puedes generar un reclamo SERNAC con los antecedentes, o contactar a tu empresa con los datos en mano. Para gas red también puedes acudir a la SEC.',
   },
   {
     q: '¿Es gratis?',
@@ -120,7 +120,7 @@ export default function BoletaGasPage() {
 
           <div className="mt-8">
             <p className="text-xs font-medium uppercase tracking-wide text-soft">
-              O elegí tu empresa de gas
+              O elige tu empresa de gas
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               {EMPRESAS_GAS.map((g) => (

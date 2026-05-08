@@ -74,7 +74,7 @@ const FAQ_ITEMS = [
   },
   {
     q: '¿Qué hago si la lupa encuentra un problema?',
-    a: 'Te mostramos qué línea llamó la atención y por qué. Podés generar un reclamo SERNAC con los antecedentes, o llamar a tu sanitaria con los datos en mano. SISS también recibe reclamos formales cuando la mediación no avanza.',
+    a: 'Te mostramos qué línea llamó la atención y por qué. Puedes generar un reclamo SERNAC con los antecedentes, o llamar a tu sanitaria con los datos en mano. SISS también recibe reclamos formales cuando la mediación no avanza.',
   },
   {
     q: '¿Es gratis?',
@@ -121,7 +121,7 @@ export default function BoletaAguaPage() {
 
           <div className="mt-8">
             <p className="text-xs font-medium uppercase tracking-wide text-soft">
-              O elegí tu sanitaria
+              O elige tu sanitaria
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               {SANITARIAS.map((s) => (

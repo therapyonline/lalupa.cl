@@ -78,15 +78,18 @@ function AlertTitle({
   className,
   children,
   ...props
-}: React.HTMLAttributes<HTMLHeadingElement>) {
+}: React.HTMLAttributes<HTMLParagraphElement>) {
+  // <p> en vez de <h4>: el Alert ya tiene role="alert" o "status" para
+  // contexto semántico; un heading dentro rompe el outline del documento
+  // si el padre va de h1 → h2 (heading-order WCAG 1.3.1).
   return (
-    <h4
+    <p
       data-slot="alert-title"
       className={cn('font-bold leading-snug', className)}
       {...props}
     >
       {children}
-    </h4>
+    </p>
   )
 }
 

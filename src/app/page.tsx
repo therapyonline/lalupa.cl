@@ -147,7 +147,6 @@ export default async function HomePage() {
               <Link
                 key={tool.href}
                 href={tool.href}
-                aria-label={tool.title}
                 className="block h-full rounded-[20px] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15"
               >
                 <CardLight className="flex h-full flex-col transition-all duration-200 hover:-translate-y-0.5 hover:border-ink hover:shadow-[0_8px_24px_rgba(34,34,34,0.06)]">

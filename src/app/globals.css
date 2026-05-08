@@ -5,7 +5,8 @@
   --cream-warm: #fce9a8;
   --ink: #222222;
   --body: #484848;
-  --soft: #888888;
+  /* WCAG AA en cream: #6b6b6b da contraste 5.06:1 (texto pequeño OK). */
+  --soft: #6b6b6b;
 
   --primary: #3754aa;
   --primary-2: #536cb6;
@@ -14,7 +15,8 @@
 
   --accent: #ff6b35;
   --accent-soft: #ffe4d9;
-  --accent-deep: #d14a1a;
+  /* WCAG AA: #9a3413 (Tailwind orange-800) da 5.06:1 sobre cream. */
+  --accent-deep: #9a3413;
 
   --success: #15803d;
   --success-soft: #dcfce7;

@@ -84,7 +84,7 @@ export function FileDrop({ onFile, className, statusMessage }: FileDropProps) {
     <div
       role="button"
       tabIndex={0}
-      aria-label="Arrastra el PDF o foto de tu boleta acá o tócalo para elegir un archivo"
+      aria-label="Arrastra tu boleta acá o tócalo para elegir un archivo"
       aria-busy={state === 'processing'}
       onClick={openPicker}
       onKeyDown={handleKeyDown}
@@ -130,9 +130,9 @@ export function FileDrop({ onFile, className, statusMessage }: FileDropProps) {
           <span aria-hidden className="text-[48px] leading-none">
             📄
           </span>
-          <h3 className="mt-6 text-xl font-medium text-ink">
+          <p className="mt-6 text-xl font-medium text-ink">
             Arrastra tu boleta acá
-          </h3>
+          </p>
           <p className="mt-2 text-sm text-body">
             O toca para elegir el PDF o una foto desde tu galería
           </p>

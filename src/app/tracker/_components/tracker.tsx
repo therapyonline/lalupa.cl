@@ -207,7 +207,10 @@ export function Tracker() {
       {!loaded ? (
         <section className="bg-cream pb-20">
           <Container>
-            <div className="rounded-[20px] border border-border bg-white p-10">
+            {/* min-h reserva el espacio del estado vacío/cargado para evitar
+                que el body se desplace cuando llega la data desde IndexedDB
+                (CLS WCAG/Lighthouse). */}
+            <div className="min-h-[420px] rounded-[20px] border border-border bg-white p-10">
               <p
                 role="status"
                 aria-live="polite"
@@ -221,7 +224,7 @@ export function Tracker() {
       ) : boletas.length === 0 ? (
         <section className="bg-cream pb-20">
           <Container>
-            <div className="rounded-[20px] border border-border bg-white p-10 text-center">
+            <div className="min-h-[420px] rounded-[20px] border border-border bg-white p-10 text-center">
               <p className="font-mono text-xs uppercase tracking-[0.1em] text-soft">
                 Sin boletas todavía
               </p>

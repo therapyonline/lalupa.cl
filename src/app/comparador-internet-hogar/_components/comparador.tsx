@@ -387,9 +387,9 @@ function PlanCard({ plan, comuna }: { plan: PlanScored; comuna: string }) {
             <p className="font-mono text-xs uppercase tracking-[0.1em] text-soft">
               {plan.empresa}
             </p>
-            <h3 className="mt-2 text-xl font-medium leading-tight tracking-tight text-ink md:text-2xl">
+            <h2 className="mt-2 text-xl font-medium leading-tight tracking-tight text-ink md:text-2xl">
               {plan.plan}
-            </h3>
+            </h2>
             <p className="mt-1 text-xs uppercase tracking-wide text-soft">
               {plan.tecnologia === 'fibra'
                 ? 'Fibra simétrica'

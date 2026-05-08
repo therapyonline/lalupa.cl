@@ -18,10 +18,28 @@
  * métricas crudas para validar < umbrales del usuario.
  */
 
+import { spawn } from 'node:child_process'
+import { setTimeout as sleep } from 'node:timers/promises'
 import { chromium } from '@playwright/test'
 
-const URL = process.argv[2] ?? 'http://localhost:3000'
+const URL =
+  process.argv.find((a) => a.startsWith('http')) ?? 'http://localhost:3000'
+const SHOULD_START_SERVER = process.argv.includes('--start-server')
 const ROUTES = ['/', '/boleta-luz', '/guias', '/comparador-internet-hogar']
+
+async function waitForReady(url, timeoutMs = 60_000) {
+  const t0 = Date.now()
+  while (Date.now() - t0 < timeoutMs) {
+    try {
+      const r = await fetch(url)
+      if (r.ok) return true
+    } catch {
+      // not ready yet
+    }
+    await sleep(500)
+  }
+  throw new Error(`Server no respondió en ${timeoutMs}ms`)
+}
 
 async function auditRoute(browser, route) {
   const context = await browser.newContext({
@@ -119,6 +137,18 @@ async function auditRoute(browser, route) {
 }
 
 async function main() {
+  let serverProc
+  if (SHOULD_START_SERVER) {
+    console.log('Iniciando `pnpm start` en background...')
+    serverProc = spawn('pnpm', ['start'], {
+      stdio: ['ignore', 'ignore', 'pipe'],
+      detached: true,
+    })
+    serverProc.unref()
+    await waitForReady(URL)
+    console.log('Server listo.\n')
+  }
+
   const browser = await chromium.launch()
   console.log(`\n🔍 Auditando ${URL}\n`)
   const rows = []
@@ -128,6 +158,14 @@ async function main() {
     console.log(`✓ ${route}`)
   }
   await browser.close()
+
+  if (serverProc) {
+    try {
+      process.kill(-serverProc.pid)
+    } catch {
+      // already gone
+    }
+  }
 
   console.log('\n📊 Core Web Vitals (ms / count / kB):\n')
   console.log(
@@ -151,6 +189,41 @@ async function main() {
   console.log('  LCP < 2500ms (good)  < 1500ms (excellent)')
   console.log('  CLS < 0.1   (good)  < 0.05   (excellent)')
   console.log('  FCP < 1800ms (good)  < 1000ms (excellent)\n')
+
+  // --assert: falla si alguna métrica excede budget. Para CI.
+  if (process.argv.includes('--assert')) {
+    // Budgets generosos: localhost loopback es muy rápido pero también
+    // tienen variabilidad por GC/compile-on-demand. Estos valores buscan
+    // detectar regresiones grandes (10x el baseline actual ~50ms FCP/LCP).
+    const BUDGET_FCP_MS = Number(process.env.BUDGET_FCP_MS ?? 1500)
+    const BUDGET_LCP_MS = Number(process.env.BUDGET_LCP_MS ?? 2000)
+    const BUDGET_CLS = Number(process.env.BUDGET_CLS ?? 0.1)
+    const BUDGET_JS_KB = Number(process.env.BUDGET_JS_KB ?? 1500)
+    const failures = []
+    for (const r of rows) {
+      if (r.fcp && Number(r.fcp) > BUDGET_FCP_MS) {
+        failures.push(`${r.route}: FCP ${r.fcp}ms > ${BUDGET_FCP_MS}ms`)
+      }
+      if (r.lcp && Number(r.lcp) > BUDGET_LCP_MS) {
+        failures.push(`${r.route}: LCP ${r.lcp}ms > ${BUDGET_LCP_MS}ms`)
+      }
+      if (Number(r.cls) > BUDGET_CLS) {
+        failures.push(`${r.route}: CLS ${r.cls} > ${BUDGET_CLS}`)
+      }
+      if (Number(r.jsKB) > BUDGET_JS_KB) {
+        failures.push(`${r.route}: JS ${r.jsKB}kB > ${BUDGET_JS_KB}kB`)
+      }
+    }
+    if (failures.length) {
+      console.error('\n❌ Perf budget violations:')
+      for (const f of failures) console.error(`   - ${f}`)
+      console.error(
+        '\nSi el aumento es justificado, ajustá BUDGET_* envs en CI.',
+      )
+      process.exit(1)
+    }
+    console.log('✓ Within all perf budgets\n')
+  }
 }
 
 main().catch((err) => {

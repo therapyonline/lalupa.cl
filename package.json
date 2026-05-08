@@ -17,6 +17,7 @@
     "setup:tesseract": "node scripts/setup-tesseract.mjs",
     "check:bundle-size": "node scripts/check-bundle-size.mjs",
     "perf:audit": "node scripts/perf-audit.mjs",
+    "perf:audit:ci": "node scripts/perf-audit.mjs --start-server --assert",
     "postinstall": "pnpm copy:pdf-worker && pnpm setup:tesseract"
   },
   "dependencies": {

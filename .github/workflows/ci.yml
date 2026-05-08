@@ -88,3 +88,30 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 7
+
+  perf-audit:
+    name: Perf budget (Web Vitals)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [lint-typecheck]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Install Playwright browsers
+        run: pnpm test:e2e:install
+      - name: Build for production
+        run: pnpm build
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+      - name: Perf audit (CWV budget)
+        # Levanta el server prod y mide FCP/LCP/CLS en 4 rutas.
+        # Falla si excede budgets (default: FCP <1500ms, LCP <2000ms, CLS <0.1).
+        # Override con BUDGET_FCP_MS / BUDGET_LCP_MS / BUDGET_CLS / BUDGET_JS_KB.
+        run: pnpm perf:audit:ci

@@ -43,7 +43,7 @@ describe('buildOgImageUrl', () => {
 })
 
 describe('buildMetadata', () => {
-  it('sets canonical to path (relative — Next resolves with metadataBase)', () => {
+  it('sets canonical to path (relative, Next resolves with metadataBase)', () => {
     const m = buildMetadata({
       title: 'Test',
       description: 'Test page',

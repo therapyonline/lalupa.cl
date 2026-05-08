@@ -1,7 +1,7 @@
 /**
  * Parser de SMAPA (Servicio Municipal de Agua Potable y Alcantarillado de Maipú).
  *
- * Layout municipal — distinto a las sanitarias privadas. "DETALLE DE SU
+ * Layout municipal, distinto a las sanitarias privadas. "DETALLE DE SU
  * CUENTA" con Cargo Fijo, Consumo Agua, Alcantarillado S/Trata, y
  * TRATAM.AGUAS ANDINAS (SMAPA contrata el tratamiento a Aguas Andinas).
  */

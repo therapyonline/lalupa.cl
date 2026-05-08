@@ -76,7 +76,7 @@ function lastNumberOnLine(text: string, label: string): number | null {
 }
 
 const CARGO_PATTERNS: ReadonlyArray<{ concepto: string; pattern: RegExp }> = [
-  // "Cargo Fijo 914" — un solo número, el simple `buildCargoPattern` sirve.
+  // "Cargo Fijo 914", un solo número, el simple `buildCargoPattern` sirve.
   { concepto: 'Cargo fijo', pattern: buildCargoPattern('Cargo\\s+Fijo') },
   {
     concepto: 'Reposición',
@@ -195,7 +195,7 @@ export function parseSissFamily(
   const desde = parseChileanDate(lectAnterior) ?? new Date(NaN)
   const hasta = parseChileanDate(lectActual) ?? new Date(NaN)
 
-  // "Consumo Facturado 12,00" — preferimos esta línea sobre "1 m3 = 1.000
+  // "Consumo Facturado 12,00", preferimos esta línea sobre "1 m3 = 1.000
   // litros" que aparece como leyenda explicativa.
   const consumoFacturadoMatch = text.match(
     /Consumo\s+Facturado[^\d]*?(\d+(?:,\d+)?)/i,

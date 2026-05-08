@@ -52,7 +52,7 @@ Stack:
 ## Aportar
 
 1. Lee `ARCHITECTURE.md` y `AGENTS.md`.
-2. Para parsers nuevos: ver `src/lib/parsers/__fixtures__/README.md` — el flujo es agregar fixture redactado, escribir `parse()`, sumar tests cross-empresa.
+2. Para parsers nuevos: ver `src/lib/parsers/__fixtures__/README.md`, el flujo es agregar fixture redactado, escribir `parse()`, sumar tests cross-empresa.
 3. Para guías nuevas: agregar MDX en `src/content/guias/` con frontmatter completo.
 
 ---

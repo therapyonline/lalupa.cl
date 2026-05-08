@@ -2,7 +2,7 @@
 
 ## Reportar una vulnerabilidad
 
-Si encontraste una vulnerabilidad de seguridad en lalupa.cl — sea en el código, en el pipeline de parsing, en la cadena de dependencias o en headers de hardening — agradecemos un reporte privado antes de divulgarla públicamente.
+Si encontraste una vulnerabilidad de seguridad en lalupa.cl, sea en el código, en el pipeline de parsing, en la cadena de dependencias o en headers de hardening, agradecemos un reporte privado antes de divulgarla públicamente.
 
 **Canal**: enviar email a [seguridad@lalupa.cl](mailto:seguridad@lalupa.cl).
 

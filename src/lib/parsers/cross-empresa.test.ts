@@ -4,7 +4,7 @@
  * Cada parser debe lanzar `WRONG_EMPRESA` cuando se le pasa el fixture de
  * OTRA empresa del mismo servicio. Esto previene regresiones en `detect()`
  * o en los `markersRegex` que harían que un parser "robe" boletas de su
- * vecino — un bug típico cuando dos empresas comparten layout (ej. SAESA
+ * vecino, un bug típico cuando dos empresas comparten layout (ej. SAESA
  * y Frontel, ESSBio y Nuevosur).
  *
  * Genera 13 × 12 = 156 assertions (una por par fixture/parser de otra
@@ -70,7 +70,7 @@ describe('cross-empresa rejection', () => {
   for (const target of BUNDLES) {
     for (const wrong of BUNDLES) {
       if (target.empresa === wrong.empresa) continue
-      // Solo testeamos cross-empresa dentro del mismo servicio — un parser
+      // Solo testeamos cross-empresa dentro del mismo servicio, un parser
       // de electricidad legítimamente puede no reconocer una boleta de
       // gas (caería en INVALID_FORMAT, no en WRONG_EMPRESA).
       if (target.servicio !== wrong.servicio) continue

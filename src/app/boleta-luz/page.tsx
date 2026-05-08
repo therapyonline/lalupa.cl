@@ -66,7 +66,7 @@ const FAQ_ITEMS = [
   },
   {
     q: '¿Funciona si la boleta es una foto?',
-    a: 'Sí. Analizamos PDFs nativos (los que descargás del sitio de tu empresa eléctrica) y también fotos JPG o PNG con OCR — el reconocimiento corre en tu propio navegador. Para fotos, una imagen nítida y derecha mejora muchísimo la precisión.',
+    a: 'Sí. Analizamos PDFs nativos (los que descargás del sitio de tu empresa eléctrica) y también fotos JPG o PNG con OCR, el reconocimiento corre en tu propio navegador. Para fotos, una imagen nítida y derecha mejora muchísimo la precisión.',
   },
   {
     q: '¿Por qué no detectó mi distribuidora?',

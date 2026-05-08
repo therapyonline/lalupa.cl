@@ -3,7 +3,7 @@
  * `EMPRESAS_SERVICIOS` debe incluir el RUT exacto en su fingerprint.
  *
  * Esto detecta drift entre `src/data/empresas.ts` (fuente de verdad
- * de identidad legal) y los parsers — si alguien actualiza el RUT
+ * de identidad legal) y los parsers, si alguien actualiza el RUT
  * en empresas.ts pero olvida tocar el parser, este test falla.
  *
  * Empresas con `rut === 'PENDIENTE'` se excluyen porque no tenemos

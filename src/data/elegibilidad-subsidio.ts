@@ -1,5 +1,5 @@
 /**
- * Elegibilidad y monto del Subsidio Eléctrico Ley 21.667 — 5ta convocatoria 2026
+ * Elegibilidad y monto del Subsidio Eléctrico Ley 21.667, 5ta convocatoria 2026
  *
  * Fuente: https://www.subsidioelectrico.cl/ (extraído 2026-05-06)
  * Marco legal: Ley 21.667, Decreto Exento Nº136/2024 Ministerio de Energía
@@ -71,12 +71,12 @@ export interface ResultadoElegibilidad {
   pasosSiguientes: string[];
   /** Alertas o consideraciones especiales */
   alertas: string[];
-  /** Por qué no califica (si aplica) — útil para guiar al usuario */
+  /** Por qué no califica (si aplica), útil para guiar al usuario */
   bloqueadores: string[];
 }
 
 // ============================================================================
-// CONSTANTES MONETARIAS — 5ta convocatoria 2026
+// CONSTANTES MONETARIAS, 5ta convocatoria 2026
 // ============================================================================
 
 /** Montos semestrales según composición del hogar (5ta convocatoria mayo 2026) */
@@ -102,38 +102,38 @@ export const CALENDARIO_5TA_CONVOCATORIA = {
 // FUNCIONES PURAS DE CRITERIOS
 // ============================================================================
 
-/** Q1 — Edad mínima 18 años */
+/** Q1, Edad mínima 18 años */
 function cumpleEdad(r: RespuestasUsuario): boolean {
   return r.esMayorDeEdad === true;
 }
 
-/** Q2 — Estar en RSH */
+/** Q2, Estar en RSH */
 function cumpleRSH(r: RespuestasUsuario): boolean {
   return r.estaEnRSH === true;
 }
 
-/** Q3 + Q4 — Cumple criterio principal (tramo 0-40% O electrodependiente) */
+/** Q3 + Q4, Cumple criterio principal (tramo 0-40% O electrodependiente) */
 function cumpleCriterioPrincipal(r: RespuestasUsuario): boolean {
   if (r.hayElectrodependiente) return true;
   return r.tramoCSE === '0-40';
 }
 
-/** Q5 — Cliente residencial */
+/** Q5, Cliente residencial */
 function cumpleClienteResidencial(r: RespuestasUsuario): boolean {
   return r.esClienteResidencial === true;
 }
 
-/** Q6 — Sistema regulado (no aislado) */
+/** Q6, Sistema regulado (no aislado) */
 function cumpleSistemaRegulado(r: RespuestasUsuario): boolean {
   return r.estaEnSistemaRegulado === true;
 }
 
-/** Q7 — Al día con la cuenta */
+/** Q7, Al día con la cuenta */
 function cumpleAlDia(r: RespuestasUsuario): boolean {
   return r.estaAlDia === true;
 }
 
-/** Q8 — Tiene ClaveÚnica (no bloqueador, hay vías presenciales) */
+/** Q8, Tiene ClaveÚnica (no bloqueador, hay vías presenciales) */
 function tieneClaveUnica(r: RespuestasUsuario): boolean {
   return r.tieneClaveUnica === true;
 }
@@ -411,7 +411,7 @@ export const TEST_CASES = {
     },
   },
 
-  /** Caso 4: NO califica — tramo alto sin electrodependiente */
+  /** Caso 4: NO califica, tramo alto sin electrodependiente */
   noCalificaTramoAlto: {
     input: {
       esMayorDeEdad: true,
@@ -430,7 +430,7 @@ export const TEST_CASES = {
     },
   },
 
-  /** Caso 5: NO califica — no está al día */
+  /** Caso 5: NO califica, no está al día */
   noCalificaDeuda: {
     input: {
       esMayorDeEdad: true,
@@ -449,7 +449,7 @@ export const TEST_CASES = {
     },
   },
 
-  /** Caso 6: Borderline — no tiene ClaveÚnica pero tiene todo lo demás (NO bloquea, alerta) */
+  /** Caso 6: Borderline, no tiene ClaveÚnica pero tiene todo lo demás (NO bloquea, alerta) */
   borderlineSinClaveUnica: {
     input: {
       esMayorDeEdad: true,

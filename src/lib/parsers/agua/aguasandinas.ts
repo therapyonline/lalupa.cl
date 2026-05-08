@@ -1,7 +1,7 @@
 /**
  * Parser de Aguas Andinas S.A.
  *
- * Layout SISS estándar — ver `_siss-family.ts`. Comparte template con
+ * Layout SISS estándar, ver `_siss-family.ts`. Comparte template con
  * ESSBio y Nuevosur (todas usan "Su consumo en $ se calcula así").
  */
 
@@ -18,7 +18,7 @@ const AGUASANDINAS_KEYWORDS = [
 
 /**
  * Regex específica: requiere razón social completa, dominio, RUT o
- * dirección legal — NO matchea con menciones genéricas de "Aguas Andinas"
+ * dirección legal, NO matchea con menciones genéricas de "Aguas Andinas"
  * que aparecen como referencia en boletas de otras sanitarias (ej. SMAPA
  * que contrata tratamiento a Aguas Andinas).
  */
@@ -44,7 +44,7 @@ export const aguasandinasParser: ParserModule = {
   fingerprint: {
     keywords: AGUASANDINAS_KEYWORDS,
     format:
-      'Aguas Andinas: layout SISS — "Su consumo en $ se calcula así" con Cargo Fijo, Consumo Agua Potable, Servicio Alcantarillado, Tratamiento, ajustes, IVA en "Datos tributarios".',
+      'Aguas Andinas: layout SISS, "Su consumo en $ se calcula así" con Cargo Fijo, Consumo Agua Potable, Servicio Alcantarillado, Tratamiento, ajustes, IVA en "Datos tributarios".',
   },
   detect(text) {
     return Boolean(text) && AGUASANDINAS_DETECT_REGEX.test(text)

@@ -40,7 +40,7 @@ export const frontelParser: ParserModule = {
   fingerprint: {
     keywords: FRONTEL_KEYWORDS,
     format:
-      'Frontel: layout idéntico a SAESA (mismo grupo) — "Detalle de mi cuenta" con 5 cargos + Total exento/neto/IVA/Boleta/Saldo/Total a pagar.',
+      'Frontel: layout idéntico a SAESA (mismo grupo), "Detalle de mi cuenta" con 5 cargos + Total exento/neto/IVA/Boleta/Saldo/Total a pagar.',
   },
   detect(text) {
     return Boolean(text) && FRONTEL_DETECT_REGEX.test(text)

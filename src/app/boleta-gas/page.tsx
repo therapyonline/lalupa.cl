@@ -69,7 +69,7 @@ const FAQ_ITEMS = [
   },
   {
     q: '¿De dónde saco una boleta de cilindro en PDF?',
-    a: 'Lipigas, Abastible y Gasco generan boleta digital cuando el delivery se paga con tarjeta. Si pagaste en efectivo y solo tenés la boleta en papel, sacale una foto nítida (JPG o PNG) y subila — corremos OCR en tu navegador para extraer los datos.',
+    a: 'Lipigas, Abastible y Gasco generan boleta digital cuando el delivery se paga con tarjeta. Si pagaste en efectivo y solo tenés la boleta en papel, sacale una foto nítida (JPG o PNG) y subila, corremos OCR en tu navegador para extraer los datos.',
   },
   {
     q: '¿Qué hago si la lupa encuentra un problema?',

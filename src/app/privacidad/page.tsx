@@ -41,7 +41,7 @@ export default function PrivacidadPage() {
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-body">
             lalupa fue construida bajo un principio simple: no almacenamos lo
-            que no necesitamos. Esta página es la versión literal de eso —
+            que no necesitamos. Esta página es la versión literal de eso:
             qué hacemos, qué no, y cómo desactivar lo poco que sí hacemos.
           </p>
           <p className="mt-4 font-mono text-xs uppercase tracking-[0.1em] text-soft">
@@ -87,7 +87,7 @@ export default function PrivacidadPage() {
                   <strong className="text-ink">
                     No identificamos a usuarios individuales.
                   </strong>{' '}
-                  Las métricas que sí usamos son agregadas y anónimas — ver
+                  Las métricas que sí usamos son agregadas y anónimas, ver
                   abajo.
                 </li>
                 <li className={LI}>
@@ -123,7 +123,7 @@ export default function PrivacidadPage() {
                 en modo cookie-less, configurado para{' '}
                 <strong className="text-ink">enmascarar todos los inputs</strong>{' '}
                 de formularios. Lo que vemos es por dónde se mueve el cursor
-                y dónde la gente se atasca — útil para mejorar la UX. Lo que{' '}
+                y dónde la gente se atasca, útil para mejorar la UX. Lo que{' '}
                 <em>no</em> vemos es: qué escribís, tu nombre, RUT, ni
                 ningún campo de tu boleta. Nunca capturamos texto de inputs.
               </p>
@@ -139,10 +139,10 @@ export default function PrivacidadPage() {
                 </a>
                 ), esos datos viven en{' '}
                 <strong className="text-ink">IndexedDB</strong> dentro de
-                tu navegador. Solo tu dispositivo tiene acceso — ni siquiera
+                tu navegador. Solo tu dispositivo tiene acceso, ni siquiera
                 nosotros podemos leerlo. Si borrás los datos del sitio, el
                 histórico se borra junto. Y nunca se sincroniza a otros
-                dispositivos automáticamente — solo si vos exportás manualmente.
+                dispositivos automáticamente, solo si vos exportás manualmente.
               </p>
             </div>
 
@@ -193,8 +193,8 @@ export default function PrivacidadPage() {
                 <strong className="text-ink">Ley 21.719</strong> sobre
                 Protección de Datos Personales (Chile, vigente desde diciembre
                 2026). Aunque técnicamente no procesamos datos personales
-                identificables en servidor —porque todo el procesamiento de
-                boletas ocurre en tu navegador—, declaramos transparentemente
+                identificables en servidor (porque todo el procesamiento de
+                boletas ocurre en tu navegador), declaramos transparentemente
                 acá qué hacemos y qué no.
               </p>
               <p className={P}>
@@ -208,7 +208,7 @@ export default function PrivacidadPage() {
                   privacidad@lalupa.cl
                 </a>
                 . En la mayoría de los casos la respuesta va a ser que no
-                tenemos datos tuyos para acceder, rectificar o cancelar —
+                tenemos datos tuyos para acceder, rectificar o cancelar,
                 pero la garantía está y la respondemos por escrito en los
                 plazos legales (15 días hábiles).
               </p>
@@ -246,9 +246,9 @@ export default function PrivacidadPage() {
             <div className={SECTION} id="cambios">
               <h2 className={H2}>Cambios a esta política</h2>
               <p className={P}>
-                Si cambiamos algo material — agregamos un tracker nuevo,
+                Si cambiamos algo material, agregamos un tracker nuevo,
                 cambiamos proveedor de analytics, o pasa cualquier cosa que
-                afecte qué se mide o cómo — lo vas a ver reflejado en la
+                afecte qué se mide o cómo, lo vas a ver reflejado en la
                 fecha de actualización al inicio de esta página, y notificamos
                 en el footer del sitio durante 30 días.
               </p>

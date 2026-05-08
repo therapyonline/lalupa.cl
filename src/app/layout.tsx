@@ -14,7 +14,7 @@ import {
 } from '@/lib/seo'
 import './globals.css'
 
-const DEFAULT_TITLE = 'Lalupa.cl — Lo que esconden bajo la letra chica'
+const DEFAULT_TITLE = 'Lalupa.cl, Lo que esconden bajo la letra chica'
 const DEFAULT_DESCRIPTION =
   'Revisa tus boletas de luz, agua, gas e internet en tu propio celular. Detecta cobros sospechosos en segundos.'
 const DEFAULT_OG_IMAGE = buildOgImageUrl(

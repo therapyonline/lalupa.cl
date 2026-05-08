@@ -66,7 +66,7 @@ const FAQ_ITEMS = [
   },
   {
     q: '¿Funciona si la boleta es una foto?',
-    a: 'Sí. Analizamos PDFs nativos y también fotos JPG o PNG con OCR — el reconocimiento corre en tu propio navegador, no se sube nada. Una imagen nítida y derecha mejora la precisión.',
+    a: 'Sí. Analizamos PDFs nativos y también fotos JPG o PNG con OCR, el reconocimiento corre en tu propio navegador, no se sube nada. Una imagen nítida y derecha mejora la precisión.',
   },
   {
     q: '¿Las tarifas de agua son distintas en cada región?',

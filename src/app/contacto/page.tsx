@@ -6,7 +6,7 @@ import { breadcrumbsSchema, buildMetadata } from '@/lib/seo'
 export const metadata = buildMetadata({
   title: 'Contacto',
   description:
-    'Cómo contactar al equipo de lalupa: sugerir distribuidora, reportar bug, prensa, partnership. Solo email — sin formulario, sin almacenar datos.',
+    'Cómo contactar al equipo de lalupa: sugerir distribuidora, reportar bug, prensa, partnership. Solo email, sin formulario, sin almacenar datos.',
   path: '/contacto',
   ogKind: 'guide',
 })
@@ -31,7 +31,7 @@ const CANALES = [
     title: 'Medios y prensa',
     body: 'Solicitudes de información, entrevistas o material para artículos.',
     email: 'prensa@lalupa.cl',
-    subject: 'Prensa — solicitud sobre lalupa',
+    subject: 'Prensa, solicitud sobre lalupa',
   },
   {
     eyebrow: 'Partnership',
@@ -65,7 +65,7 @@ export default function ContactoPage() {
             Si algo no calza, escribinos.
           </h1>
           <p className="mt-6 max-w-2xl text-[17px] leading-[1.65] text-body">
-            Sin formulario, sin almacenamiento de datos. Solo email — vos
+            Sin formulario, sin almacenamiento de datos. Solo email, vos
             controlás qué compartís y nosotros mantenemos la promesa
             privacy-first hasta el final del flujo.
           </p>
@@ -112,7 +112,7 @@ export default function ContactoPage() {
             <p className="mt-4 text-body">
               Si tu reclamo es contra una empresa de servicios básicos, las
               vías formales con poder regulatorio son SERNAC, SEC, SISS y
-              SUBTEL — no nosotros. Podés generar tu carta SERNAC en{' '}
+              SUBTEL, no nosotros. Podés generar tu carta SERNAC en{' '}
               <Link
                 href="/reclamar-sernac"
                 className="font-medium text-primary underline underline-offset-4 hover:no-underline"

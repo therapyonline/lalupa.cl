@@ -1,5 +1,5 @@
 /**
- * Tarifas vigentes de servicios básicos en Chile — Mayo 2026
+ * Tarifas vigentes de servicios básicos en Chile, Mayo 2026
  *
  * ÚLTIMA ACTUALIZACIÓN: 2026-05-06
  * PRÓXIMA REVISIÓN: 2026-08-06 (trimestral)
@@ -51,7 +51,7 @@ export interface TarifaAguaPotable {
   aguaPotableNoPuntaCLPM3: number;
   /** Precio agua potable en período punta verano (CLP/m³) */
   aguaPotablePuntaCLPM3: number;
-  /** Sobreconsumo agua potable punta — penalty (CLP/m³) */
+  /** Sobreconsumo agua potable punta, penalty (CLP/m³) */
   sobreconsumoPuntaCLPM3: number;
   /** Cargo alcantarillado (CLP/m³) */
   alcantarilladoCLPM3: number;
@@ -92,7 +92,7 @@ export const CARGO_FIJO_BT1_2026: Record<string, number> = {
 };
 
 /**
- * Tarifa BT-1 representativa por distribuidora — mayo 2026.
+ * Tarifa BT-1 representativa por distribuidora, mayo 2026.
  * Valores tomados de la zona/tipo de red más común para cada empresa.
  *
  * NOTA: Para CGE el componente $/kWh varía por sector tarifario (STxD-3 RM 15.964 vs STxE rural 21.435).
@@ -436,7 +436,7 @@ export function validarCobro(
     estaDentroDelRango: false,
     desviacionPct,
     alerta: 'cobro_indebido_probable',
-    mensaje: `El cobro está ${desviacionPct > 0 ? 'sobre' : 'bajo'} lo esperado en ${absDesviacion.toFixed(1)}%. Probable cobro indebido — generar reclamo SERNAC.`,
+    mensaje: `El cobro está ${desviacionPct > 0 ? 'sobre' : 'bajo'} lo esperado en ${absDesviacion.toFixed(1)}%. Probable cobro indebido, generar reclamo SERNAC.`,
   };
 }
 

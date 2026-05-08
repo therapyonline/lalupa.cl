@@ -131,7 +131,7 @@ const LEVEL_BG: Record<0 | 1 | 2 | 3 | 4, string> = {
 }
 
 function formatCLP(n: number): string {
-  if (!Number.isFinite(n) || n === 0) return '—'
+  if (!Number.isFinite(n) || n === 0) return '-'
   return `$ ${Math.round(n).toLocaleString('es-CL')}`
 }
 
@@ -306,13 +306,13 @@ export function Tracker() {
                 />
                 <SummaryCard
                   label="Mes más caro"
-                  value={masCaro ? formatCLP(masCaro.total) : '—'}
+                  value={masCaro ? formatCLP(masCaro.total) : '-'}
                   hint={masCaro ? masCaro.label : 'Sin datos'}
                   tone="danger"
                 />
                 <SummaryCard
                   label="Mes más barato"
-                  value={masBarato ? formatCLP(masBarato.total) : '—'}
+                  value={masBarato ? formatCLP(masBarato.total) : '-'}
                   hint={masBarato ? masBarato.label : 'Sin datos'}
                   tone="success"
                 />
@@ -875,7 +875,7 @@ function ManagementPanel({ onChanged }: { onChanged: () => void }) {
         <Alert.Body>
           Todo se guarda en IndexedDB de tu navegador (db `lalupa`). No hay
           servidor que sincronice. Si limpiás los datos del navegador o
-          cambiás de celular, se pierde — usá Exportar para hacer respaldo.
+          cambiás de celular, se pierde, usá Exportar para hacer respaldo.
         </Alert.Body>
       </Alert>
     </div>

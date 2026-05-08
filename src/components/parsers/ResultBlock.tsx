@@ -6,7 +6,7 @@ import { Skeleton } from '@/components/ui/Skeleton'
 import { cn } from '@/lib/utils'
 
 /**
- * Skeleton shape de ResultBlock — para mostrar mientras parseamos la
+ * Skeleton shape de ResultBlock, para mostrar mientras parseamos la
  * boleta en el navegador. Mismo layout que el componente real para evitar
  * layout shift al hidratar.
  */
@@ -163,7 +163,7 @@ function capitalize(s: string): string {
 }
 
 export function formatCLP(n: number): string {
-  if (!Number.isFinite(n)) return '—'
+  if (!Number.isFinite(n)) return '-'
   return `$ ${Math.round(n).toLocaleString('es-CL')}`
 }
 

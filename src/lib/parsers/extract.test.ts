@@ -3,7 +3,7 @@ import { extractTextFromBoleta } from './engine'
 import { extractTextFromImage } from './ocr'
 
 function makeFile(type: string): File {
-  // The constructor doesn't run anything that needs a real binary — File is
+  // The constructor doesn't run anything that needs a real binary, File is
   // available in modern Node test envs.
   return new File([new Uint8Array(0)], 'boleta', { type })
 }

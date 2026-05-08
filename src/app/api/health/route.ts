@@ -2,7 +2,7 @@
  * Health check endpoint para uptime monitoring (Vercel cron, Pingdom, etc.).
  *
  * Devuelve 200 con un payload mínimo si la app puede servir requests.
- * Cero dependencias externas — esto debe responder incluso si todo lo
+ * Cero dependencias externas, esto debe responder incluso si todo lo
  * demás está roto.
  *
  *   GET /api/health → { status: 'ok', timestamp: ISO, uptime: seconds }

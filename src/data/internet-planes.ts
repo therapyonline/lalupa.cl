@@ -1,7 +1,7 @@
 /**
- * Planes de Internet Hogar Chile — Mayo 2026
+ * Planes de Internet Hogar Chile, Mayo 2026
  *
- * DATOS REFERENCIALES — última actualización 2026-05-06
+ * DATOS REFERENCIALES, última actualización 2026-05-06
  * Verificar antes de usar en producción contra páginas oficiales.
  * No hay API pública unificada; el dataset se actualiza manualmente.
  *
@@ -126,7 +126,7 @@ export const PLANES_INTERNET_2026: PlanInternet[] = [
     coberturaRegiones: ['nacional'],
     alertas: [
       'Promoción solo dura 6 meses (la más corta del mercado).',
-      'Repetidor WiFi NO incluido — costo adicional $2.990/mes.',
+      'Repetidor WiFi NO incluido, costo adicional $2.990/mes.',
     ],
     fuente: 'https://ww2.movistar.cl/hogar/',
   },
@@ -180,7 +180,7 @@ export const PLANES_INTERNET_2026: PlanInternet[] = [
     servicios: ['internet'],
     coberturaRegiones: ['nacional'], // limitada en algunas zonas
     alertas: [
-      '⚠️ Compromiso 24 meses — multa por término anticipado.',
+      '⚠️ Compromiso 24 meses, multa por término anticipado.',
       'Precio escalado: $14.990 (mes 4-12) → $15.990 (mes 13-24) → $21.990 (mes 25+).',
       'Promoción inicial de 3 meses puede tener precio aún menor.',
     ],
@@ -249,7 +249,7 @@ export const PLANES_INTERNET_2026: PlanInternet[] = [
     servicios: ['internet'],
     coberturaRegiones: ['nacional'],
     alertas: [
-      'Disponibilidad limitada por comuna — verificar factibilidad técnica.',
+      'Disponibilidad limitada por comuna, verificar factibilidad técnica.',
       'Subida asimétrica (cable, no fibra simétrica).',
       'Datos referenciales (verificar precios actuales en vtr.com).',
     ],
@@ -321,7 +321,7 @@ export function compararPlanes(criterios: CriteriosBusqueda): PlanScored[] {
       const motivos: string[] = [];
       let score = 0;
 
-      // 30% — precio dentro del presupuesto (más bajo = mejor)
+      // 30%, precio dentro del presupuesto (más bajo = mejor)
       if (criterios.presupuestoMaxPromo) {
         const ratio = plan.precio.mes1a12 / criterios.presupuestoMaxPromo;
         const subscore = Math.round((1 - Math.min(ratio, 1)) * 30);
@@ -331,7 +331,7 @@ export function compararPlanes(criterios: CriteriosBusqueda): PlanScored[] {
         score += 15; // neutral
       }
 
-      // 30% — velocidad cumple/supera mínimo
+      // 30%, velocidad cumple/supera mínimo
       if (criterios.velocidadMin) {
         const exceso = plan.velocidad.bajada / criterios.velocidadMin;
         const subscore = Math.round(Math.min(exceso, 2) * 15); // hasta 30 puntos si dobla la velocidad
@@ -341,12 +341,12 @@ export function compararPlanes(criterios: CriteriosBusqueda): PlanScored[] {
         score += 15;
       }
 
-      // 20% — pocas alertas (precio estable)
+      // 20%, pocas alertas (precio estable)
       const subscoreAlertas = Math.max(0, 20 - plan.alertas.length * 5);
       score += subscoreAlertas;
       if (plan.alertas.length === 0) motivos.push('Sin alertas de letra chica.');
 
-      // 20% — match exacto de servicios
+      // 20%, match exacto de servicios
       if (criterios.servicios?.length) {
         const cumpleTodos = criterios.servicios.every((s) => plan.servicios.includes(s));
         score += cumpleTodos ? 20 : 0;

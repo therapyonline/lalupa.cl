@@ -3,7 +3,7 @@
  *
  * Las dos empresas usan literalmente el mismo template de boleta
  * (web.gruposaesa.cl). La única diferencia entre fixtures es la razón
- * social, RUT y dirección — el resto (cargos, totales, layout) es idéntico.
+ * social, RUT y dirección, el resto (cargos, totales, layout) es idéntico.
  */
 
 import { ParserError } from '../errors'
@@ -73,9 +73,9 @@ function detectarSospecha(cargo: Cargo, text: string): string | null {
 
 interface SaesaFamilyConfig {
   empresa: EmpresaElectrica
-  /** Markers únicos de la empresa (RUT + grupo + dominio) — gates parse(). */
+  /** Markers únicos de la empresa (RUT + grupo + dominio), gates parse(). */
   markersRegex: RegExp
-  /** Markers de cualquier OTRA empresa eléctrica — para detectar cross-empresa. */
+  /** Markers de cualquier OTRA empresa eléctrica, para detectar cross-empresa. */
   otherEmpresaMarkersRegex: RegExp
 }
 

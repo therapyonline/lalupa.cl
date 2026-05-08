@@ -67,7 +67,7 @@ describe('calcularBoletaEsperadaAgua', () => {
   it('retorna null si el cargo fijo no está disponible', () => {
     // Usa una clave que probablemente no esté completa en la tabla.
     // Si Aguas Andinas tiene cargoFijoCLP definido, entonces el resultado
-    // no será null — solo verificamos que no explota.
+    // no será null, solo verificamos que no explota.
     const r = calcularBoletaEsperadaAgua('aguas-andinas', 12)
     expect(r === null || typeof r === 'object').toBe(true)
   })

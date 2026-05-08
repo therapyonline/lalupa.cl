@@ -50,11 +50,11 @@ const ENEL_CARGO_PATTERNS: ReadonlyArray<{ concepto: string; pattern: RegExp }> 
       pattern: buildCargoPattern('Electricidad\\s+Consumida(?:\\s+\\(Var\\.?\\s+IVA\\))?'),
     },
     {
-      concepto: 'Electricidad consumida — impuesto SIB.UEN',
+      concepto: 'Electricidad consumida, impuesto SIB.UEN',
       pattern: buildCargoPattern('Electricidad\\s+Consumida\\s+Imp\\.?\\s+SIB\\.?UEN'),
     },
     {
-      concepto: 'Electricidad consumida — impuesto NIVEN',
+      concepto: 'Electricidad consumida, impuesto NIVEN',
       pattern: buildCargoPattern('Electricidad\\s+Consumida\\s+Imp\\.?\\s+NIVEN'),
     },
     {

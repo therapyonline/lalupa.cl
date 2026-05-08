@@ -1,5 +1,5 @@
 /**
- * Calendario de feriados oficiales y helpers de días hábiles — Chile
+ * Calendario de feriados oficiales y helpers de días hábiles, Chile
  *
  * Fuente: https://www.feriados.cl/ (sitio reconocido de feriados Chile)
  * Marco legal: Ley 2.977, Ley 19.668, Ley 20.148, Ley 21.357 (Pueblos Indígenas)

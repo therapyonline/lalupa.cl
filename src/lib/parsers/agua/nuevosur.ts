@@ -1,7 +1,7 @@
 /**
  * Parser de Nuevosur S.A.
  *
- * Layout SISS estándar — sister template de ESSBio (mismo grupo).
+ * Layout SISS estándar, sister template de ESSBio (mismo grupo).
  */
 
 import type { ParsedBoleta, ParserModule } from '../types'

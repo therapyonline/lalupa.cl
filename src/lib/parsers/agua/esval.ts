@@ -150,7 +150,7 @@ export const esvalParser: ParserModule = {
   fingerprint: {
     keywords: ESVAL_KEYWORDS,
     format:
-      'Esval: layout V Región tabular — DETALLE DE FACTURACIÓN con Cargo Fijo, Consumo Agua, Recolección, Tratamiento, Subtotal, Subsidio. IVA explícito en bloque "EL IVA MES DE ESTA BOLETA".',
+      'Esval: layout V Región tabular, DETALLE DE FACTURACIÓN con Cargo Fijo, Consumo Agua, Recolección, Tratamiento, Subtotal, Subsidio. IVA explícito en bloque "EL IVA MES DE ESTA BOLETA".',
   },
   detect(text) {
     return Boolean(text) && ESVAL_DETECT_REGEX.test(text)

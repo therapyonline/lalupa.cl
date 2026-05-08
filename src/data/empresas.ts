@@ -82,12 +82,12 @@ export const EMPRESAS_SERVICIOS: EmpresaServicio[] = [
     razonSocial: 'COMPAÑÍA NACIONAL DE FUERZA ELÉCTRICA S.A.',
     rut: '91.143.000-2', // PENDIENTE verificar
     servicios: ['electricidad'],
-    direccion: 'Verificar — subsidiaria de CGE',
+    direccion: 'Verificar, subsidiaria de CGE',
     emailNotificaciones: null,
     telefonoCliente: 'PENDIENTE',
     urlReclamosPropio: null,
     sitioWeb: 'https://www.conafe.cl',
-    fuenteVerificacion: 'PENDIENTE — verificar en CMF',
+    fuenteVerificacion: 'PENDIENTE, verificar en CMF',
   },
   {
     id: 'chilquinta',

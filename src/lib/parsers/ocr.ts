@@ -4,7 +4,7 @@
  * y reutiliza el mismo Worker entre llamadas dentro de la sesión.
  *
  * Antes de pasar a Tesseract, aplicamos un preprocesado mínimo
- * (grayscale + contrast stretch) — mejora la precisión en fotos de
+ * (grayscale + contrast stretch), mejora la precisión en fotos de
  * celular con sombras o papel térmico desteñido.
  */
 import { preprocessImageForOcr } from './image-preprocess'
@@ -30,7 +30,7 @@ async function getWorker(
   workerPromise = (async () => {
     const { createWorker } = await import('tesseract.js')
     return createWorker('spa', 1, {
-      // Servir todos los assets desde el mismo origen — sin CDN externo.
+      // Servir todos los assets desde el mismo origen, sin CDN externo.
       // Setup automático en `pnpm install` via scripts/setup-tesseract.mjs.
       workerPath: '/tesseract/worker.min.js',
       corePath: '/tesseract/core',
@@ -106,7 +106,7 @@ export async function extractTextFromImage(
     return await withTimeout(run, OCR_TIMEOUT_MS, 'El OCR')
   } catch (err) {
     // En cualquier fallo del pipeline (timeout o crash), descartamos el
-    // worker — la próxima llamada construirá uno limpio.
+    // worker, la próxima llamada construirá uno limpio.
     void disposeOcrWorker()
     throw err
   }

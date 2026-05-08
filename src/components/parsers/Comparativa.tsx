@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 import { formatCLP, formatPeriod } from './ResultBlock'
 
 /**
- * Skeleton de la Comparativa — mismo layout que las filas reales para que
+ * Skeleton de la Comparativa, mismo layout que las filas reales para que
  * la transición desde "leyendo IndexedDB" sea sin layout shift.
  */
 export function ComparativaSkeleton({

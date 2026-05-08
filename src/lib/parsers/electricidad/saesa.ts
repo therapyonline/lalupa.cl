@@ -40,7 +40,7 @@ export const saesaParser: ParserModule = {
   fingerprint: {
     keywords: SAESA_KEYWORDS,
     format:
-      'SAESA: layout Grupo SAESA — header + "Detalle de mi cuenta" con 5 cargos (Administración, Electricidad consumida X kWh, Coordinación y transporte, Cargo por servicio público, Cargo por compras de potencia) + Total exento + Total neto + IVA 19% + Total Boleta + Saldo anterior + Total a pagar.',
+      'SAESA: layout Grupo SAESA, header + "Detalle de mi cuenta" con 5 cargos (Administración, Electricidad consumida X kWh, Coordinación y transporte, Cargo por servicio público, Cargo por compras de potencia) + Total exento + Total neto + IVA 19% + Total Boleta + Saldo anterior + Total a pagar.',
   },
   detect(text) {
     return Boolean(text) && SAESA_DETECT_REGEX.test(text)

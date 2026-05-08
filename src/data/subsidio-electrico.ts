@@ -1,5 +1,5 @@
 /**
- * Wizard del Subsidio Eléctrico Ley 21.667 — 5ta convocatoria 2026.
+ * Wizard del Subsidio Eléctrico Ley 21.667, 5ta convocatoria 2026.
  *
  * Este archivo es la capa que el componente <Wizard> consume:
  *  - `PREGUNTAS_2026`: array de preguntas a mostrar (13 en total)
@@ -83,11 +83,11 @@ export const PREGUNTAS_2026: ReadonlyArray<PreguntaWizard> = [
     tipo: 'select',
     opciones: [
       { value: 'no_registrado', label: 'No estoy registrado en el RSH' },
-      { value: '0-40', label: 'Sí — Tramo 0% a 40% (más vulnerable)' },
-      { value: '41-60', label: 'Sí — Tramo 41% a 60%' },
-      { value: '61-80', label: 'Sí — Tramo 61% a 80%' },
-      { value: '81-90', label: 'Sí — Tramo 81% a 90%' },
-      { value: '91-100', label: 'Sí — Tramo 91% a 100%' },
+      { value: '0-40', label: 'Sí, Tramo 0% a 40% (más vulnerable)' },
+      { value: '41-60', label: 'Sí, Tramo 41% a 60%' },
+      { value: '61-80', label: 'Sí, Tramo 61% a 80%' },
+      { value: '81-90', label: 'Sí, Tramo 81% a 90%' },
+      { value: '91-100', label: 'Sí, Tramo 91% a 100%' },
     ],
   },
   {

@@ -60,7 +60,7 @@ export default function SobrePage() {
                 propósito. Tarifas reguladas que cambian dos veces al año,
                 cargos por reposición, recargos por mora ya pagada,
                 refacturaciones retroactivas, lecturas estimadas que después
-                «se ajustan» — todo dentro de un PDF de tres páginas que
+                «se ajustan», todo dentro de un PDF de tres páginas que
                 nadie lee.
               </p>
               <p className={P}>
@@ -102,7 +102,7 @@ export default function SobrePage() {
                 Un equipo chico de gente con experiencia en software,
                 producto y derecho del consumidor. No tenemos relación con
                 ninguna empresa de servicios básicos, ni con SERNAC, SEC,
-                SISS o SUBTEL — somos independientes.
+                SISS o SUBTEL, somos independientes.
               </p>
               <p className={P}>
                 Si querés que apliquemos a un fondo de software cívico,
@@ -168,7 +168,7 @@ export default function SobrePage() {
                 </li>
                 <li className="leading-[1.65] text-body">
                   Un canal oficial de reclamo (eso es SERNAC, SEC, SISS,
-                  SUBTEL — ver{' '}
+                  SUBTEL, ver{' '}
                   <Link
                     href="/terminos"
                     className="text-primary underline underline-offset-4 hover:no-underline"

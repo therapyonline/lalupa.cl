@@ -1,8 +1,8 @@
 /**
  * Parser de Abastible (gas por red, medidor).
  *
- * El fixture trae layout de medidor — para clientes con conexión por red.
- * (Abastible también vende cilindros pero usa otra boleta — pendiente).
+ * El fixture trae layout de medidor, para clientes con conexión por red.
+ * (Abastible también vende cilindros pero usa otra boleta, pendiente).
  */
 
 import { ParserError } from '../errors'

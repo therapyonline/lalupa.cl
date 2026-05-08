@@ -159,7 +159,7 @@ export function ResultViewGas({ empresaSlug }: { empresaSlug: string }) {
     return (
       <ErrorView
         title={`Aún no analizamos boletas de ${state.empresa}`}
-        description={`El parser de ${state.empresa} todavía no está implementado — necesitamos una boleta real para mapear el formato exacto. Mientras tanto podés volver a subir o probar con otra herramienta.`}
+        description={`El parser de ${state.empresa} todavía no está implementado, necesitamos una boleta real para mapear el formato exacto. Mientras tanto podés volver a subir o probar con otra herramienta.`}
       />
     )
   }

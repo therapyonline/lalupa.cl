@@ -33,7 +33,7 @@ export const INDICADORES_HOME: Indicador[] = [
     caption: 'Tramo residencial · Abril 2026',
     linkLabel: 'Ver historial',
     href: '/guias',
-    fuente: 'SEC — promedio BT-1 nacional',
+    fuente: 'SEC, promedio BT-1 nacional',
     derivado: false,
     notas:
       'TODO: derivar con calcularTarifaBT1Promedio() cuando TARIFAS_BT1_2026 tenga todas las distribuidoras completas.',
@@ -44,7 +44,7 @@ export const INDICADORES_HOME: Indicador[] = [
     caption: 'semestrales por hogar de 4 o más integrantes',
     linkLabel: '¿Calificas?',
     href: '/subsidio-electrico',
-    fuente: 'Ley 21.667 — Quinta convocatoria 2026',
+    fuente: 'Ley 21.667, Quinta convocatoria 2026',
     derivado: false,
   },
   {
@@ -54,7 +54,7 @@ export const INDICADORES_HOME: Indicador[] = [
     linkLabel: 'Ver fuente',
     href: 'https://www.sernac.cl',
     external: true,
-    fuente: 'SERNAC — Estadísticas mensuales',
+    fuente: 'SERNAC, Estadísticas mensuales',
     derivado: false,
     notas:
       'TODO: automatizar desde portal estadísticas SERNAC (no hay API pública, requiere scraping mensual).',
@@ -65,7 +65,7 @@ export const INDICADORES_HOME: Indicador[] = [
     caption: 'Cambio promedio últimos 12 meses',
     linkLabel: 'Por qué subió',
     href: '/guias',
-    fuente: 'CNE — Variación tarifaria 12m',
+    fuente: 'CNE, Variación tarifaria 12m',
     derivado: false,
     notas:
       'TODO: calcular desde calendario-tarifario-2026.md (acumular reajustes IPC + Ley 21.667).',
@@ -93,10 +93,10 @@ export const INDICADORES_METADATA = {
   ultimaActualizacion: '2026-05-06',
   proximaRevision: '2026-06-06',
   fuentesPrimarias: [
-    'SEC — Tarifas de suministro vigentes',
-    'CNE — Decretos tarifarios PNP',
-    'SERNAC — Estadísticas de reclamos',
-    'Ministerio de Energía — Subsidio Eléctrico Ley 21.667',
+    'SEC, Tarifas de suministro vigentes',
+    'CNE, Decretos tarifarios PNP',
+    'SERNAC, Estadísticas de reclamos',
+    'Ministerio de Energía, Subsidio Eléctrico Ley 21.667',
   ],
   pendientes: [
     'Conectar #1 (tarifa BT-1) a calcularTarifaBT1Promedio() cuando tarifas.ts esté completo',

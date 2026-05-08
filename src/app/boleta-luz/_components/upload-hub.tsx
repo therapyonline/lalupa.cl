@@ -27,7 +27,7 @@ export function UploadHub() {
   const [resetKey, setResetKey] = useState(0)
   const [ocrStatus, setOcrStatus] = useState<string | null>(null)
 
-  // Libera el Worker de Tesseract al desmontar — evita ~50 MB de memoria
+  // Libera el Worker de Tesseract al desmontar, evita ~50 MB de memoria
   // residual si el usuario navega sin haber subido foto en este viaje.
   useEffect(() => {
     return () => {

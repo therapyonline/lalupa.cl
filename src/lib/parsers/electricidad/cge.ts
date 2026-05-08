@@ -310,7 +310,7 @@ export const cgeParser: ParserModule = {
   fingerprint: {
     keywords: CGE_KEYWORDS,
     format:
-      'CGE residencial BT-1: 4 partes verticales — header con logo + RUT + datos cliente, detalle de cargos + lectura medidor, gráfico histórico de consumo, códigos de pago + información SERNAC.',
+      'CGE residencial BT-1: 4 partes verticales, header con logo + RUT + datos cliente, detalle de cargos + lectura medidor, gráfico histórico de consumo, códigos de pago + información SERNAC.',
   },
   detect(text) {
     if (!text) return false

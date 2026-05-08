@@ -67,7 +67,7 @@ describe('aguasandinasParser.parse', () => {
   })
 
   it('rechaza boletas SMAPA con WRONG_EMPRESA', () => {
-    const smapa = `SMAPA — Servicio Municipal de Agua Potable\nsmapa.cl\nBoleta: 12060510`
+    const smapa = `SMAPA, Servicio Municipal de Agua Potable\nsmapa.cl\nBoleta: 12060510`
     try {
       parseAguasAndinas(smapa)
     } catch (err) {

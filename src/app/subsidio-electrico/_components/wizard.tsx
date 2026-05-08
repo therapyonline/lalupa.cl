@@ -510,7 +510,7 @@ function MontoCard({
             ? 'media'
             : prioridad === 'baja'
               ? 'baja'
-              : '—'}
+              : '-'}
       </Pill>
     </div>
   )

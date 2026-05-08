@@ -129,7 +129,7 @@ describe('filterGuiasForTool', () => {
 
 describe('pickRelatedGuias', () => {
   it('puts same-category guides first when same-category covers the limit', () => {
-    // limit=2; same-category has b, c (a excluded) — exactly fits
+    // limit=2; same-category has b, c (a excluded), exactly fits
     const result = pickRelatedGuias(GUIAS, 'a', 'luz', 2)
     expect(result.map((g) => g.slug)).toEqual(['b', 'c'])
   })

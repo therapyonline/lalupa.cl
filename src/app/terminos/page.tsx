@@ -78,19 +78,19 @@ export default function TerminosPage() {
               </p>
               <ul className={UL}>
                 <li className={LI}>
-                  <strong className="text-ink">SERNAC</strong> — Servicio
+                  <strong className="text-ink">SERNAC</strong>, Servicio
                   Nacional del Consumidor (cualquier servicio).
                 </li>
                 <li className={LI}>
-                  <strong className="text-ink">SEC</strong> —
+                  <strong className="text-ink">SEC</strong>,
                   Superintendencia de Electricidad y Combustibles (luz y gas).
                 </li>
                 <li className={LI}>
-                  <strong className="text-ink">SISS</strong> —
+                  <strong className="text-ink">SISS</strong>,
                   Superintendencia de Servicios Sanitarios (agua).
                 </li>
                 <li className={LI}>
-                  <strong className="text-ink">SUBTEL</strong> — Subsecretaría
+                  <strong className="text-ink">SUBTEL</strong>, Subsecretaría
                   de Telecomunicaciones (internet, telefonía).
                 </li>
               </ul>

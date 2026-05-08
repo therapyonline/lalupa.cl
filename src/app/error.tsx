@@ -30,7 +30,7 @@ export default function GlobalError({
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-body">
             Tuvimos un error inesperado al renderizar esta página. Tu boleta y
-            tu histórico siguen seguros — nada salió de tu dispositivo.
+            tu histórico siguen seguros, nada salió de tu dispositivo.
             Intentá recargar.
           </p>
           {error.digest && (

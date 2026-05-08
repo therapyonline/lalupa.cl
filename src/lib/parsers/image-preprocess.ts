@@ -4,12 +4,12 @@
  *   1. Decode con ImageBitmap (más rápido y privado que Image+URL).
  *   2. Convierte a grayscale (luminance Rec.709).
  *   3. Aplica contrast stretch sobre el percentil 5/95 (similar a "auto contrast"
- *      de Photoshop) — saca el efecto de papel térmico desteñido o sombra
+ *      de Photoshop), saca el efecto de papel térmico desteñido o sombra
  *      uniforme sin convertir las áreas brillantes en blancos puros.
  *
  * Devuelve un `Blob` PNG listo para pasarle al worker de Tesseract.
  *
- * Heurística: solo procesamos si la imagen es ≥ 800px de lado mayor — ahí
+ * Heurística: solo procesamos si la imagen es ≥ 800px de lado mayor, ahí
  * casi seguro es foto de celular y vale la pena. Imágenes chicas
  * (capturas de pantalla, miniaturas) se devuelven tal cual.
  */
@@ -19,13 +19,13 @@ const MIN_LONG_SIDE_FOR_PREPROCESS = 800
 export async function preprocessImageForOcr(file: File): Promise<Blob> {
   if (typeof window === 'undefined') return file
   if (!file.type.startsWith('image/')) return file
-  // PNG sin compresión a veces son screenshots — no las preprocesamos.
+  // PNG sin compresión a veces son screenshots, no las preprocesamos.
 
   let bitmap: ImageBitmap
   try {
     bitmap = await createImageBitmap(file)
   } catch {
-    // Si decoding falla, devolvemos el original — Tesseract intentará igual.
+    // Si decoding falla, devolvemos el original, Tesseract intentará igual.
     return file
   }
 

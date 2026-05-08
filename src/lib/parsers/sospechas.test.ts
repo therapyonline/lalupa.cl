@@ -1,7 +1,7 @@
 /**
  * Tests específicos para las heurísticas de sospecha de cada parser.
  *
- * Las heurísticas son el core de lalupa — si dejan de marcar un cargo
+ * Las heurísticas son el core de lalupa, si dejan de marcar un cargo
  * legítimamente sospechoso (false negative) o marcan algo correcto como
  * sospechoso (false positive), la herramienta pierde credibilidad.
  *
@@ -31,7 +31,7 @@ describe('sospecha: Reposición sin contexto de corte', () => {
 
   it('NO marca Reposición cuando la boleta menciona corte', () => {
     // El fixture SAESA ya menciona "Corte el 01 Oct 2024 Motivo: No pago".
-    // Inyectamos un cargo Reposición — debería NO ser sospechoso por
+    // Inyectamos un cargo Reposición, debería NO ser sospechoso por
     // contexto explícito.
     const r = parseSaesa(
       `SOCIEDAD AUSTRAL DE ELECTRICIDAD S.A.\nRUT: 96.544.470-3\ngruposaesa.cl/saesa\n` +
@@ -109,7 +109,7 @@ Total a pagar ................ $ 56.000
   })
 
   it('marca como sospechoso cuando cargo fijo difiere 5-20% del SEC', () => {
-    // 1300 vs 1048 = +24% — entra en cobro_indebido_probable
+    // 1300 vs 1048 = +24%, entra en cobro_indebido_probable
     const r = parseCGE(makeCgeFixture(1300))
     const cargoFijo = r.cargos.find((c) => c.concepto === 'Cargo fijo')
     expect(cargoFijo?.sospechoso).toBe(true)

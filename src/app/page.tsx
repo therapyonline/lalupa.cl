@@ -35,7 +35,7 @@ const TOOLS = [
     badge: null,
     title: 'Revisa tu boleta de gas',
     description:
-      'Metrogas, Lipigas, Abastible, Gasco. Cilindro o red — detectamos recargos y diferencias contra precios SEC.',
+      'Metrogas, Lipigas, Abastible, Gasco. Cilindro o red, detectamos recargos y diferencias contra precios SEC.',
   },
   {
     href: '/reclamar-sernac',
@@ -106,7 +106,7 @@ export default async function HomePage() {
 
         <Container className="relative z-10">
           <Pill variant="accent" className="font-mono uppercase">
-            Para el chileno que ya no come cuento
+            Para los que revisan antes de pagar
           </Pill>
 
           <h1 className="mt-8 text-[clamp(48px,8vw,96px)] font-medium leading-none tracking-tight text-ink [&_em]:not-italic [&_em]:text-primary">
@@ -115,7 +115,7 @@ export default async function HomePage() {
 
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-body md:text-xl">
             Sube el PDF o sacale una foto. La lupa la procesa en tu propio
-            celular —nunca sale de tu dispositivo— y te dice si te están
+            celular (nunca sale de tu dispositivo) y te dice si te están
             cobrando lo justo.
           </p>
 
@@ -349,7 +349,7 @@ const STATS = [
         <em>14</em> empresas
       </>
     ),
-    label: '5 luz · 5 agua · 4 gas — chequeadas contra tarifas SEC y SISS',
+    label: '5 luz · 5 agua · 4 gas, chequeadas contra tarifas SEC y SISS',
   },
   {
     number: (

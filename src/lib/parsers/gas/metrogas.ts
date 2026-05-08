@@ -108,7 +108,7 @@ export function parseMetrogas(text: string): ParsedBoleta {
     )
   }
 
-  // Período "07 Junio - 06 Agosto" sin año — usar año de fecha emisión.
+  // Período "07 Junio - 06 Agosto" sin año, usar año de fecha emisión.
   const fechaEmision = extractFechaEmision(text)
   const periodo = extractPeriodo(text, fechaEmision?.getFullYear())
 

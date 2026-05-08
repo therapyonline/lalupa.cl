@@ -24,7 +24,7 @@ export function ExtractedTextPreview({
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch {
-      // Clipboard puede fallar en contextos sin permisos — no es crítico.
+      // Clipboard puede fallar en contextos sin permisos, no es crítico.
     }
   }
 

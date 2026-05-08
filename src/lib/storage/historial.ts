@@ -90,7 +90,7 @@ export async function eliminarBoleta(id: string): Promise<void> {
 
 /**
  * Borra todas las boletas del histórico local. Devuelve la cantidad
- * eliminada. Operación irreversible — el caller debería pedir
+ * eliminada. Operación irreversible, el caller debería pedir
  * confirmación al usuario.
  */
 export async function eliminarTodasLasBoletas(): Promise<number> {

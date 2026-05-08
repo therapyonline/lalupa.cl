@@ -45,7 +45,7 @@ export type TipoReclamo = (typeof TIPO_OPTIONS)[number]
 export const TIPOS_RECLAMO: readonly TipoReclamo[] = TIPO_OPTIONS
 
 function formatCLP(n: number): string {
-  if (!Number.isFinite(n)) return '—'
+  if (!Number.isFinite(n)) return '-'
   return `$ ${Math.round(n).toLocaleString('es-CL')}`
 }
 

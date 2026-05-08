@@ -57,7 +57,7 @@ export async function extractTextFromPDF(file: File): Promise<string> {
  * Renderiza la primera página del PDF a PNG. Usado como fallback cuando
  * un PDF no tiene capa de texto (escaneo) y debemos pasarlo por OCR.
  *
- * Render a 2x escala (~144 DPI desde el viewport por defecto de 72) —
+ * Render a 2x escala (~144 DPI desde el viewport por defecto de 72):
  * suficiente para Tesseract sin inflar memoria desproporcionadamente.
  */
 async function rasterizePdfFirstPage(file: File): Promise<Blob | null> {
@@ -83,7 +83,7 @@ async function rasterizePdfFirstPage(file: File): Promise<Blob | null> {
 }
 
 /**
- * Extrae texto de un archivo de boleta — PDF nativo o imagen (jpg/png).
+ * Extrae texto de un archivo de boleta, PDF nativo o imagen (jpg/png).
  *
  *   - PDF con capa de texto: extracción directa con pdfjs.
  *   - PDF escaneado (sin capa de texto): rasteriza la primera página

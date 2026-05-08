@@ -146,7 +146,7 @@ export const chilquintaParser: ParserModule = {
   fingerprint: {
     keywords: CHILQUINTA_KEYWORDS,
     format:
-      'Chilquinta: layout 4 partes — header + datos + cargos + info pago. Cargos: Administración, Electricidad consumida X kWh, Coordinación y transporte. Total exento + neto + IVA + boleta + saldo + a pagar.',
+      'Chilquinta: layout 4 partes, header + datos + cargos + info pago. Cargos: Administración, Electricidad consumida X kWh, Coordinación y transporte. Total exento + neto + IVA + boleta + saldo + a pagar.',
   },
   detect(text) {
     return Boolean(text) && CHILQUINTA_DETECT_REGEX.test(text)

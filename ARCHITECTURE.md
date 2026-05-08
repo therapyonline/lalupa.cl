@@ -1,4 +1,4 @@
-# lalupa.cl — Arquitectura
+# lalupa.cl, Arquitectura
 
 Una herramienta gratuita para revisar boletas de servicios básicos en Chile. **Privacy-by-design**: el procesamiento ocurre íntegramente en el navegador del usuario, sin uploads ni cuentas.
 
@@ -7,7 +7,7 @@ Una herramienta gratuita para revisar boletas de servicios básicos en Chile. **
 - **100% browser-side**: PDFs y fotos nunca dejan el dispositivo. El parser corre como JavaScript en el browser.
 - **No backend, no DB remota**: Vercel sirve assets estáticos; el histórico vive en IndexedDB local.
 - **No login**: cero registros, cero forms que persistan datos. Analytics es opt-in via env var (Cloudflare WA + Clarity en mask mode, sin cookies de marketing).
-- **Self-hosted dependencies**: Tesseract.js (OCR) y pdfjs-dist (PDF) servidos desde el mismo origen — sin CDNs externos.
+- **Self-hosted dependencies**: Tesseract.js (OCR) y pdfjs-dist (PDF) servidos desde el mismo origen, sin CDNs externos.
 
 ## Stack
 
@@ -115,7 +115,7 @@ Cada parser implementa `detectarSospecha(cargo, text, ...)` con dos tipos de reg
 
 - **Unit (Vitest)** ~390 tests cubriendo parsers, helpers, SEO, RUT validator, OCR guards, dataset-sync, cross-empresa rejection, sospechas
 - **E2E (Playwright)** ~45 tests cubriendo SEO metadata, a11y, OCR pipeline end-to-end, security headers, health check
-- **Fixtures**: 13 boletas reales en `src/lib/parsers/__fixtures__/{empresa}-real-{period}.ts` — niveles A+/A/C documentados por fixture
+- **Fixtures**: 13 boletas reales en `src/lib/parsers/__fixtures__/{empresa}-real-{period}.ts`, niveles A+/A/C documentados por fixture
 
 Test sistémicos clave:
 - `dataset-sync.test.ts`: cada parser declara el RUT exacto de `empresas.ts`

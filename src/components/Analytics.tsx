@@ -1,7 +1,7 @@
 /**
  * Analytics opt-in via env vars.
  *
- * Solo carga scripts si las variables están seteadas — default no carga
+ * Solo carga scripts si las variables están seteadas, default no carga
  * nada (privacy-first en local/dev).
  *
  *   NEXT_PUBLIC_CLOUDFLARE_WA_TOKEN  → Cloudflare Web Analytics (cookie-less)

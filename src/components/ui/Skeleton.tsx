@@ -26,7 +26,7 @@ export function Skeleton({
 }
 
 /**
- * Logo spinner — usado en loading.tsx globales y de fallback. La animación
+ * Logo spinner, usado en loading.tsx globales y de fallback. La animación
  * gira el círculo del medio del logo (que también es la lupa). Se ajusta
  * automáticamente al color del fondo en el que está embebido.
  */

@@ -54,7 +54,7 @@ const PRINCIPLES: Array<{
 const FAQS: Array<{ q: string; a: string }> = [
   {
     q: '¿Lalupa sube mi boleta a la nube?',
-    a: 'No. La boleta se procesa íntegramente en tu navegador. El servidor de lalupa solo entrega el código de la página al inicio — después de eso, el archivo PDF nunca se transmite a internet.',
+    a: 'No. La boleta se procesa íntegramente en tu navegador. El servidor de lalupa solo entrega el código de la página al inicio, después de eso, el archivo PDF nunca se transmite a internet.',
   },
   {
     q: '¿Necesito crear una cuenta?',
@@ -62,11 +62,11 @@ const FAQS: Array<{ q: string; a: string }> = [
   },
   {
     q: '¿Puedo usar lalupa sin conexión?',
-    a: 'La primera vez necesitás conexión para cargar el sitio. Una vez cargado, el parser de PDF funciona offline porque corre en el navegador. Si subís una foto, la primera vez se descargan el motor de OCR y el modelo de español (todos desde lalupa.cl, sin terceros); después de eso también quedan en cache. El sitio no es PWA por ahora — eso quiere decir que si cerrás la pestaña, la próxima vez vas a necesitar conexión para reabrirlo.',
+    a: 'La primera vez necesitás conexión para cargar el sitio. Una vez cargado, el parser de PDF funciona offline porque corre en el navegador. Si subís una foto, la primera vez se descargan el motor de OCR y el modelo de español (todos desde lalupa.cl, sin terceros); después de eso también quedan en cache. El sitio no es PWA por ahora, eso quiere decir que si cerrás la pestaña, la próxima vez vas a necesitar conexión para reabrirlo.',
   },
   {
     q: '¿Qué tan precisas son las alertas?',
-    a: 'Las alertas son referenciales. Comparamos tu boleta contra tarifas SEC/SISS publicadas y contra tu histórico local. Pueden equivocarse — el formato de boleta cambia y a veces las tarifas se actualizan después de una resolución oficial. Verificá siempre la boleta original antes de usar una alerta como base de un reclamo formal.',
+    a: 'Las alertas son referenciales. Comparamos tu boleta contra tarifas SEC/SISS publicadas y contra tu histórico local. Pueden equivocarse, el formato de boleta cambia y a veces las tarifas se actualizan después de una resolución oficial. Verificá siempre la boleta original antes de usar una alerta como base de un reclamo formal.',
   },
   {
     q: '¿Por qué confiar en una herramienta gratuita?',
@@ -78,7 +78,7 @@ const FAQS: Array<{ q: string; a: string }> = [
   },
   {
     q: '¿Qué hago si la herramienta se equivoca?',
-    a: 'Mandanos un correo a bugs@lalupa.cl con la empresa, la fecha de la boleta y qué fue lo que falló. Mejoramos los parsers a partir de reportes reales (sin necesidad de que nos mandes la boleta — solo lo necesario para reproducir).',
+    a: 'Mandanos un correo a bugs@lalupa.cl con la empresa, la fecha de la boleta y qué fue lo que falló. Mejoramos los parsers a partir de reportes reales (sin necesidad de que nos mandes la boleta, solo lo necesario para reproducir).',
   },
 ]
 
@@ -117,7 +117,7 @@ export default function ComoFuncionaPage() {
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-body">
             Lalupa fue construida bajo un principio simple: no almacenamos lo
             que no necesitamos, y no necesitamos casi nada. Esta página explica
-            exactamente cómo lo hacemos — incluyendo cómo verificarlo vos
+            exactamente cómo lo hacemos, incluyendo cómo verificarlo vos
             mismo.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">

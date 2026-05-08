@@ -7,7 +7,7 @@ const TIPS = [
   {
     icon: '📐',
     title: 'Boleta plana y derecha',
-    body: 'Apoyala en una mesa, no en tu falda. Que esté lo más recta posible — sin perspectiva.',
+    body: 'Apoyala en una mesa, no en tu falda. Que esté lo más recta posible, sin perspectiva.',
   },
   {
     icon: '🔍',
@@ -49,7 +49,7 @@ export function OcrPhotoTips({ className }: { className?: string }) {
       </ul>
       <p className="mt-3 text-xs text-soft">
         Si tenés el PDF original (descargado del sitio de la empresa), preferilo
-        siempre — es más exacto que cualquier foto.
+        siempre, es más exacto que cualquier foto.
       </p>
     </details>
   )

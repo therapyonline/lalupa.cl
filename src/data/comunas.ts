@@ -20,7 +20,7 @@ export interface Comuna {
   nombre: string;
   region: string;       // nombre canónico de la región
   codigoRegion: string; // ej '13'
-  codigoComuna?: string; // pendiente — INE 5 dígitos
+  codigoComuna?: string; // pendiente, INE 5 dígitos
 }
 
 export const REGIONES: Region[] = [

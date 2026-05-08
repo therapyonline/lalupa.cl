@@ -412,7 +412,7 @@ export function Wizard() {
           <p className="mt-8 max-w-2xl text-xs text-soft">
             La carta se arma en tu navegador con `pdf-lib`. No subimos ni
             guardamos tus datos en ningún servidor. SERNAC, SEC y SISS son las
-            entidades formales para tramitar el reclamo —{' '}
+            entidades formales para tramitar el reclamo.{' '}
             <Link
               href="/boleta-luz"
               className="text-primary underline underline-offset-4 hover:no-underline"
@@ -651,7 +651,7 @@ function Step4({
       </h2>
       <p className="mt-2 text-body">
         Pre-armamos un texto base con los datos de tu boleta. Editalo si hace
-        falta — es lo que SERNAC va a leer primero.
+        falta, es lo que SERNAC va a leer primero.
       </p>
       <Textarea
         value={value}

@@ -27,16 +27,22 @@ const WORKER_SRC = join(
   'dist',
   'worker.min.js',
 )
-const CORE_SRC_DIR = join(
-  ROOT,
-  'node_modules',
-  '.pnpm',
-  'tesseract.js-core@7.0.0',
-  'node_modules',
-  'tesseract.js-core',
-)
 const TRAINEDDATA_URL =
   'https://tessdata.projectnaptha.com/4.0.0/spa.traineddata.gz'
+
+/**
+ * Resuelve el directorio de tesseract.js-core de manera version-agnostic.
+ * Busca en node_modules/.pnpm/tesseract.js-core@<x.y.z>/node_modules/tesseract.js-core
+ * para no romperse cuando pnpm bumpea la versión transitiva.
+ */
+async function resolveCoreSrcDir() {
+  const pnpmDir = join(ROOT, 'node_modules', '.pnpm')
+  if (!(await exists(pnpmDir))) return null
+  const entries = await readdir(pnpmDir)
+  const match = entries.find((e) => /^tesseract\.js-core@/.test(e))
+  if (!match) return null
+  return join(pnpmDir, match, 'node_modules', 'tesseract.js-core')
+}
 
 async function exists(p) {
   try {
@@ -73,8 +79,9 @@ async function main() {
   if (copiedWorker) console.log('· worker.min.js copiado')
 
   // 2. Core (todas las variantes — tesseract.js elige la mejor en runtime)
-  if (await exists(CORE_SRC_DIR)) {
-    const files = await readdir(CORE_SRC_DIR)
+  const coreSrcDir = await resolveCoreSrcDir()
+  if (coreSrcDir && (await exists(coreSrcDir))) {
+    const files = await readdir(coreSrcDir)
     // Solo LSTM (oem: 1). tesseract.js elige la variante en runtime según
     // soporte SIMD del navegador.
     const wanted = files.filter(
@@ -85,7 +92,7 @@ async function main() {
     let coreCopied = 0
     for (const f of wanted) {
       const did = await copyIfMissing(
-        join(CORE_SRC_DIR, f),
+        join(coreSrcDir, f),
         join(PUBLIC_DIR, 'core', f),
       )
       if (did) coreCopied += 1
@@ -94,7 +101,7 @@ async function main() {
       console.log(`· core: ${coreCopied} archivos copiados (${wanted.length} totales)`)
   } else {
     console.error(
-      `tesseract.js-core no encontrado en ${CORE_SRC_DIR} — saltando core.`,
+      'tesseract.js-core no encontrado bajo node_modules/.pnpm/tesseract.js-core@*/ — saltando core.',
     )
   }
 

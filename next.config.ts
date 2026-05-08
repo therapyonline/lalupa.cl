@@ -12,7 +12,7 @@ import type { NextConfig } from 'next'
  *   - CSP same-origin con `wasm-unsafe-eval` (Tesseract) y `blob:` (pdf-lib)
  *
  * 'unsafe-inline' en script-src/style-src es pendiente de migrar a nonces
- * (App Router lo soporta) — hoy es necesario para hidratación + estilos
+ * (App Router lo soporta), hoy es necesario para hidratación + estilos
  * inline que Next inyecta.
  */
 
@@ -56,12 +56,70 @@ const SECURITY_HEADERS = [
   },
 ]
 
+// Cache-Control para assets que servimos directamente desde public/ y rutas
+// custom (OG image, tesseract, pdf worker). Las páginas SSG/ISR las cachea
+// Vercel en el edge con su propia política.
+const CACHE_IMMUTABLE = [
+  {
+    key: 'Cache-Control',
+    value: 'public, max-age=31536000, immutable',
+  },
+]
+
+const CACHE_24H_REVALIDATE = [
+  {
+    key: 'Cache-Control',
+    value:
+      'public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800',
+  },
+]
+
 const nextConfig: NextConfig = {
+  // Quitar header X-Powered-By: Next.
+  poweredByHeader: false,
+
+  // Compresión gzip/brotli (default en Vercel pero explícito).
+  compress: true,
+
+  // Tree-shake agresivo de paquetes con muchos exports. lucide-react expone
+  // ~1000 íconos, nosotros usamos <10. date-fns tiene cientos de funciones
+  // y solo importamos format/parseISO/etc.
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'date-fns'],
+  },
+
   async headers() {
     return [
+      // Headers de seguridad globales.
       {
         source: '/:path*',
         headers: SECURITY_HEADERS,
+      },
+      // Logo: contenido inmutable, cache largo.
+      {
+        source: '/icon.svg',
+        headers: CACHE_IMMUTABLE,
+      },
+      // Tesseract assets (worker, core wasm, traineddata): nunca cambian
+      // entre deploys salvo upgrade de tesseract.js.
+      {
+        source: '/tesseract/:path*',
+        headers: CACHE_IMMUTABLE,
+      },
+      // PDF.js worker.
+      {
+        source: '/pdf.worker.min.mjs',
+        headers: CACHE_IMMUTABLE,
+      },
+      // OG image: regenerable, cache 24h con stale-while-revalidate.
+      {
+        source: '/api/og',
+        headers: CACHE_24H_REVALIDATE,
+      },
+      // Fuentes Google self-hosted por next/font: hash en filename, immutable.
+      {
+        source: '/_next/static/media/:path*',
+        headers: CACHE_IMMUTABLE,
       },
     ]
   },

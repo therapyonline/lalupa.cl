@@ -16,6 +16,7 @@
     "copy:pdf-worker": "cp node_modules/pdfjs-dist/build/pdf.worker.min.mjs public/pdf.worker.min.mjs",
     "setup:tesseract": "node scripts/setup-tesseract.mjs",
     "check:bundle-size": "node scripts/check-bundle-size.mjs",
+    "perf:audit": "node scripts/perf-audit.mjs",
     "postinstall": "pnpm copy:pdf-worker && pnpm setup:tesseract"
   },
   "dependencies": {

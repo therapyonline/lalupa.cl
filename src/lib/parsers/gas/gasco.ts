@@ -17,6 +17,7 @@ import {
 import type { ParsedBoleta, ParserModule } from '../types'
 
 const GASCO_KEYWORDS = [
+  'Gasco',
   'GASCO GLP S.A.',
   'Gasco GLP',
   'Gasco S.A.',
@@ -25,7 +26,10 @@ const GASCO_KEYWORDS = [
   'Santo Domingo 1061',
 ]
 
-const GASCO_DETECT_REGEX = /Gasco\s+GLP|Gasco\s+S\.A\.|gasco\.cl|96\.568\.740-8/i
+// Detect amplio: cualquier "Gasco" como palabra completa o el dominio
+// o el RUT con separadores tolerantes.
+const GASCO_DETECT_REGEX =
+  /\bgasco\b|gasco\.cl|96[\s.,]?568[\s.,]?740[\s-]?8/i
 const GASCO_MARKERS_REGEX = GASCO_DETECT_REGEX
 
 const OTHER_EMPRESA_MARKERS_REGEX =

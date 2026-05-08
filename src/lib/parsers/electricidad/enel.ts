@@ -23,15 +23,20 @@ import {
 import type { Cargo, ParsedBoleta, ParserModule } from '../types'
 
 const ENEL_KEYWORDS = [
+  'Enel',
   'Enel Distribución Chile',
   'Enel Distribución',
   'enel.cl',
   '96.800.570-7',
 ]
 
-const ENEL_DETECT_REGEX = /Enel\s+Distribuci[óo]n|enel\.cl/i
+// Detect amplio: cualquier "Enel" como palabra completa, dominio o RUT
+// con separadores tolerantes. Si el texto contiene "Enel" pero no es
+// boleta de Enel, MARKERS_REGEX o el parser tiran error después.
+const ENEL_DETECT_REGEX = /\benel\b|enel\.cl/i
 
-const ENEL_MARKERS_REGEX = /(Enel\s+Distribuci[óo]n|96\.800\.570-7|enel\.cl)/i
+const ENEL_MARKERS_REGEX =
+  /(\benel\b|96[\s.,]?800[\s.,]?570[\s-]?7|enel\.cl)/i
 
 const OTHER_EMPRESA_MARKERS_REGEX =
   /(\bCGE\b|99\.513\.400-4|Compa[ñn][ií]a\s+General\s+de\s+Electricidad|Chilquinta\s+(?:Energ[íi]a|Distribuci[óo]n)|96\.813\.520-1|Sociedad\s+Austral\s+de\s+Electricidad|96\.544\.470-3|Empresa\s+El[ée]ctrica\s+de\s+la\s+Frontera|76\.073\.164-1)/i

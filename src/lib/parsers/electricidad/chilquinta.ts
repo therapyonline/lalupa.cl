@@ -22,6 +22,7 @@ import {
 import type { Cargo, ParsedBoleta, ParserModule } from '../types'
 
 const CHILQUINTA_KEYWORDS = [
+  'Chilquinta',
   'CHILQUINTA DISTRIBUCIÓN S.A.',
   'Chilquinta Energía',
   'Chilquinta Distribución',
@@ -29,11 +30,14 @@ const CHILQUINTA_KEYWORDS = [
   '96.813.520-1',
 ]
 
-const CHILQUINTA_DETECT_REGEX =
-  /Chilquinta\s+(?:Energ[íi]a|Distribuci[óo]n)|chilquinta\.cl/i
+// Detect amplio: cualquier mención de "Chilquinta" o el dominio o el RUT
+// con espacios. Si el texto contiene la palabra pero no es realmente una
+// boleta de Chilquinta, MARKERS_REGEX o el resto del parser tira el
+// error correcto al final.
+const CHILQUINTA_DETECT_REGEX = /\bchilquinta\b|chilquinta\.cl/i
 
 const CHILQUINTA_MARKERS_REGEX =
-  /(Chilquinta\s+(?:Energ[íi]a|Distribuci[óo]n)|96\.813\.520-1|chilquinta\.cl)/i
+  /(\bchilquinta\b|96[\s.,]?813[\s.,]?520[\s-]?1|chilquinta\.cl)/i
 
 const OTHER_EMPRESA_MARKERS_REGEX =
   /(\bCGE\b|99\.513\.400-4|Compa[ñn][ií]a\s+General\s+de\s+Electricidad|Enel\s+Distribuci[óo]n|96\.800\.570-7|Sociedad\s+Austral\s+de\s+Electricidad|96\.544\.470-3|Empresa\s+El[ée]ctrica\s+de\s+la\s+Frontera|76\.073\.164-1)/i

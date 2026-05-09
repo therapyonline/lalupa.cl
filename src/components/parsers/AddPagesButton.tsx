@@ -1,8 +1,7 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useId, useState } from 'react'
 import { Loader2 } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
 import { extractTextFromImages, type OcrProgress } from '@/lib/parsers'
 
 const MAX_ADDITIONAL_FILES = 5
@@ -38,9 +37,13 @@ function formatStatus(p: OcrProgress, page: number, total: number): string {
  * PDF físico, por ejemplo), el usuario puede sumar fotos adicionales
  * sin tener que re-uploadear desde cero. El OCR corre sobre las nuevas
  * fotos y el texto se concatena al rawText actual.
+ *
+ * Implementado con `<label htmlFor>` en vez de Button.click() programático
+ * porque ese patrón es más confiable en todos los browsers (Safari iOS
+ * a veces ignora click() en inputs ocultos).
  */
 export function AddPagesButton({ onAddText }: Props) {
-  const inputRef = useRef<HTMLInputElement>(null)
+  const inputId = useId()
   const [busy, setBusy] = useState(false)
   const [status, setStatus] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -74,9 +77,9 @@ export function AddPagesButton({ onAddText }: Props) {
 
   async function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const list = e.target.files
-    if (!list) return
-    const files = Array.from(list)
-    e.target.value = '' // permite re-seleccionar el mismo archivo si el usuario quiere
+    const files = list ? Array.from(list) : []
+    e.target.value = '' // permite re-seleccionar el mismo archivo
+    if (files.length === 0) return
 
     const v = validate(files)
     if (v) {
@@ -96,42 +99,54 @@ export function AddPagesButton({ onAddText }: Props) {
         )
       }
       onAddText(text)
+      setStatus('Listo. Actualizando resultado…')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error procesando.')
+      const msg =
+        err instanceof Error ? err.message : 'Error procesando la foto.'
+      setError(msg)
     } finally {
       setBusy(false)
-      setStatus(null)
+      // Mantenemos el último status visible un instante para que el
+      // usuario vea el feedback antes de que cambie el resultado.
+      setTimeout(() => setStatus(null), 1500)
     }
   }
 
+  // El input está oculto con sr-only (no `display:none`) así Safari y
+  // navegadores estrictos pueden rastrear el `htmlFor` del label.
   return (
     <div className="mt-4 flex flex-col items-start gap-2">
       <input
-        ref={inputRef}
+        id={inputId}
         type="file"
         accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif"
         multiple
         onChange={handleChange}
-        className="hidden"
-        aria-hidden
-        tabIndex={-1}
-      />
-      <Button
-        type="button"
-        variant="dark"
-        size="sm"
-        onClick={() => inputRef.current?.click()}
         disabled={busy}
+        className="sr-only"
+      />
+      <label
+        htmlFor={inputId}
+        aria-disabled={busy}
+        className={
+          busy
+            ? 'inline-flex items-center gap-2 rounded-full bg-ink/60 px-4 py-2 text-xs font-medium uppercase tracking-wide text-cream cursor-wait'
+            : 'inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2 text-xs font-medium uppercase tracking-wide text-cream transition-colors hover:bg-primary-dark cursor-pointer focus-within:ring-4 focus-within:ring-primary/20'
+        }
       >
         {busy ? (
           <>
-            <Loader2 className="h-4 w-4 animate-spin" strokeWidth={1.5} />
+            <Loader2
+              className="h-4 w-4 animate-spin"
+              strokeWidth={1.5}
+              aria-hidden
+            />
             <span>Procesando…</span>
           </>
         ) : (
-          <span>Agregar foto del reverso</span>
+          <span>Agregar foto (frente, reverso, otra página)</span>
         )}
-      </Button>
+      </label>
       {status && (
         <p
           role="status"

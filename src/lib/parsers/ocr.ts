@@ -152,13 +152,19 @@ export async function extractTextFromImage(
 /**
  * Libera el worker (útil al desmontar pantallas que ya no necesitan OCR).
  * Volver a llamar `extractTextFromImage` recreará el worker.
+ *
+ * Importante: nullificamos `workerPromise` ANTES de awaitar el terminate,
+ * para evitar que un nuevo caller (e.g. AddPagesButton en result-view)
+ * agarre la promesa del worker que se está muriendo.
  */
 export async function disposeOcrWorker(): Promise<void> {
-  if (!workerPromise) return
+  const p = workerPromise
+  if (!p) return
+  workerPromise = null
   try {
-    const worker = await workerPromise
+    const worker = await p
     await worker.terminate()
-  } finally {
-    workerPromise = null
+  } catch {
+    // ya estaba en proceso de terminación o falló, no es bloqueante
   }
 }

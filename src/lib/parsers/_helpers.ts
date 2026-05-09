@@ -70,6 +70,32 @@ export function normalizeOcrText(text: string): string {
   // "kvvh" → "kWh" cuando OCR confunde W con vv.
   out = out.replace(/\bkvvh\b/gi, 'kWh')
 
+  // Cargos comunes con l→1 / o→0 / i→1 confusiones. Cubre los casos que
+  // rompen CARGO_PATTERNS en CGE/Enel/Chilquinta/SISS.
+  //
+  // Importante: estos regex usan clases tipo `[1i]` que tambien matchean
+  // la palabra intacta, así que solo aplicamos la corrección cuando el
+  // match contiene al menos un dígito (0/1) — i.e., cuando OCR realmente
+  // mangleó. Sin este guard, "servicio" intacto se vuelve "Servicio"
+  // (case change espurio).
+  const replaceIfMangled = (re: RegExp, canonical: string) =>
+    out.replace(re, (m) => (/[01]/.test(m) ? canonical : m))
+
+  out = replaceIfMangled(/\bE[1l]ectric[1i]dad\b/gi, 'Electricidad')
+  out = replaceIfMangled(
+    /\bAdm[1iIl]n[1iIl]strac[1i][óo0]n\b/gi,
+    'Administración',
+  )
+  out = replaceIfMangled(
+    /\bC[o0][o0]rd[1i]nac[1i][óo0]n\b/gi,
+    'Coordinación',
+  )
+  out = replaceIfMangled(/\bRepos[1i]c[1i][óo0]n\b/gi, 'Reposición')
+  out = replaceIfMangled(/\bC[o0]ns[u0]m[o0]\b/gi, 'Consumo')
+  out = replaceIfMangled(/\bCargo\s+f[1i]j[o0]\b/gi, 'Cargo fijo')
+  out = replaceIfMangled(/\bSubt[o0]ta[1l]\b/gi, 'Subtotal')
+  out = replaceIfMangled(/\bServ[1i]c[1i]o\b/gi, 'Servicio')
+
   return out
 }
 

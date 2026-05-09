@@ -41,6 +41,38 @@ describe('normalizeOcrText', () => {
     const twice = normalizeOcrText(once)
     expect(twice).toBe(once)
   })
+
+  it('corrige cargos con l→1 en "Electricidad"', () => {
+    expect(
+      normalizeOcrText('E1ectricidad consumida 163 kWh $ 23.452'),
+    ).toContain('Electricidad consumida')
+  })
+
+  it('corrige cargos con i→1 en "Administración"', () => {
+    expect(
+      normalizeOcrText('Adm1nistración del servicio $ 1.324'),
+    ).toContain('Administración')
+  })
+
+  it('corrige cargos con o→0 en "Coordinación"', () => {
+    expect(
+      normalizeOcrText('Co0rdinación y transporte $ 3.202'),
+    ).toContain('Coordinación')
+  })
+
+  it('corrige "Reposici0n" → "Reposición"', () => {
+    expect(normalizeOcrText('Reposici0n de servicio')).toContain('Reposición')
+  })
+
+  it('corrige "Cargo fij0" → "Cargo fijo"', () => {
+    expect(normalizeOcrText('Cargo fij0  $ 5.200')).toContain('Cargo fijo')
+  })
+
+  it('NO altera palabras intactas (idempotencia sobre cargos)', () => {
+    const intact =
+      'Administración del servicio\nElectricidad consumida 163 kWh\nCoordinación y transporte\nReposición\nCargo fijo'
+    expect(normalizeOcrText(intact)).toBe(intact)
+  })
 })
 
 describe('extractPeriodo (OCR-tolerante)', () => {

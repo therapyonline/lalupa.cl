@@ -60,7 +60,7 @@ export function AddPagesButton({ onAddText }: Props) {
         f.type === 'image/heif' ||
         HEIC_EXT.some((e) => lower.endsWith(e))
       if (isHeic) {
-        return 'iOS guarda fotos en HEIC. En Ajustes > Cámara > Formatos elegí "Más compatible" (JPEG).'
+        return 'iOS guarda fotos en HEIC. En Ajustes > Cámara > Formatos elige "Más compatible" (JPEG).'
       }
       if (!f.type.startsWith('image/')) {
         return 'Solo imágenes (JPG/PNG/WebP) para agregar páginas.'

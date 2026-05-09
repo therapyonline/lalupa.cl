@@ -59,6 +59,11 @@ export function ResultViewGas({ empresaSlug }: { empresaSlug: string }) {
   const router = useRouter()
   const [state, setState] = useState<ViewState>({ kind: 'loading' })
   const [refreshTick, setRefreshTick] = useState(0)
+  // Cuántas veces el usuario ya intentó "Agregar foto del reverso".
+  // Lo usamos para escalar el mensaje del banner Lectura parcial: si ya
+  // probó 2 veces y sigue sin extraer cargos, paramos de empujar fotos
+  // y le sugerimos el PDF original.
+  const [addAttempts, setAddAttempts] = useState(0)
 
   useEffect(() => {
     // Hidratación desde sessionStorage: en primer render no hay datos; el
@@ -247,6 +252,7 @@ export function ResultViewGas({ empresaSlug }: { empresaSlug: string }) {
         // ignore
       }
       setState({ kind: 'parsed', boleta: updatedBoleta, payload: updatedPayload })
+      setAddAttempts((n) => n + 1)
     } catch (err) {
       const message =
         err instanceof Error ? err.message : 'Error al re-parsear con la nueva foto.'
@@ -297,7 +303,11 @@ export function ResultViewGas({ empresaSlug }: { empresaSlug: string }) {
 
       <section className="bg-cream pb-12">
         <Container>
-          <PartialExtractionAlert boleta={boleta} onAddText={handleAddText} />
+          <PartialExtractionAlert
+            boleta={boleta}
+            onAddText={handleAddText}
+            addAttempts={addAttempts}
+          />
           <div className={boleta.cargos.length > 0 ? '' : 'mt-6'}>
             <ResultBlock boleta={boleta} />
           </div>

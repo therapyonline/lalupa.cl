@@ -17,6 +17,7 @@ import {
   extractPeriodo,
   extractTotal,
   normalizeOcrText,
+  parseChileanDate,
 } from './_helpers'
 import { isValidDate } from '@/lib/dates'
 
@@ -192,6 +193,51 @@ describe('extractTotal (con fallback)', () => {
     expect(
       extractTotal('Subtotal $ 5.000\nTotal a pagar $ 10.000'),
     ).toBe(10000)
+  })
+
+  it('NO matchea palabras compuestas terminadas en "total"', () => {
+    expect(extractTotal('elecTotal $ 5.000')).toBe(0)
+  })
+
+  it('acepta "TOTAL A PAGAR" en mayúsculas (estilo SII)', () => {
+    expect(extractTotal('TOTAL A PAGAR $ 28.533')).toBe(28533)
+  })
+})
+
+describe('extractPeriodo (filtros adicionales)', () => {
+  it('acepta período bimestral de 60 días', () => {
+    const r = extractPeriodo('Período: 01/05/2026 al 30/06/2026')
+    expect(isValidDate(r.desde)).toBe(true)
+    expect(isValidDate(r.hasta)).toBe(true)
+  })
+
+  it('acepta exactamente 90 días', () => {
+    const r = extractPeriodo('01/05/2026 al 30/07/2026')
+    expect(isValidDate(r.desde)).toBe(true)
+  })
+
+  it('rechaza > 90 días (no es período típico)', () => {
+    const r = extractPeriodo('01/01/2026 al 30/06/2026')
+    expect(isValidDate(r.desde)).toBe(false)
+  })
+})
+
+describe('parseChileanDate (timezone Chile)', () => {
+  it('devuelve Date local, no UTC', () => {
+    const d = parseChileanDate('15/05/2024')
+    // En la zona horaria local debe ser día 15 mes 4 (mayo)
+    expect(d?.getFullYear()).toBe(2024)
+    expect(d?.getMonth()).toBe(4)
+    expect(d?.getDate()).toBe(15)
+  })
+
+  it('año de 2 dígitos asume 20XX', () => {
+    expect(parseChileanDate('15/05/24')?.getFullYear()).toBe(2024)
+  })
+
+  it('texto basura devuelve null', () => {
+    expect(parseChileanDate('foo bar baz')).toBeNull()
+    expect(parseChileanDate('')).toBeNull()
   })
 })
 

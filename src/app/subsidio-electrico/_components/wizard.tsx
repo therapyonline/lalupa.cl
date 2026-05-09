@@ -90,6 +90,18 @@ export function SubsidioWizard() {
       return
     }
     setDirection('forward')
+
+    // Short-circuit: si la respuesta a Q1 (esMayorDeEdad) es false,
+    // el resto del wizard no aplica (bloqueador absoluto). Saltamos
+    // directo al resultado para no hacer perder tiempo al usuario.
+    if (
+      pregunta.id === 'esMayorDeEdad' &&
+      answers.esMayorDeEdad === false
+    ) {
+      setShowResult(true)
+      return
+    }
+
     if (step < TOTAL - 1) {
       setStep((s) => s + 1)
     } else {
@@ -271,7 +283,11 @@ function PreguntaInput({
 }) {
   if (pregunta.tipo === 'boolean') {
     return (
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div
+        role="radiogroup"
+        aria-label={pregunta.pregunta}
+        className="grid grid-cols-1 gap-3 sm:grid-cols-2"
+      >
         <BooleanOption
           label="Sí"
           selected={value === true}
@@ -343,7 +359,15 @@ function BooleanOption({
   return (
     <button
       type="button"
+      role="radio"
+      aria-checked={selected}
       onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === ' ' || e.key === 'Enter') {
+          e.preventDefault()
+          onClick()
+        }
+      }}
       className={cn(
         'rounded-md border-[1.5px] px-6 py-4 text-left text-[15px] font-medium transition-colors',
         selected

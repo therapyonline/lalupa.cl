@@ -402,6 +402,18 @@ function MonthCell({
   onClick: () => void
 }) {
   const level = levelFor(bucket.total, maxMonthTotal)
+  // Empresas únicas en este bucket, para mostrar en el card. Si hay
+  // más de 2, las acortamos con "+N".
+  const empresas = Array.from(
+    new Set(bucket.boletas.map((b) => b.empresa)),
+  )
+  const empresasLabel =
+    empresas.length === 0
+      ? null
+      : empresas.length <= 2
+        ? empresas.join(' · ')
+        : `${empresas.slice(0, 2).join(' · ')} +${empresas.length - 2}`
+
   return (
     <li>
       <button
@@ -421,6 +433,11 @@ function MonthCell({
         <span className="text-xs text-body">
           {bucket.count} {bucket.count === 1 ? 'boleta' : 'boletas'}
         </span>
+        {empresasLabel && (
+          <span className="text-[11px] text-soft truncate w-full">
+            {empresasLabel}
+          </span>
+        )}
       </button>
     </li>
   )

@@ -127,11 +127,23 @@ export function AddPagesButton({ onAddText }: Props) {
       />
       <label
         htmlFor={inputId}
+        // role=button + tabIndex hace que screen readers anuncien "botón"
+        // en vez de "label" y permite activación con Enter/Space.
+        role="button"
+        tabIndex={busy ? -1 : 0}
         aria-disabled={busy}
+        onKeyDown={(e) => {
+          if (busy) return
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            const input = document.getElementById(inputId) as HTMLInputElement | null
+            input?.click()
+          }
+        }}
         className={
           busy
             ? 'inline-flex items-center gap-2 rounded-full bg-ink/60 px-4 py-2 text-xs font-medium uppercase tracking-wide text-cream cursor-wait'
-            : 'inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2 text-xs font-medium uppercase tracking-wide text-cream transition-colors hover:bg-primary-dark cursor-pointer focus-within:ring-4 focus-within:ring-primary/20'
+            : 'inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2 text-xs font-medium uppercase tracking-wide text-cream transition-colors hover:bg-primary-dark cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/20'
         }
       >
         {busy ? (

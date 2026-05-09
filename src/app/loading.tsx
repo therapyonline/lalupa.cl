@@ -1,9 +1,13 @@
 import { Container } from '@/components/layout/Container'
 import { LogoSpinner } from '@/components/ui/Skeleton'
 
+// `<div>` en vez de `<main>`: durante streaming SSR esta loading aparece
+// mientras la page real (que también tiene <main>) se hidrata, dejando
+// momentáneamente 2 elementos `<main>` en el DOM. El landmark único
+// queda en page.tsx; aquí basta con role="status".
 export default function Loading() {
   return (
-    <main className="flex flex-1 items-center justify-center bg-cream py-20">
+    <div className="flex flex-1 items-center justify-center bg-cream py-20">
       <Container>
         <div
           role="status"
@@ -16,6 +20,6 @@ export default function Loading() {
           </p>
         </div>
       </Container>
-    </main>
+    </div>
   )
 }

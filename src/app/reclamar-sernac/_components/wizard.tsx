@@ -183,6 +183,38 @@ export function Wizard() {
     })
   }
 
+  /**
+   * Valida un campo individual al blur (cuando el usuario sale del input).
+   * Da feedback inmediato sin esperar al click "Siguiente". WCAG 3.3.1.
+   */
+  function handleFieldBlur<K extends keyof ReclamoFormData>(key: K) {
+    const schema = stepSchemas[step]
+    const result = schema.safeParse(data)
+    if (result.success) {
+      // El campo está OK individualmente o todo el paso está OK.
+      setErrors((e) => {
+        if (!e[key as string]) return e
+        const next = { ...e }
+        delete next[key as string]
+        return next
+      })
+      return
+    }
+    // Solo actualizamos errores del campo actual, no de otros campos
+    // que el usuario aún no tocó (evita que vea errores prematuros).
+    const issue = result.error.issues.find((i) => i.path[0] === key)
+    if (issue) {
+      setErrors((e) => ({ ...e, [key as string]: issue.message }))
+    } else {
+      setErrors((e) => {
+        if (!e[key as string]) return e
+        const next = { ...e }
+        delete next[key as string]
+        return next
+      })
+    }
+  }
+
   function validateCurrentStep(): boolean {
     const schema = stepSchemas[step]
     const result = schema.safeParse(data)
@@ -338,12 +370,18 @@ export function Wizard() {
                 data={data}
                 onChange={updateField}
                 onRutBlur={handleRutBlur}
+                onFieldBlur={handleFieldBlur}
                 errors={errors}
               />
             )}
 
             {step === 3 && (
-              <Step3 data={data} onChange={updateField} errors={errors} />
+              <Step3
+                data={data}
+                onChange={updateField}
+                onFieldBlur={handleFieldBlur}
+                errors={errors}
+              />
             )}
 
             {step === 4 && (
@@ -377,6 +415,15 @@ export function Wizard() {
                 >
                   Siguiente
                 </Button>
+              )}
+              {step < 5 && !isCurrentStepValid() && (
+                <p
+                  className="basis-full text-[13px] text-soft sm:basis-auto"
+                  role="status"
+                  aria-live="polite"
+                >
+                  Completa los campos requeridos para continuar.
+                </p>
               )}
               {step === 5 && (
                 <>
@@ -558,6 +605,7 @@ function Step2({
   data,
   onChange,
   onRutBlur,
+  onFieldBlur,
   errors,
 }: {
   data: ReclamoFormData
@@ -566,6 +614,7 @@ function Step2({
     value: ReclamoFormData[K],
   ) => void
   onRutBlur: () => void
+  onFieldBlur: <K extends keyof ReclamoFormData>(key: K) => void
   errors: Record<string, string>
 }) {
   return (
@@ -581,13 +630,17 @@ function Step2({
           label="Nombre completo"
           value={data.nombre}
           onChange={(e) => onChange('nombre', e.target.value)}
+          onBlur={() => onFieldBlur('nombre')}
           error={errors.nombre}
         />
         <Input
           label="RUT"
           value={data.rut}
           onChange={(e) => onChange('rut', e.target.value)}
-          onBlur={onRutBlur}
+          onBlur={() => {
+            onRutBlur()
+            onFieldBlur('rut')
+          }}
           error={errors.rut}
           hint="Ej: 12.345.678-9"
         />
@@ -596,6 +649,7 @@ function Step2({
           type="email"
           value={data.email}
           onChange={(e) => onChange('email', e.target.value)}
+          onBlur={() => onFieldBlur('email')}
           error={errors.email}
         />
         <Input
@@ -603,6 +657,7 @@ function Step2({
           type="tel"
           value={data.telefono}
           onChange={(e) => onChange('telefono', e.target.value)}
+          onBlur={() => onFieldBlur('telefono')}
           error={errors.telefono}
           hint="Con código de país si vives fuera"
         />
@@ -611,6 +666,7 @@ function Step2({
             label="Dirección postal"
             value={data.direccion}
             onChange={(e) => onChange('direccion', e.target.value)}
+            onBlur={() => onFieldBlur('direccion')}
             error={errors.direccion}
             hint="Calle, número, comuna y región"
           />
@@ -623,6 +679,7 @@ function Step2({
 function Step3({
   data,
   onChange,
+  onFieldBlur,
   errors,
 }: {
   data: ReclamoFormData
@@ -630,6 +687,7 @@ function Step3({
     key: K,
     value: ReclamoFormData[K],
   ) => void
+  onFieldBlur: <K extends keyof ReclamoFormData>(key: K) => void
   errors: Record<string, string>
 }) {
   return (
@@ -646,12 +704,14 @@ function Step3({
           label="Razón social"
           value={data.empresaRazonSocial}
           onChange={(e) => onChange('empresaRazonSocial', e.target.value)}
+          onBlur={() => onFieldBlur('empresaRazonSocial')}
           error={errors.empresaRazonSocial}
         />
         <Input
           label="RUT empresa"
           value={data.empresaRut}
           onChange={(e) => onChange('empresaRut', e.target.value)}
+          onBlur={() => onFieldBlur('empresaRut')}
           error={errors.empresaRut}
           hint="Formato chileno con dígito verificador"
         />
@@ -659,6 +719,7 @@ function Step3({
           label="Dirección de notificación"
           value={data.empresaDireccion}
           onChange={(e) => onChange('empresaDireccion', e.target.value)}
+          onBlur={() => onFieldBlur('empresaDireccion')}
           error={errors.empresaDireccion}
         />
       </div>

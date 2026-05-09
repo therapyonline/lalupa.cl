@@ -210,6 +210,51 @@ export function ResultViewGas({ empresaSlug }: { empresaSlug: string }) {
   const hasFlags = flags.length > 0
   const esProducto = boleta.tipoVenta === 'producto'
 
+  function handleAddText(newText: string) {
+    if (state.kind !== 'parsed') return
+    const combinedText = `${state.payload.rawText}\n\n${newText}`
+    try {
+      const updatedBoleta = parseGas(state.payload.empresa, combinedText)
+      const updatedPayload: PayloadShape = {
+        ...state.payload,
+        rawText: combinedText,
+      }
+      try {
+        safeSessionSet(SESSION_KEY, JSON.stringify(updatedPayload))
+      } catch {
+        // ignore
+      }
+      const reclamoPayload = {
+        empresaSlug: updatedPayload.slug,
+        empresaNombre: updatedBoleta.empresa,
+        servicio: updatedBoleta.servicio,
+        periodoDesde: safeISOString(updatedBoleta.periodo.desde),
+        periodoHasta: safeISOString(updatedBoleta.periodo.hasta),
+        fechaEmision: safeISOString(updatedBoleta.fechaEmision),
+        fechaVencimiento: safeISOString(updatedBoleta.fechaVencimiento),
+        numeroCliente: updatedBoleta.cliente.numeroCliente,
+        total: updatedBoleta.totales.total,
+        cargosSospechosos: updatedBoleta.cargos
+          .filter((c) => c.sospechoso)
+          .map((c) => ({
+            concepto: c.concepto,
+            monto: c.monto,
+            razon: c.razonSospecha,
+          })),
+      }
+      try {
+        safeSessionSet(RECLAMO_KEY, JSON.stringify(reclamoPayload))
+      } catch {
+        // ignore
+      }
+      setState({ kind: 'parsed', boleta: updatedBoleta, payload: updatedPayload })
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'Error al re-parsear con la nueva foto.'
+      setState({ kind: 'parser-error', error: message })
+    }
+  }
+
   return (
     <main className="flex-1">
       <section className="bg-cream py-12 md:py-16">
@@ -246,7 +291,7 @@ export function ResultViewGas({ empresaSlug }: { empresaSlug: string }) {
 
       <section className="bg-cream pb-12">
         <Container>
-          <PartialExtractionAlert boleta={boleta} />
+          <PartialExtractionAlert boleta={boleta} onAddText={handleAddText} />
           <div className={boleta.cargos.length > 0 ? '' : 'mt-6'}>
             <ResultBlock boleta={boleta} />
           </div>

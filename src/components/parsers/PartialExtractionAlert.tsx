@@ -1,17 +1,28 @@
 import { Alert } from '@/components/ui/Alert'
 import { isValidDate } from '@/lib/dates'
 import type { ParsedBoleta } from '@/lib/parsers'
+import { AddPagesButton } from './AddPagesButton'
 
 /**
  * Banner que aparece cuando el parser produjo un resultado pero faltan
  * datos críticos. Pasa cuando el usuario sube una foto de baja calidad
- * (OCR mangled) o solo la primera página del PDF (cargos quedan en el
- * reverso).
+ * (OCR mangled) o solo la primera página del PDF físico (cargos quedan
+ * al reverso).
  *
  * Aparece sobre el bloque de resultado, sin reemplazarlo: lo que sí
  * pudimos extraer (empresa, total, fechas) sigue visible y es útil.
+ *
+ * Si el caller pasa `onAddText`, mostramos un botón "Agregar foto del
+ * reverso" que corre OCR sobre nuevas imágenes y devuelve el texto
+ * combinado para que el caller re-parsee.
  */
-export function PartialExtractionAlert({ boleta }: { boleta: ParsedBoleta }) {
+export function PartialExtractionAlert({
+  boleta,
+  onAddText,
+}: {
+  boleta: ParsedBoleta
+  onAddText?: (newText: string) => void
+}) {
   const issues: string[] = []
 
   if (!isValidDate(boleta.periodo.desde) || !isValidDate(boleta.periodo.hasta)) {
@@ -42,9 +53,11 @@ export function PartialExtractionAlert({ boleta }: { boleta: ParsedBoleta }) {
           : issues.length === 2
             ? `${issues[0]} ni ${issues[1]}`
             : `${issues.slice(0, -1).join(', ')} ni ${issues[issues.length - 1]}`}
-        . Para un análisis completo, sube el PDF original descargado del
-        sitio de la empresa (no la foto del documento físico).
+        . Si tu boleta tiene el detalle al reverso, agregá esa foto acá
+        abajo. También puedes subir el PDF original descargado del sitio
+        de la empresa para análisis completo.
       </Alert.Body>
+      {onAddText && <AddPagesButton onAddText={onAddText} />}
     </Alert>
   )
 }

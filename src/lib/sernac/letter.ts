@@ -93,15 +93,33 @@ Solicité aclaración a la empresa pero la respuesta no resolvió el problema, p
 }
 
 export function buildPeticionTemplate(payload: ReclamoBoletaPayload): string {
-  const cargo = payload.cargosSospechosos[0]
-  const monto = cargo ? cargo.monto : 0
-  const montoText = monto > 0 ? formatCLP(monto) : '[monto del cargo objetado]'
+  const sospechosos = payload.cargosSospechosos.filter((c) => c.monto > 0)
 
-  return `Solicito a SERNAC mediar con la empresa para que:
+  // Caso 1: hay cargos sospechosos identificados.
+  if (sospechosos.length > 0) {
+    const total = sospechosos.reduce((sum, c) => sum + c.monto, 0)
+    const montoText = formatCLP(total)
+    const conceptoText =
+      sospechosos.length === 1
+        ? sospechosos[0].concepto
+        : `los siguientes cargos: ${sospechosos.map((c) => c.concepto).join(', ')}`
+    return `Solicito a SERNAC mediar con la empresa para que:
 
-1. Se anule el cobro indebido por ${montoText} y se me reembolse en mi próxima boleta.
+1. Se anule el cobro indebido por ${montoText} (${conceptoText}) y se me reembolse en mi próxima boleta.
 2. Se entreguen, por escrito, las disculpas correspondientes y la corrección del cobro.
 3. Se garantice que el sistema de facturación no vuelva a aplicar este cargo de forma indebida.
+
+Adjunto antecedentes de la boleta cuestionada y reservo el derecho de continuar la vía legal en el Juzgado de Policía Local correspondiente si la mediación no resuelve el reclamo (artículos 50 y siguientes de la Ley 19.496).`
+  }
+
+  // Caso 2: no hay cargos sospechosos identificados; el reclamo es
+  // genérico (ej. el usuario detectó un problema que el parser no
+  // marcó automáticamente). Sin placeholders sin resolver.
+  return `Solicito a SERNAC mediar con la empresa para que:
+
+1. Se aclaren por escrito los cargos cuestionados de mi boleta y, si corresponde, se ajusten en una próxima facturación.
+2. Se entregue el detalle completo de las tarifas y unidades aplicadas para verificar que coinciden con las publicadas por el regulador.
+3. Se garantice que cualquier cobro sin respaldo no vuelva a aplicarse.
 
 Adjunto antecedentes de la boleta cuestionada y reservo el derecho de continuar la vía legal en el Juzgado de Policía Local correspondiente si la mediación no resuelve el reclamo (artículos 50 y siguientes de la Ley 19.496).`
 }

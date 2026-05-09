@@ -10,9 +10,31 @@ const VALID_SLUGS = new Set([
   'chilquinta',
 ])
 
-export const metadata: Metadata = {
-  title: 'Resultado',
-  robots: { index: false, follow: false },
+/**
+ * Metadata dinámica: si el slug es inválido devolvemos un title acorde
+ * a "no encontrado" así el 404 fallback no hereda "Resultado".
+ */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ empresa: string }>
+}): Promise<Metadata> {
+  const { empresa } = await params
+  if (!VALID_SLUGS.has(empresa)) {
+    return {
+      title: 'Página no encontrada',
+      robots: { index: false, follow: false },
+      alternates: { canonical: '/boleta-luz' },
+    }
+  }
+  return {
+    title: 'Resultado',
+    robots: { index: false, follow: false },
+    // Canonical apunta a la ruta indexable padre (/boleta-luz) en lugar
+    // del default de layout (/) — más semánticamente correcto aunque la
+    // página sea noindex.
+    alternates: { canonical: '/boleta-luz' },
+  }
 }
 
 export default async function ResultadoPage({

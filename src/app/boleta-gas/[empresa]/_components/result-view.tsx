@@ -20,10 +20,9 @@ import {
   type EmpresaGas,
   type GasSlug,
   type ParsedBoleta,
-  SLUG_TO_EMPRESA_GAS,
   parseGas,
 } from '@/lib/parsers'
-import { safeISOString } from '@/lib/dates'
+import { isValidDate, safeISOString } from '@/lib/dates'
 import {
   safeSessionGet,
   safeSessionRemove,
@@ -107,19 +106,19 @@ export function ResultViewGas({ empresaSlug }: { empresaSlug: string }) {
     }
 
     if (payload.slug !== empresaSlug) {
-      // Manual override: usuario clickeó otra empresa de gas desde chip.
-      // Reusamos el rawText pero parseamos con la empresa de la URL.
-      const empresaFromUrl = SLUG_TO_EMPRESA_GAS[empresaSlug as GasSlug]
-      if (!empresaFromUrl) {
-        router.replace('/boleta-gas')
-        setState({ kind: 'redirecting' })
-        return
+      // Slug viejo en sessionStorage: limpiamos y redirigimos al upload.
+      safeSessionRemove(SESSION_KEY)
+      try {
+        safeSessionSet(
+          REDIRECT_MESSAGE_KEY,
+          'Sube tu boleta para ver el análisis.',
+        )
+      } catch {
+        // ignore
       }
-      payload = {
-        ...payload,
-        empresa: empresaFromUrl,
-        slug: empresaSlug as GasSlug,
-      }
+      router.replace('/boleta-gas')
+      setState({ kind: 'redirecting' })
+      return
     }
 
     try {
@@ -265,20 +264,27 @@ export function ResultViewGas({ empresaSlug }: { empresaSlug: string }) {
           <h1 className="mt-4 max-w-[24ch] text-[clamp(36px,5vw,64px)] font-medium leading-[1.05] tracking-tight text-ink">
             {esProducto
               ? `Tu compra${
-                  boleta.fechaEmision
+                  boleta.fechaEmision && isValidDate(boleta.fechaEmision)
                     ? ` del ${boleta.fechaEmision.toLocaleDateString('es-CL')}`
                     : ''
                 }.`
-              : `Tu boleta de ${formatPeriod(boleta.periodo)}.`}
+              : isValidDate(boleta.periodo.desde) &&
+                  isValidDate(boleta.periodo.hasta)
+                ? `Tu boleta de ${formatPeriod(boleta.periodo)}.`
+                : `Tu última boleta de ${boleta.empresa}.`}
           </h1>
           {hasFlags ? (
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-body">
               Encontramos{' '}
               <strong className="font-medium text-accent-deep">
-                {flags.length} {flags.length === 1 ? 'cargo' : 'cargos'} que
-                merecen tu atención
+                {flags.length}{' '}
+                {flags.length === 1
+                  ? 'cargo que merece tu atención'
+                  : 'cargos que merecen tu atención'}
               </strong>
-              . Revísalos abajo y, si quieres, genera un reclamo formal.
+              .{' '}
+              {flags.length === 1 ? 'Revísalo' : 'Revísalos'} abajo y, si
+              quieres, genera un reclamo formal.
             </p>
           ) : (
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-body">

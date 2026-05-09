@@ -86,6 +86,16 @@ const CARGO_PATTERNS: ReadonlyArray<{ concepto: string; pattern: RegExp }> = [
     concepto: 'Sobreconsumo',
     pattern: buildCargoPattern('Sobreconsumo'),
   },
+  {
+    concepto: 'Reliquidación',
+    pattern: buildCargoPattern('Reliquidaci[óo]n'),
+  },
+  {
+    concepto: 'Ajuste por lectura estimada',
+    pattern: buildCargoPattern(
+      'Ajuste\\s+(?:por\\s+)?lectura\\s+estimada|Ajuste\\s+(?:cargo\\s+)?(?:por\\s+)?no\\s+registro\\s+(?:de\\s+)?[Ll]ectura',
+    ),
+  },
 ]
 
 /**
@@ -108,6 +118,18 @@ function detectarSospecha(
 ): string | null {
   if (cargo.concepto === 'Reposición' && !REPOSICION_CONTEXTO_REGEX.test(text)) {
     return 'Cargo por reposición pero la boleta no menciona ningún corte previo. Pide desglose.'
+  }
+
+  if (cargo.concepto === 'Sobreconsumo' && cargo.monto > 0) {
+    return 'Cargo por sobreconsumo (consumo mayor al promedio invernal). Verifica que tu consumo real lo justifique. Si no hay fuga ni cambios de uso, pide al SISS revisar el cálculo.'
+  }
+
+  if (cargo.concepto === 'Reliquidación' && cargo.monto !== 0) {
+    return 'Reliquidación de un período anterior. Pide a la sanitaria el detalle de qué se reliquidó y por qué (errores de lectura, cambios tarifarios retroactivos, etc.).'
+  }
+
+  if (cargo.concepto === 'Ajuste por lectura estimada') {
+    return 'Tu medidor no fue leído (consumo estimado). Tienes derecho a pedir relectura sin costo si crees que la estimación está inflada.'
   }
 
   const tarifaKey = TARIFA_KEY[empresa]

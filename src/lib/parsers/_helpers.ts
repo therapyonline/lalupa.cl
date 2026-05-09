@@ -199,12 +199,22 @@ export function extractPeriodo(
   return { desde: new Date(NaN), hasta: new Date(NaN) }
 }
 
-/** Construye un regex que matchea "{label} ... {número chileno}". */
+/**
+ * Construye un regex que matchea "{label} ... {número chileno}".
+ * Captura signo opcional `-` antes del número para soportar créditos
+ * negativos (ej. Metrogas reliquidación: "-$ 75.847").
+ */
 export function buildCargoPattern(label: string): RegExp {
-  return new RegExp(`${label}[^\\n]*?${CL_NUMBER}`, 'i')
+  return new RegExp(
+    `${label}[^\\n]*?(-?\\s*\\$?\\s*(?:\\d{1,3}(?:\\.\\d{3})+|\\d+)(?:,\\d+)?)`,
+    'i',
+  )
 }
 
-/** Extrae múltiples cargos según una lista de patrones {concepto, pattern}. */
+/**
+ * Extrae múltiples cargos según una lista de patrones {concepto, pattern}.
+ * Conserva el signo (negativo para créditos/ajustes a favor del cliente).
+ */
 export function extractCargosFromPatterns(
   text: string,
   patterns: ReadonlyArray<{ concepto: string; pattern: RegExp }>,
@@ -213,7 +223,9 @@ export function extractCargosFromPatterns(
   for (const { concepto, pattern } of patterns) {
     const m = text.match(pattern)
     if (!m) continue
-    const monto = parseChileanNumber(m[1])
+    // Trim whitespace y `$` del capture, preservando signo `-`.
+    const cleaned = m[1].replace(/[\s$]/g, '')
+    const monto = parseChileanNumber(cleaned)
     if (!Number.isFinite(monto)) continue
     cargos.push({ concepto, monto })
   }

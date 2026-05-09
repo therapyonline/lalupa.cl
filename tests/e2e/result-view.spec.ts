@@ -83,9 +83,13 @@ test.describe('Boleta result view', () => {
   // payload de CGE. Comportamiento anterior (BUG): redirigía a
   // /boleta-luz/cge (rebote a la última boleta). Comportamiento nuevo:
   // tratamos como manual override y parseamos el rawText con Enel.
-  // Si el texto no calza, el parser lanza WRONG_EMPRESA y mostramos
-  // error; lo importante es NO rebotar al slug viejo.
-  test('payload con slug distinto al de la URL: NO rebota al slug viejo', async ({
+  // Bug regression: usuario sube boleta CGE, va atrás, click en chip
+  // "Enel". Antes: rebotaba a /boleta-luz/cge (la última boleta).
+  // Después de la primera fix: hacía manual override (parser fallaba con
+  // WRONG_EMPRESA y mostraba error confuso).
+  // Ahora (audit v2): limpia el sessionStorage stale y redirige al upload
+  // landing limpio, así el usuario puede subir una boleta de Enel.
+  test('payload con slug distinto al de la URL: limpia y redirige al upload', async ({
     page,
   }) => {
     test.setTimeout(30_000)
@@ -107,13 +111,11 @@ test.describe('Boleta result view', () => {
     )
     // Visito /boleta-luz/enel manualmente. El payload dice cge.
     await page.goto('/boleta-luz/enel')
-    // Damos tiempo al efecto de hidratación.
-    await page.waitForTimeout(500)
-    // NO debe rebotar a /boleta-luz/cge.
+    // Espero a que el efecto de hidratación redirija.
+    await page.waitForURL('/boleta-luz', { timeout: 10_000 })
+    // NO debe quedar en /boleta-luz/cge ni /boleta-luz/enel.
     expect(page.url()).not.toMatch(/\/boleta-luz\/cge/)
-    // Debe quedarse en /boleta-luz/enel (con error de parser porque el
-    // texto es de CGE, no de Enel).
-    expect(page.url()).toMatch(/\/boleta-luz\/enel/)
+    expect(page.url()).not.toMatch(/\/boleta-luz\/enel/)
   })
 
   test('sin payload en sessionStorage: redirige al upload', async ({

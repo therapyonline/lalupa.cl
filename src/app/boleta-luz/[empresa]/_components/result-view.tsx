@@ -17,10 +17,9 @@ import {
   type EmpresaElectrica,
   type EmpresaSlug,
   type ParsedBoleta,
-  SLUG_TO_EMPRESA_ELECTRICA,
   parseElectricidad,
 } from '@/lib/parsers'
-import { safeISOString } from '@/lib/dates'
+import { isValidDate, safeISOString } from '@/lib/dates'
 import {
   safeSessionGet,
   safeSessionRemove,
@@ -102,24 +101,23 @@ export function ResultView({ empresaSlug }: { empresaSlug: string }) {
     }
 
     if (payload.slug !== empresaSlug) {
-      // Slug en URL distinto al del payload: el usuario clickeó un chip
-      // de otra distribuidora intencionalmente. Tratamos como manual
-      // override: reusamos el rawText pero lo parseamos con la empresa
-      // de la URL. Si el texto no calza, el parser lanza WRONG_EMPRESA
-      // y mostramos error claro.
-      const empresaFromUrl =
-        SLUG_TO_EMPRESA_ELECTRICA[empresaSlug as EmpresaSlug]
-      if (!empresaFromUrl) {
-        // Slug inválido (no debería pasar dado VALID_SLUGS en page.tsx).
-        router.replace('/boleta-luz')
-        setState({ kind: 'redirecting' })
-        return
+      // El usuario clickeó un chip de otra distribuidora con un payload
+      // viejo en sessionStorage. En vez de tratar como manual override
+      // (que confunde porque mostraba error si el parser fallaba), lo
+      // tratamos como "intención de empezar fresco con esta empresa":
+      // limpiamos el payload viejo y redirigimos al upload landing.
+      safeSessionRemove(SESSION_KEY)
+      try {
+        safeSessionSet(
+          REDIRECT_MESSAGE_KEY,
+          'Sube tu boleta para ver el análisis.',
+        )
+      } catch {
+        // ignore
       }
-      payload = {
-        ...payload,
-        empresa: empresaFromUrl,
-        slug: empresaSlug as EmpresaSlug,
-      }
+      router.replace('/boleta-luz')
+      setState({ kind: 'redirecting' })
+      return
     }
 
     try {
@@ -268,16 +266,22 @@ export function ResultView({ empresaSlug }: { empresaSlug: string }) {
             Resultado · {boleta.empresa}
           </p>
           <h1 className="mt-4 max-w-[24ch] text-[clamp(36px,5vw,64px)] font-medium leading-[1.05] tracking-tight text-ink">
-            Tu boleta de {formatPeriod(boleta.periodo)}.
+            {isValidDate(boleta.periodo.desde) && isValidDate(boleta.periodo.hasta)
+              ? `Tu boleta de ${formatPeriod(boleta.periodo)}.`
+              : `Tu última boleta de ${boleta.empresa}.`}
           </h1>
           {hasFlags ? (
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-body">
               Encontramos{' '}
               <strong className="font-medium text-accent-deep">
-                {flags.length} {flags.length === 1 ? 'cargo' : 'cargos'} que
-                merecen tu atención
+                {flags.length}{' '}
+                {flags.length === 1
+                  ? 'cargo que merece tu atención'
+                  : 'cargos que merecen tu atención'}
               </strong>
-              . Revísalos abajo y, si quieres, genera un reclamo formal.
+              .{' '}
+              {flags.length === 1 ? 'Revísalo' : 'Revísalos'} abajo y, si
+              quieres, genera un reclamo formal.
             </p>
           ) : (
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-body">

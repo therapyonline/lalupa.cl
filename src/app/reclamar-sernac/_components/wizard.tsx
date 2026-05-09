@@ -219,8 +219,27 @@ export function Wizard() {
   }
 
   function handleNext() {
-    if (!validateCurrentStep()) return
+    if (!validateCurrentStep()) {
+      // Asegurar que el mensaje de error se ve y se anuncia con AT.
+      // El componente Step{N} ya renderiza role="alert"; scrollamos
+      // al inicio del paso para que el usuario vea el feedback aunque
+      // hayan llegado al botón en mobile.
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: window.scrollY, behavior: 'smooth' })
+      }
+      return
+    }
     if (step < 5) setStep((s) => (s + 1) as StepNumber)
+  }
+
+  /**
+   * El paso actual es válido (sin tocar setErrors). Sirve para deshabilitar
+   * el botón "Siguiente" antes que el usuario lo apriete cuando aún
+   * falta data crítica (ej. paso 1 sin tipoReclamo seleccionado).
+   */
+  function isCurrentStepValid(): boolean {
+    const schema = stepSchemas[step]
+    return schema.safeParse(data).success
   }
 
   function handleBack() {
@@ -350,7 +369,12 @@ export function Wizard() {
                 </Button>
               )}
               {step < 5 && (
-                <Button variant="dark" size="md" onClick={handleNext}>
+                <Button
+                  variant="dark"
+                  size="md"
+                  onClick={handleNext}
+                  disabled={!isCurrentStepValid()}
+                >
                   Siguiente
                 </Button>
               )}

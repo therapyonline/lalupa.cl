@@ -69,6 +69,12 @@ const CARGO_PATTERNS: ReadonlyArray<{ concepto: string; pattern: RegExp }> = [
     ),
   },
   {
+    concepto: 'Ajuste por no registro de lectura',
+    pattern: buildCargoPattern(
+      'Ajuste\\s+(?:cargo\\s+)?(?:por\\s+)?no\\s+registro\\s+(?:de\\s+)?[Ll]ectura(?:\\s+anterior(?:es)?)?',
+    ),
+  },
+  {
     concepto: 'Reposición',
     pattern: buildCargoPattern('Reposici[óo]n(?:\\s+de\\s+servicio)?'),
   },
@@ -83,6 +89,20 @@ const REPOSICION_CONTEXTO_REGEX = /(corte|suspensi[óo]n|reposici[óo]n)/i
 function detectarSospecha(cargo: Cargo, text: string): string | null {
   if (cargo.concepto === 'Reposición' && !REPOSICION_CONTEXTO_REGEX.test(text)) {
     return 'Reposición sin que la boleta mencione un corte. Pide desglose.'
+  }
+  if (cargo.concepto === 'Ajuste por no registro de lectura') {
+    return 'Metrogas no registró tu medidor (consumo estimado). Tienes derecho a pedir relectura sin costo.'
+  }
+  if (cargo.concepto === 'Reliquidación de consumo' && cargo.monto > 0) {
+    return 'Cuota de reliquidación de un período anterior. Pide a Metrogas el detalle del período reliquidado y por qué (lectura corregida, ajuste tarifario, etc.).'
+  }
+  if (
+    cargo.concepto === 'Crédito consumo equivalente reliquidado' &&
+    cargo.monto > 0
+  ) {
+    // Un crédito debería ser negativo. Si aparece positivo, la facturación
+    // está mal y el usuario debería revisarlo.
+    return 'Un crédito reliquidado debería figurar como negativo. Si aparece positivo, pide a Metrogas que revise la facturación.'
   }
   return null
 }

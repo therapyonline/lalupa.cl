@@ -20,10 +20,9 @@ import {
   type AguaSlug,
   type EmpresaSanitaria,
   type ParsedBoleta,
-  SLUG_TO_EMPRESA_SANITARIA,
   parseAgua,
 } from '@/lib/parsers'
-import { safeISOString } from '@/lib/dates'
+import { isValidDate, safeISOString } from '@/lib/dates'
 import {
   safeSessionGet,
   safeSessionRemove,
@@ -110,20 +109,20 @@ export function ResultViewAgua({ empresaSlug }: { empresaSlug: string }) {
     }
 
     if (payload.slug !== empresaSlug) {
-      // Manual override: usuario clickeó otra sanitaria desde el chip.
-      // Reusamos el rawText pero parseamos con la empresa de la URL.
-      const empresaFromUrl =
-        SLUG_TO_EMPRESA_SANITARIA[empresaSlug as AguaSlug]
-      if (!empresaFromUrl) {
-        router.replace('/boleta-agua')
-        setState({ kind: 'redirecting' })
-        return
+      // Slug viejo en sessionStorage: limpiamos y redirigimos al upload
+      // para que el usuario suba una boleta de la sanitaria que eligió.
+      safeSessionRemove(SESSION_KEY)
+      try {
+        safeSessionSet(
+          REDIRECT_MESSAGE_KEY,
+          'Sube tu boleta para ver el análisis.',
+        )
+      } catch {
+        // ignore
       }
-      payload = {
-        ...payload,
-        empresa: empresaFromUrl,
-        slug: empresaSlug as AguaSlug,
-      }
+      router.replace('/boleta-agua')
+      setState({ kind: 'redirecting' })
+      return
     }
 
     try {
@@ -266,16 +265,22 @@ export function ResultViewAgua({ empresaSlug }: { empresaSlug: string }) {
             Resultado · {boleta.empresa}
           </p>
           <h1 className="mt-4 max-w-[24ch] text-[clamp(36px,5vw,64px)] font-medium leading-[1.05] tracking-tight text-ink">
-            Tu boleta de {formatPeriod(boleta.periodo)}.
+            {isValidDate(boleta.periodo.desde) && isValidDate(boleta.periodo.hasta)
+              ? `Tu boleta de ${formatPeriod(boleta.periodo)}.`
+              : `Tu última boleta de ${boleta.empresa}.`}
           </h1>
           {hasFlags ? (
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-body">
               Encontramos{' '}
               <strong className="font-medium text-accent-deep">
-                {flags.length} {flags.length === 1 ? 'cargo' : 'cargos'} que
-                merecen tu atención
+                {flags.length}{' '}
+                {flags.length === 1
+                  ? 'cargo que merece tu atención'
+                  : 'cargos que merecen tu atención'}
               </strong>
-              . Revísalos abajo y, si quieres, genera un reclamo formal.
+              .{' '}
+              {flags.length === 1 ? 'Revísalo' : 'Revísalos'} abajo y, si
+              quieres, genera un reclamo formal.
             </p>
           ) : (
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-body">

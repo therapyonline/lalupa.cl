@@ -22,6 +22,14 @@ const UL = 'mt-4 flex flex-col gap-2 list-disc pl-6 marker:text-soft'
 const LI = 'leading-[1.65] text-body'
 
 export default function PrivacidadPage() {
+  // Analytics se cargan via env vars opt-in. Si no están seteadas en el
+  // deploy actual, este copy refleja la realidad (ningún script de
+  // tracking corre) en lugar de prometer Cloudflare/Clarity que no
+  // existen.
+  const analyticsActive =
+    Boolean(process.env.NEXT_PUBLIC_CLOUDFLARE_WA_TOKEN) ||
+    Boolean(process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID)
+
   return (
     <main className="flex-1">
       <JsonLd
@@ -104,29 +112,65 @@ export default function PrivacidadPage() {
             <div className={SECTION} id="que-si-hacemos">
               <h2 className={H2}>Qué SÍ hacemos</h2>
               <p className={P}>
-                Tres cosas, todas declaradas y bypaseables.
+                {analyticsActive
+                  ? 'Tres cosas, todas declaradas y bypaseables.'
+                  : 'Una sola cosa, declarada y bajo tu control.'}
               </p>
 
-              <h3 className={H3}>Métricas anónimas agregadas</h3>
-              <p className={P}>
-                Usamos <strong className="text-ink">Cloudflare Web
-                Analytics</strong>: sin cookies, sin IPs almacenadas. Vemos
-                cuántas personas visitaron una página, desde qué país llegaron
-                en agregado, y qué páginas son las más usadas. No podemos
-                conectar dos visitas tuyas, ni saber qué hiciste dentro de
-                la app.
-              </p>
+              {analyticsActive && (
+                <>
+                  <h3 className={H3}>Métricas anónimas agregadas</h3>
+                  <p className={P}>
+                    Usamos{' '}
+                    <strong className="text-ink">
+                      Cloudflare Web Analytics
+                    </strong>
+                    : sin cookies, sin IPs almacenadas. Vemos cuántas personas
+                    visitaron una página, desde qué país llegaron en agregado,
+                    y qué páginas son las más usadas. No podemos conectar dos
+                    visitas tuyas, ni saber qué hiciste dentro de la app.
+                  </p>
 
-              <h3 className={H3}>Heatmaps y grabaciones de sesión</h3>
-              <p className={P}>
-                Usamos <strong className="text-ink">Microsoft Clarity</strong>{' '}
-                en modo cookie-less, configurado para{' '}
-                <strong className="text-ink">enmascarar todos los inputs</strong>{' '}
-                de formularios. Lo que vemos es por dónde se mueve el cursor
-                y dónde la gente se atasca, útil para mejorar la UX. Lo que{' '}
-                <em>no</em> vemos es: qué escribes, tu nombre, RUT, ni
-                ningún campo de tu boleta. Nunca capturamos texto de inputs.
-              </p>
+                  <h3 className={H3}>Heatmaps y grabaciones de sesión</h3>
+                  <p className={P}>
+                    Usamos{' '}
+                    <strong className="text-ink">Microsoft Clarity</strong>{' '}
+                    en modo cookie-less, configurado para{' '}
+                    <strong className="text-ink">
+                      enmascarar todos los inputs
+                    </strong>{' '}
+                    de formularios. Lo que vemos es por dónde se mueve el
+                    cursor y dónde la gente se atasca, útil para mejorar la
+                    UX. Lo que <em>no</em> vemos es: qué escribes, tu nombre,
+                    RUT, ni ningún campo de tu boleta. Nunca capturamos texto
+                    de inputs.
+                  </p>
+                </>
+              )}
+
+              {!analyticsActive && (
+                <>
+                  <h3 className={H3}>Sin analytics, por ahora</h3>
+                  <p className={P}>
+                    Hoy no cargamos ningún script de analytics, ni de
+                    Google, ni de Cloudflare, ni de Microsoft Clarity. Si en
+                    algún momento agregamos métricas (para entender qué
+                    funcionalidades usar más), va a ser con proveedores{' '}
+                    <strong className="text-ink">cookie-less</strong> y{' '}
+                    <strong className="text-ink">sin captura de inputs</strong>
+                    , declarado acá primero. Cualquier cambio queda en el{' '}
+                    <a
+                      href="https://github.com/therapyonline/lalupa.cl/commits/main"
+                      className="text-primary underline underline-offset-4 hover:no-underline"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      historial público de commits del repo
+                    </a>
+                    .
+                  </p>
+                </>
+              )}
 
               <h3 className={H3}>Datos en tu propio navegador (IndexedDB)</h3>
               <p className={P}>
@@ -142,7 +186,7 @@ export default function PrivacidadPage() {
                 tu navegador. Solo tu dispositivo tiene acceso, ni siquiera
                 nosotros podemos leerlo. Si borras los datos del sitio, el
                 histórico se borra junto. Y nunca se sincroniza a otros
-                dispositivos automáticamente, solo si vos exportás manualmente.
+                dispositivos automáticamente, solo si exportas manualmente.
               </p>
             </div>
 
@@ -150,12 +194,27 @@ export default function PrivacidadPage() {
             <div className={SECTION} id="como-optar">
               <h2 className={H2}>Cómo optar por no ser medido</h2>
               <p className={P}>
-                Cualquier{' '}
-                <strong className="text-ink">
-                  bloqueador de tracking estándar
-                </strong>{' '}
-                bloquea todo lo de la sección anterior sin afectar funcionalidad.
-                La app sigue funcionando 100% igual sin métricas.
+                {analyticsActive ? (
+                  <>
+                    Cualquier{' '}
+                    <strong className="text-ink">
+                      bloqueador de tracking estándar
+                    </strong>{' '}
+                    bloquea todo lo de la sección anterior sin afectar
+                    funcionalidad. La app sigue funcionando 100% igual sin
+                    métricas.
+                  </>
+                ) : (
+                  <>
+                    Hoy no hay nada que bloquear, no cargamos analytics. Si
+                    en el futuro los activamos, cualquier{' '}
+                    <strong className="text-ink">
+                      bloqueador de tracking estándar
+                    </strong>{' '}
+                    (uBlock Origin, Brave Shields, Firefox ETP en Strict)
+                    los bloquea automáticamente sin afectar la app.
+                  </>
+                )}
               </p>
               <ul className={UL}>
                 <li className={LI}>

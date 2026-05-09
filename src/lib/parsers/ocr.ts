@@ -29,8 +29,8 @@ async function getWorker(
   if (workerPromise) return workerPromise
 
   workerPromise = (async () => {
-    const { createWorker } = await import('tesseract.js')
-    return createWorker('spa', 1, {
+    const { createWorker, PSM } = await import('tesseract.js')
+    const worker = await createWorker('spa', 1, {
       // Servir todos los assets desde el mismo origen, sin CDN externo.
       // Setup automático en `pnpm install` via scripts/setup-tesseract.mjs.
       workerPath: '/tesseract/worker.min.js',
@@ -43,6 +43,27 @@ async function getWorker(
             onProgress({ status: m.status, progress: m.progress })
         : undefined,
     })
+
+    // Tuning específico para boletas chilenas. Probado contra fotos de
+    // celular con iluminación irregular y papel térmico desteñido.
+    //
+    //   - preserve_interword_spaces: 1 → mantiene los espacios entre
+    //     palabras, crítico para que "Cargo fijo" no se vuelva
+    //     "Cargofijo" y los regex matcheen.
+    //   - user_defined_dpi: 300 → Tesseract está optimizado para 300dpi.
+    //     Sin esto, fotos celulares (típicamente equivalente a 72dpi)
+    //     reducen confidence porque el modelo asume baja resolución.
+    //   - tessedit_pageseg_mode: 6 (SINGLE_BLOCK) → trata la boleta como
+    //     un bloque uniforme. AUTO (default 3) divide a veces mal y se
+    //     come secciones de cargos. SINGLE_BLOCK es más confiable para
+    //     este tipo de documento (texto + tabla simple).
+    await worker.setParameters({
+      preserve_interword_spaces: '1',
+      user_defined_dpi: '300',
+      tessedit_pageseg_mode: PSM.SINGLE_BLOCK,
+    })
+
+    return worker
   })()
 
   return workerPromise

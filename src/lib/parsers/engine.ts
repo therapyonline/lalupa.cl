@@ -213,6 +213,74 @@ async function rasterizePdfPages(file: File): Promise<Blob | null> {
 }
 
 /**
+ * Cap de imágenes que aceptamos en una sola subida múltiple.  Boletas
+ * típicas chilenas son 1-3 páginas; >5 fotos sugiere uso indebido.
+ */
+const MAX_IMAGES_PER_UPLOAD = 5
+
+/**
+ * Multi-page version: acepta varias imágenes (típicamente fotos de
+ * páginas distintas del mismo PDF físico) y devuelve el texto concatenado
+ * con separador de página.
+ *
+ * Restricción: las múltiples solo aplican a IMÁGENES. Si el caller manda
+ * un PDF, debe ser un único archivo.
+ *
+ * `onProgress` recibe el progreso del OCR de la imagen ACTUAL; el caller
+ * puede mantener un contador separado de "página X de N".
+ */
+export async function extractTextFromImages(
+  files: File[],
+  onProgress?: (p: OcrProgress, pageIndex: number, totalPages: number) => void,
+): Promise<string> {
+  if (files.length === 0) {
+    throw new Error('No pudimos leer ningún archivo.')
+  }
+  if (files.length > MAX_IMAGES_PER_UPLOAD) {
+    throw new Error(
+      `Aceptamos hasta ${MAX_IMAGES_PER_UPLOAD} imágenes por boleta. Si tu PDF tiene más páginas, súbelo directamente como PDF.`,
+    )
+  }
+  for (const f of files) {
+    if (isHeicFile(f)) {
+      throw new Error(
+        'iOS guarda fotos en formato HEIC, que el navegador no puede leer. En tu iPhone: Ajustes > Cámara > Formatos > "Más compatible" (JPEG). O convierte la foto a JPG antes de subirla.',
+      )
+    }
+    if (!f.type.startsWith('image/')) {
+      throw new Error(
+        `Para subir varias páginas, cada archivo debe ser imagen (JPG/PNG/WebP). Si querés subir un PDF, mándalo como un único archivo.`,
+      )
+    }
+  }
+
+  const texts: string[] = []
+  let lastError: Error | null = null
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i]
+    const innerProgress = onProgress
+      ? (p: OcrProgress) => onProgress(p, i + 1, files.length)
+      : undefined
+    try {
+      const text = await extractTextFromImage(file, innerProgress)
+      texts.push(text)
+    } catch (err) {
+      // Una página individual con poca/ninguna lectura no debe abortar
+      // el resto: combinaremos lo que sí leamos. Si TODAS fallan, abajo
+      // retornamos el último error.
+      lastError = err instanceof Error ? err : new Error(String(err))
+    }
+  }
+
+  if (texts.length === 0 && lastError) {
+    throw lastError
+  }
+
+  // Separador entre páginas para que el parser y los regex no tropiecen.
+  return texts.join('\n\n')
+}
+
+/**
  * Extrae texto de un archivo de boleta, PDF nativo o imagen (jpg/png/webp).
  *
  *   - PDF con capa de texto: extracción directa con pdfjs.

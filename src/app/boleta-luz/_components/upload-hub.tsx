@@ -7,11 +7,11 @@ import { OcrPhotoTips } from '@/components/parsers/OcrPhotoTips'
 import { useBoletaUpload } from '@/lib/parsers/use-boleta-upload'
 
 export function UploadHub() {
-  const { handleFile, error, ocrStatus, resetKey } = useBoletaUpload('luz')
+  const { handleFiles, error, ocrStatus, resetKey } = useBoletaUpload('luz')
 
   return (
     <div>
-      <FileDrop key={resetKey} onFile={handleFile} statusMessage={ocrStatus} />
+      <FileDrop key={resetKey} onFiles={handleFiles} statusMessage={ocrStatus} />
       <OcrPhotoTips />
       {error && (
         <div className="mt-6">

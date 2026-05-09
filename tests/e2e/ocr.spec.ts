@@ -248,6 +248,77 @@ test.describe('OCR pipeline', () => {
     )
   })
 
+  // Multi-página: el usuario puede subir varias fotos juntas (frente +
+  // reverso de un PDF físico). El OCR procesa cada una y concatena el
+  // texto antes del detect.
+  test('multi-página: 2 PNGs sintéticos se procesan y combinan', async ({
+    page,
+  }) => {
+    test.setTimeout(180_000)
+    await page.goto('/boleta-luz')
+
+    // Genera 2 buffers PNG con texto sintético. Canvas 1200x800 (igual
+    // tamaño que los tests single-page que sí funcionan).
+    const pages = [
+      [
+        'CGE DISTRIBUCION S.A.',
+        'RUT: 99.513.400-4',
+        'Boleta de electricidad',
+        'Cliente: 1234567',
+        'cge.cl',
+      ],
+      [
+        'Detalle de cargos',
+        'Cargo fijo $ 1.000',
+        'Energia 100 kWh',
+        'Periodo: Mayo 2026',
+        'Total a pagar $ 45.000',
+      ],
+    ]
+    const buffers = (await page.evaluate(async (pageLines) => {
+      const out: number[][] = []
+      for (const lines of pageLines) {
+        const canvas = document.createElement('canvas')
+        canvas.width = 1200
+        canvas.height = 800
+        const ctx = canvas.getContext('2d')
+        if (!ctx) throw new Error('no ctx')
+        ctx.fillStyle = '#ffffff'
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+        ctx.fillStyle = '#000000'
+        ctx.font = 'bold 56px sans-serif'
+        let y = 120
+        for (const line of lines) {
+          ctx.fillText(line, 80, y)
+          y += 100
+        }
+        const blob = await new Promise<Blob>((resolve) =>
+          canvas.toBlob((b) => resolve(b!), 'image/png'),
+        )
+        const arr = new Uint8Array(await blob.arrayBuffer())
+        out.push(Array.from(arr))
+      }
+      return out
+    }, pages)) as number[][]
+
+    const input = page.locator('input[type="file"]')
+    await input.setInputFiles([
+      {
+        name: 'pagina-1.png',
+        mimeType: 'image/png',
+        buffer: Buffer.from(buffers[0]),
+      },
+      {
+        name: 'pagina-2.png',
+        mimeType: 'image/png',
+        buffer: Buffer.from(buffers[1]),
+      },
+    ])
+
+    // Llega al resultado de CGE (la página 1 tiene los marcadores).
+    await page.waitForURL(/\/boleta-luz\/cge/, { timeout: 150_000 })
+  })
+
   // Empresa desconocida: detect devuelve null, no redirige y muestra
   // alerta + selector manual.
   test('boleta de empresa desconocida: alerta + selector manual visible', async ({

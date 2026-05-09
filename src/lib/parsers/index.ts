@@ -31,6 +31,7 @@ export {
   detectGas,
   detectSanitaria,
   extractTextFromBoleta,
+  extractTextFromImages,
   extractTextFromPDF,
 } from './engine'
 

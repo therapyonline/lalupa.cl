@@ -13,6 +13,7 @@ import {
   detectSanitaria,
   disposeOcrWorker,
   extractTextFromBoleta,
+  extractTextFromImages,
   AGUA_SLUGS,
   EMPRESA_SLUGS,
   GAS_SLUGS,
@@ -117,7 +118,7 @@ export function useBoletaUpload(servicio: 'luz' | 'agua' | 'gas') {
     }
   }, [])
 
-  async function handleFile(file: File) {
+  async function handleFiles(files: File[]) {
     const config = CONFIGS[servicio]
     const myGeneration = ++generationRef.current
 
@@ -126,16 +127,35 @@ export function useBoletaUpload(servicio: 'luz' | 'agua' | 'gas') {
 
     let extractedText: string | undefined
     try {
-      const isImage = file.type.startsWith('image/')
-      const onProgress = isImage
-        ? (p: OcrProgress) => {
-            if (generationRef.current !== myGeneration) return
-            if (!mountedRef.current) return
-            setOcrStatus(formatOcrStatus(p))
-          }
-        : undefined
+      const isMultiImage =
+        files.length > 1 && files.every((f) => f.type.startsWith('image/'))
+      const isSingleImage =
+        files.length === 1 && files[0].type.startsWith('image/')
 
-      extractedText = await extractTextFromBoleta(file, onProgress)
+      if (isMultiImage) {
+        // Multi-imagen: OCR cada una y concatena.
+        const onMultiProgress = (
+          p: OcrProgress,
+          pageIdx: number,
+          total: number,
+        ) => {
+          if (generationRef.current !== myGeneration) return
+          if (!mountedRef.current) return
+          const inner = formatOcrStatus(p)
+          setOcrStatus(`Foto ${pageIdx} de ${total}: ${inner}`)
+        }
+        extractedText = await extractTextFromImages(files, onMultiProgress)
+      } else {
+        const file = files[0]
+        const onProgress = isSingleImage
+          ? (p: OcrProgress) => {
+              if (generationRef.current !== myGeneration) return
+              if (!mountedRef.current) return
+              setOcrStatus(formatOcrStatus(p))
+            }
+          : undefined
+        extractedText = await extractTextFromBoleta(file, onProgress)
+      }
 
       // Si llegó otro upload o el usuario navegó mientras corríamos OCR,
       // descartamos el resultado.
@@ -146,8 +166,9 @@ export function useBoletaUpload(servicio: 'luz' | 'agua' | 'gas') {
       setOcrStatus(null)
 
       if (!extractedText.trim()) {
+        const isImageUpload = files.every((f) => f.type.startsWith('image/'))
         throw new Error(
-          isImage
+          isImageUpload
             ? 'No pudimos leer texto en la imagen. Prueba con una foto más nítida y derecha, o sube el PDF.'
             : 'No pudimos extraer texto del PDF. Prueba con la versión digital descargada del sitio de la empresa.',
         )
@@ -198,7 +219,7 @@ export function useBoletaUpload(servicio: 'luz' | 'agua' | 'gas') {
   }
 
   return {
-    handleFile,
+    handleFiles,
     error,
     ocrStatus,
     resetKey,

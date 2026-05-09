@@ -19,23 +19,29 @@ const ACCEPTED_TYPES = [
   'image/heif',
 ]
 const HEIC_EXTENSIONS = ['.heic', '.heif']
-const MAX_SIZE = 10 * 1024 * 1024 // 10 MB
+const MAX_SIZE = 10 * 1024 * 1024 // 10 MB por archivo
+const MAX_FILES = 5
 
 type FileDropState = 'idle' | 'dragOver' | 'processing' | 'error'
 
 export interface FileDropProps {
-  onFile: (file: File) => void
+  /**
+   * Recibe siempre un array. Si el caller espera un solo archivo, mira
+   * `files[0]`; si quiere multi-página, itera. El componente se encarga
+   * de validar formato y tamaño antes de llamar.
+   */
+  onFiles: (files: File[]) => void
   className?: string
   /** Texto que reemplaza "Procesando…" mientras está procesando (ej: progreso OCR). */
   statusMessage?: string | null
 }
 
-export function FileDrop({ onFile, className, statusMessage }: FileDropProps) {
+export function FileDrop({ onFiles, className, statusMessage }: FileDropProps) {
   const inputRef = React.useRef<HTMLInputElement>(null)
   const [state, setState] = React.useState<FileDropState>('idle')
   const [error, setError] = React.useState<string | null>(null)
 
-  const validate = (file: File): string | null => {
+  const validateFile = (file: File): string | null => {
     const lowerName = file.name.toLowerCase()
     const looksHeicByExt = HEIC_EXTENSIONS.some((ext) =>
       lowerName.endsWith(ext),
@@ -49,7 +55,7 @@ export function FileDrop({ onFile, className, statusMessage }: FileDropProps) {
       return 'Formato no soportado. Aceptamos PDF, JPG, PNG y WebP.'
     }
     if (file.size > MAX_SIZE) {
-      return 'Archivo muy grande. El máximo es 10 MB.'
+      return 'Archivo muy grande. El máximo es 10 MB por archivo.'
     }
     if (file.size === 0) {
       return 'El archivo está vacío.'
@@ -57,16 +63,48 @@ export function FileDrop({ onFile, className, statusMessage }: FileDropProps) {
     return null
   }
 
-  const handleFile = (file: File) => {
-    const validationError = validate(file)
-    if (validationError) {
-      setError(validationError)
+  const handleFiles = (selected: FileList | File[]) => {
+    const files = Array.from(selected)
+    if (files.length === 0) return
+    if (files.length > MAX_FILES) {
+      setError(`Máximo ${MAX_FILES} archivos por subida.`)
       setState('error')
       return
     }
+
+    // Validación: cada archivo individual válido.
+    for (const f of files) {
+      const e = validateFile(f)
+      if (e) {
+        setError(e)
+        setState('error')
+        return
+      }
+    }
+
+    // Si es múltiple, todos deben ser imágenes (PDF debe ir solo).
+    if (files.length > 1) {
+      const hasPdf = files.some((f) => f.type === 'application/pdf')
+      const allImages = files.every((f) => f.type.startsWith('image/'))
+      if (hasPdf) {
+        setError(
+          'Subí el PDF como archivo único, sin combinar con imágenes.',
+        )
+        setState('error')
+        return
+      }
+      if (!allImages) {
+        setError(
+          'Para subir varias páginas, todas deben ser imágenes (JPG/PNG/WebP).',
+        )
+        setState('error')
+        return
+      }
+    }
+
     setError(null)
     setState('processing')
-    onFile(file)
+    onFiles(files)
   }
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -83,8 +121,7 @@ export function FileDrop({ onFile, className, statusMessage }: FileDropProps) {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault()
     if (state === 'processing') return
-    const file = e.dataTransfer.files[0]
-    if (file) handleFile(file)
+    handleFiles(e.dataTransfer.files)
   }
 
   const openPicker = () => {
@@ -93,8 +130,8 @@ export function FileDrop({ onFile, className, statusMessage }: FileDropProps) {
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) handleFile(file)
+    const list = e.target.files
+    if (list) handleFiles(list)
     e.target.value = ''
   }
 
@@ -109,7 +146,7 @@ export function FileDrop({ onFile, className, statusMessage }: FileDropProps) {
     <div
       role="button"
       tabIndex={0}
-      aria-label="Arrastra tu boleta acá o tócalo para elegir un archivo"
+      aria-label="Arrastra tu boleta acá o tócalo para elegir un archivo. Si son varias fotos, podés subirlas juntas."
       aria-busy={state === 'processing'}
       onClick={openPicker}
       onKeyDown={handleKeyDown}
@@ -130,6 +167,7 @@ export function FileDrop({ onFile, className, statusMessage }: FileDropProps) {
         ref={inputRef}
         type="file"
         accept={ACCEPT}
+        multiple
         onChange={handleInputChange}
         className="hidden"
         aria-hidden
@@ -159,10 +197,10 @@ export function FileDrop({ onFile, className, statusMessage }: FileDropProps) {
             Arrastra tu boleta acá
           </p>
           <p className="mt-2 text-sm text-body">
-            O toca para elegir el PDF o una foto desde tu galería
+            PDF, foto, o varias fotos del frente y reverso de la boleta
           </p>
           <p className="mt-3 text-[11px] uppercase tracking-wide text-soft">
-            PDF, JPG, PNG o WebP · Máx 10 MB · OCR en tu navegador
+            PDF, JPG, PNG o WebP · Hasta {MAX_FILES} fotos · Máx 10 MB c/u · OCR en tu navegador
           </p>
           {error && (
             <p

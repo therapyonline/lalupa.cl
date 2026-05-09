@@ -9,11 +9,11 @@ import { OcrPhotoTips } from '@/components/parsers/OcrPhotoTips'
 import { useBoletaUpload } from '@/lib/parsers/use-boleta-upload'
 
 export function UploadHubAgua() {
-  const { handleFile, error, ocrStatus, resetKey } = useBoletaUpload('agua')
+  const { handleFiles, error, ocrStatus, resetKey } = useBoletaUpload('agua')
 
   return (
     <div>
-      <FileDrop key={resetKey} onFile={handleFile} statusMessage={ocrStatus} />
+      <FileDrop key={resetKey} onFiles={handleFiles} statusMessage={ocrStatus} />
       <OcrPhotoTips />
       {error && (
         <div className="mt-6">

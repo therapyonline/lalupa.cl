@@ -2,22 +2,27 @@ const TIPS = [
   {
     icon: '🔆',
     title: 'Buena luz',
-    body: 'Cerca de una ventana o con luz cenital. Evitá sombras de tu propia mano sobre la boleta.',
+    body: 'Cerca de una ventana o con luz cenital. Evita sombras de tu propia mano sobre la boleta.',
   },
   {
     icon: '📐',
     title: 'Boleta plana y derecha',
-    body: 'Apoyala en una mesa, no en tu falda. Que esté lo más recta posible, sin perspectiva.',
+    body: 'Apóyala en una mesa, no en tu falda. Que esté lo más recta posible, sin perspectiva.',
   },
   {
     icon: '🔍',
-    title: 'Llená el cuadro',
+    title: 'Llena el cuadro',
     body: 'La boleta debería ocupar al menos 80% de la foto. Si está chica, el OCR adivina y se equivoca.',
   },
   {
     icon: '🤚',
     title: 'Pulso firme',
-    body: 'Apoyá los codos. Una foto movida es ilegible incluso para Tesseract.',
+    body: 'Apoya los codos. Una foto movida es ilegible incluso para Tesseract.',
+  },
+  {
+    icon: '📄',
+    title: 'Frente y reverso',
+    body: 'Si tu boleta tiene el detalle de cargos al reverso, sube ambas fotos juntas (hasta 5). Las procesamos en orden.',
   },
 ] as const
 

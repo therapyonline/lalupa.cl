@@ -44,10 +44,29 @@ const IVA_REGEX = new RegExp(`IVA(?:\\s*19\\s*%)?\\s*\\$?\\s*${CL_NUMBER}`, 'i')
 
 const CILINDRO_REGEX = /(\d{1,2})\s*kg/i
 
+// Variantes de descripción vistas en facturas reales B2G de Gasco GLP
+// (verificadas en transparencia gob.cl):
+//   "VALE CARGA DE GAS TRADICIONAL 11 KG"
+//   "VALE CARGA DE GAS TRADICIONAL 15 KG"
+//   "VALE CARGA DE GAS TRADICIONAL 45 KG"
+//   "VALE CARGA GAS SUPERCATALITICO 15 KG"
+// La boleta consumidor probablemente usa la misma estructura cambiando
+// "FACTURA ELECTRONICA" por "BOLETA ELECTRONICA".
+const VALE_CARGA_LABEL =
+  'VALE\\s+CARGA\\s+(?:DE\\s+)?GAS\\s+(?:TRADICIONAL|SUPERCATALITICO)\\s+\\d+\\s*KG'
+
 const CARGO_PATTERNS: ReadonlyArray<{ concepto: string; pattern: RegExp }> = [
   {
     concepto: 'Cilindro Gas Licuado',
     pattern: buildCargoPattern('Cilindro\\s+Gas\\s+Licuado\\s+\\d+\\s*kg'),
+  },
+  {
+    // Sample real: "10 C/U VALE CARGA DE GAS TRADICIONAL 15 KG 13.490,000 134.900"
+    // El monto al final de la línea es el VALOR total (cantidad × precio
+    // unitario). buildCargoPattern captura el último número de la línea
+    // gracias al lazy `[^\n]*?` antes del grupo numérico.
+    concepto: 'Vale de carga GLP',
+    pattern: buildCargoPattern(VALE_CARGA_LABEL),
   },
   {
     concepto: 'Cargo por cambio de cilindro',

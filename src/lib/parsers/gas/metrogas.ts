@@ -27,32 +27,49 @@ const METROGAS_KEYWORDS = [
   'Metrogas S.A.',
   'Metrogas',
   'metrogas.cl',
-  '96.722.460-K',
+  '96.722.460-K', // RUT canónico (Las Condes 2019)
+  '96.772.460-K', // RUT con typo visto en plantillas Metrogas (diferencia 1 dígito)
 ]
 
-const METROGAS_DETECT_REGEX = /\bMetrogas\b|metrogas\.cl|96\.722\.460-K/i
+// Toleramos ambos RUTs porque la plantilla oficial de Metrogas tiene
+// ese typo (96.772 vs 96.722) y aparece duplicado en el header de
+// muchas facturas reales. No queremos que el typo de la empresa rompa
+// la identificación del parser.
+const METROGAS_DETECT_REGEX = /\bMetrogas\b|metrogas\.cl|96\.7[27]2\.460-K/i
 const METROGAS_MARKERS_REGEX = METROGAS_DETECT_REGEX
 
 const OTHER_EMPRESA_MARKERS_REGEX =
   /(\bLipigas\b|96\.928\.510-K|\bAbastible\b|91\.806\.000-6|GASCO\s+GLP|96\.568\.740-8)/i
 
+// Tarifas Metrogas:
+//   - `BCR01R` residencial
+//   - `BC-01`, `BC-02`, etc. para pyme / comercial / industrial liviana
+//   - `BC01` sin guión también visto en algunas plantillas
 const TARIFA_REGEX =
-  /Tipo\s+de\s+tarifa\s+contratada\s*:?\s*([A-Z]{2,5}\d{0,3}[A-Z]?)/i
+  /Tipo\s+de\s+tarifa\s+contratada\s*:?\s*(BCR?\d{0,2}[A-Z]?|BC-\d{1,3}[A-Z]?|[A-Z]{2,5}\d{0,3}[A-Z]?)/i
 
 const IVA_NOTE_REGEX = new RegExp(`IVA\\s+de\\s+esta\\s+Boleta\\s+es\\s+\\$\\s*${CL_NUMBER}`, 'i')
 
 const CARGO_PATTERNS: ReadonlyArray<{ concepto: string; pattern: RegExp }> = [
   {
+    // El patrón tolera espacios INTERNOS en el paréntesis. Visto en
+    // pyme/no-residencial: `Gas consumido ( 42,02 m3s )` con espacios
+    // alrededor del número y la unidad.
     concepto: 'Gas consumido',
-    pattern: buildCargoPattern('Gas\\s+consumido(?:\\s*\\([^)]*\\))?'),
+    pattern: buildCargoPattern(
+      'Gas\\s+consumido(?:\\s*\\(\\s*[^)]*?\\s*\\))?',
+    ),
   },
   {
     concepto: 'Crédito consumo equivalente reliquidado',
     pattern: buildCargoPattern(
-      'Cr[ée]dito\\s+Consumo\\s+Equivalente\\s+Reliquidado(?:\\s*\\([^)]*\\))?',
+      'Cr[ée]dito\\s+Consumo\\s+Equivalente\\s+Reliquidado(?:\\s*\\(\\s*[^)]*?\\s*\\))?',
     ),
   },
   {
+    // En boletas pyme/comercial puede ser CLP 0 (Cargo Fijo no aplica
+    // según plan). El parser captura 0 igual y deja al UI decidir si
+    // lo muestra o lo oculta.
     concepto: 'Administración del servicio',
     pattern: buildCargoPattern(
       'Administraci[óo]n\\s+del\\s+servicio(?:\\s*\\(Cargo\\s+Fijo\\))?',
@@ -113,6 +130,26 @@ function detectarSospecha(cargo: Cargo, text: string): string | null {
   return null
 }
 
+/**
+ * Marcadores de inicio de la sección "Infórmese" en Metrogas, donde la
+ * empresa lista las tarifas vigentes de corte/reposición/empalme como
+ * INFORMACIÓN, no como cargos del mes. Sin este recorte, regex como
+ * "Reposición" matchean los $30.700 informativos y los agregan como
+ * cargo falso del mes (visto en boleta esgrima pyme abril 2025).
+ */
+const INFORMESE_MARKER_REGEX =
+  /(?:Inf[óo]rmese|Cargo\s+por\s+corte\s+de\s+suministro\s+y\s+reposici[óo]n)/i
+
+/**
+ * Recorta el texto facturado, quitando la sección "Infórmese" final
+ * para que los regex de cargos no la confundan con cargos del mes.
+ */
+function recortarSeccionFacturable(text: string): string {
+  const m = INFORMESE_MARKER_REGEX.exec(text)
+  if (!m || typeof m.index !== 'number') return text
+  return text.slice(0, m.index)
+}
+
 export function parseMetrogas(text: string): ParsedBoleta {
   if (!text || !text.trim()) {
     throw new ParserError(
@@ -144,7 +181,11 @@ export function parseMetrogas(text: string): ParsedBoleta {
     tarifa: text.match(TARIFA_REGEX)?.[1]?.trim(),
   }
 
-  const cargos = extractCargosFromPatterns(text, CARGO_PATTERNS)
+  // Recortamos la sección "Infórmese" antes de extraer cargos para no
+  // sumar las tarifas informativas de corte/reposición como cargos
+  // del mes.
+  const textoFacturable = recortarSeccionFacturable(text)
+  const cargos = extractCargosFromPatterns(textoFacturable, CARGO_PATTERNS)
   for (const cargo of cargos) {
     const razon = detectarSospecha(cargo, text)
     if (razon) {

@@ -54,8 +54,10 @@ const NUMERO_SERVICIO_REGEX =
  * usamos un patrón que captura el último número de la línea.
  */
 function buildLastNumberPattern(label: string): RegExp {
+  // `\\*?\\s*` tolera prefijo asterisco (SMAPA marca cargos outsourceados
+  // con `* TRATAM.AGUAS ANDINAS`).
   return new RegExp(
-    `${label}[^\\n]*?(\\b(?:\\d{1,3}(?:\\.\\d{3})+|\\d+)(?:,\\d+)?\\b)(?:\\s|$)`,
+    `\\*?\\s*${label}[^\\n]*?(\\b(?:\\d{1,3}(?:\\.\\d{3})+|\\d+)(?:,\\d+)?\\b)(?:\\s|$)`,
     'gi',
   )
 }
@@ -67,7 +69,7 @@ function lastNumberOnLine(text: string, label: string): number | null {
   // Cada matchAll devuelve cada match, pero queremos el último número del
   // primer match. Usamos un regex single-match con greedy lookahead.
   const greedy = new RegExp(
-    `${label}[^\\n]*?(\\b(?:\\d{1,3}(?:\\.\\d{3})+|\\d+)(?:,\\d+)?\\b)(?=[\\s\\n]*$)`,
+    `\\*?\\s*${label}[^\\n]*?(\\b(?:\\d{1,3}(?:\\.\\d{3})+|\\d+)(?:,\\d+)?\\b)(?=[\\s\\n]*$)`,
     'im',
   )
   const m = text.match(greedy)
@@ -75,38 +77,60 @@ function lastNumberOnLine(text: string, label: string): number | null {
   return parseChileanNumber(m[1])
 }
 
+/**
+ * Wrapper sobre `buildCargoPattern` que tolera prefijo asterisco visto
+ * en SMAPA (ej. `* TRATAM.AGUAS ANDINAS`). El asterisco marca cargos
+ * outsourceados a otra empresa o pies de página tarifarios.
+ */
+function buildSissCargoPattern(label: string): RegExp {
+  return buildCargoPattern(`\\*?\\s*${label}`)
+}
+
 const CARGO_PATTERNS: ReadonlyArray<{ concepto: string; pattern: RegExp }> = [
   // "Cargo Fijo 914", un solo número, el simple `buildCargoPattern` sirve.
-  // Aguas Andinas también usa "Costo Fijo" en boletas más nuevas.
+  // Aguas Andinas usa "Costo Fijo" en boletas más nuevas; SMAPA usa
+  // "Cargo Fijo (1 CU)" con sufijo cliente único entre paréntesis.
   {
     concepto: 'Cargo fijo',
-    pattern: buildCargoPattern('(?:Cargo|Costo)\\s+Fijo'),
+    pattern: buildSissCargoPattern('(?:Cargo|Costo)\\s+Fijo'),
   },
   {
     concepto: 'Reposición',
-    pattern: buildCargoPattern('Reposici[óo]n(?:\\s+de\\s+servicio)?'),
+    pattern: buildSissCargoPattern('Reposici[óo]n(?:\\s+de\\s+servicio)?'),
   },
   {
     concepto: 'Sobreconsumo',
-    pattern: buildCargoPattern('Sobreconsumo'),
+    pattern: buildSissCargoPattern('Sobreconsumo'),
   },
   {
     concepto: 'Reliquidación',
-    pattern: buildCargoPattern('Reliquidaci[óo]n'),
+    pattern: buildSissCargoPattern('Reliquidaci[óo]n'),
   },
   {
     concepto: 'Ajuste por lectura estimada',
-    pattern: buildCargoPattern(
+    pattern: buildSissCargoPattern(
       'Ajuste\\s+(?:por\\s+)?lectura\\s+estimada|Ajuste\\s+(?:cargo\\s+)?(?:por\\s+)?no\\s+registro\\s+(?:de\\s+)?[Ll]ectura',
     ),
   },
   {
-    // Ajuste de redondeo a peso entero. Aparece en ESVAL ("Sencillo
-    // Anterior/Actual") y ESSBIO/Nuevosur ("Ajuste Sencillo
-    // Anterior/Actual"). Puede ser positivo o negativo, valor pequeño.
+    // Aguas del Valle y SMAPA usan DOS líneas separadas (delta vs
+    // ESSBIO/Nuevosur que tienen un "Ajuste Sencillo" único). Captamos
+    // cada una como cargo independiente para preservar el signo
+    // (Anterior suele ser positivo, Actual suele ser negativo).
+    concepto: 'Ajuste sencillo anterior',
+    pattern: buildSissCargoPattern('(?:Ajuste\\s+)?Sencillo\\s+Anterior'),
+  },
+  {
+    concepto: 'Ajuste sencillo actual',
+    pattern: buildSissCargoPattern('(?:Ajuste\\s+)?Sencillo\\s+Actual'),
+  },
+  {
+    // Variante de redondeo con un único cargo. Negative lookahead para
+    // no duplicar con los dos anteriores. Cubre ESSBIO/Nuevosur cuando
+    // solo aparece "Ajuste Sencillo" sin sufijo.
     concepto: 'Ajuste sencillo',
-    pattern: buildCargoPattern(
-      '(?:Ajuste\\s+)?Sencillo(?:\\s+(?:Anterior|Actual))?',
+    pattern: buildSissCargoPattern(
+      'Ajuste\\s+Sencillo(?!\\s+(?:Anterior|Actual))',
     ),
   },
   {
@@ -114,7 +138,7 @@ const CARGO_PATTERNS: ReadonlyArray<{ concepto: string; pattern: RegExp }> = [
     // como "Subsidio Agua Potable", "Subsidio (14,10m3 45%)" en ESVAL,
     // o simplemente "Subsidio" en SMAPA.
     concepto: 'Subsidio agua potable',
-    pattern: buildCargoPattern(
+    pattern: buildSissCargoPattern(
       'Subsidio(?:\\s+Agua\\s+Potable)?(?:\\s*\\([^)]*\\))?',
     ),
   },

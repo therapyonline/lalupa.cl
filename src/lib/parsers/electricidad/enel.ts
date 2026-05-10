@@ -61,6 +61,12 @@ const ENEL_CARGO_PATTERNS: ReadonlyArray<{ concepto: string; pattern: RegExp }> 
         'Electricidad\\s+Consumida(?:\\s+\\(Var\\.?\\s+IVA\\))?(?!\\s+Imp)',
       ),
     },
+    // SIB.UEN y NIVEN: variantes vistas en el sample oficial Enel
+    // "Entendiendo Mi Boleta" (enel.cl). No aparecen en facturas
+    // residenciales típicas y son de baja frecuencia; verificación v2
+    // no encontró otros PDFs públicos que las contengan. Las mantenemos
+    // como guard porque vienen de la doc oficial de Enel. Si nunca
+    // matchean en producción real durante 6 meses, considerar removerlas.
     {
       concepto: 'Electricidad consumida, impuesto SIB.UEN',
       pattern: buildCargoPattern('Electricidad\\s+Consumida\\s+Imp\\.?\\s+SIB\\.?UEN'),

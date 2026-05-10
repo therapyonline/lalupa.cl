@@ -11,6 +11,7 @@ export type EmpresaSanitaria =
   | 'ESSBio'
   | 'Nuevosur'
   | 'SMAPA'
+  | 'Aguas del Valle'
 
 export type EmpresaGas = 'Metrogas' | 'Lipigas' | 'Abastible' | 'Gasco GLP'
 
@@ -77,6 +78,7 @@ export type AguaSlug =
   | 'essbio'
   | 'nuevosur'
   | 'smapa'
+  | 'aguas-del-valle'
 
 export const AGUA_SLUGS: Record<EmpresaSanitaria, AguaSlug> = {
   'Aguas Andinas': 'aguas-andinas',
@@ -84,6 +86,7 @@ export const AGUA_SLUGS: Record<EmpresaSanitaria, AguaSlug> = {
   ESSBio: 'essbio',
   Nuevosur: 'nuevosur',
   SMAPA: 'smapa',
+  'Aguas del Valle': 'aguas-del-valle',
 }
 
 /** Reverse map para manual override desde chip. */
@@ -93,6 +96,7 @@ export const SLUG_TO_EMPRESA_SANITARIA: Record<AguaSlug, EmpresaSanitaria> = {
   essbio: 'ESSBio',
   nuevosur: 'Nuevosur',
   smapa: 'SMAPA',
+  'aguas-del-valle': 'Aguas del Valle',
 }
 
 export type GasSlug = 'metrogas' | 'lipigas' | 'abastible' | 'gasco-glp'

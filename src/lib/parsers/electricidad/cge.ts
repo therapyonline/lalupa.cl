@@ -35,8 +35,15 @@ const CARGO_PATTERNS: Array<{ concepto: string; pattern: RegExp }> = [
   { concepto: 'Cargo único', pattern: buildCargoPattern('Cargo\\s+[úu]nico') },
   { concepto: 'Recargo por mora', pattern: buildCargoPattern('Recargo por mora') },
   {
+    // Variantes vistas en boletas reales 2026:
+    //   "Subsidio Eléctrico Ley 21.667"
+    //   "Subsidio Eléctrico Ley N°21.667"
+    //   "Subsidio Eléctrico Ley Nº 21.667"
+    //   "Ley 21.667" / "Ley 21667"
     concepto: 'Subsidio Eléctrico Ley 21.667',
-    pattern: buildCargoPattern('(?:Subsidio\\s+El[ée]ctrico|Ley\\s*21\\.?667)'),
+    pattern: buildCargoPattern(
+      '(?:Subsidio\\s+El[ée]ctrico|Ley\\s+N?[°º]?\\s*21\\.?667)',
+    ),
   },
   { concepto: 'IVA 19%', pattern: buildCargoPattern('IVA(?:\\s*19\\s*%)?') },
 ]

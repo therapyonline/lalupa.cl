@@ -51,8 +51,15 @@ const ENEL_CARGO_PATTERNS: ReadonlyArray<{ concepto: string; pattern: RegExp }> 
       pattern: buildCargoPattern('Administraci[óo]n del servicio'),
     },
     {
+      // Negative lookahead `(?!\s+Imp)` evita que este pattern matchee
+      // las líneas con sufijo "Imp. SIB.UEN" o "Imp. NIVEN" cuando no
+      // hay una línea "(Var. IVA)" explícita. Sin esto, los dos cargos
+      // de impuesto se duplican (uno como "Electricidad consumida"
+      // genérica + otro como impuesto específico).
       concepto: 'Electricidad consumida',
-      pattern: buildCargoPattern('Electricidad\\s+Consumida(?:\\s+\\(Var\\.?\\s+IVA\\))?'),
+      pattern: buildCargoPattern(
+        'Electricidad\\s+Consumida(?:\\s+\\(Var\\.?\\s+IVA\\))?(?!\\s+Imp)',
+      ),
     },
     {
       concepto: 'Electricidad consumida, impuesto SIB.UEN',

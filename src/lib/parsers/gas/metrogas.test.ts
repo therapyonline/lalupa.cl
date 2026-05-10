@@ -44,6 +44,36 @@ describe('metrogasParser.parse', () => {
     expect(conceptos).toContain('Administración del servicio')
   })
 
+  it('preserva el signo negativo en créditos por reliquidación', () => {
+    // El fixture tiene "Crédito Consumo Equivalente Reliquidado (...)
+    // $ -75.847" — el signo negativo viene DESPUÉS del $, no antes.
+    // Sin este test, regresión silenciosa convierte el crédito en
+    // positivo e infla el total a pagar.
+    const r = parseMetrogas(METROGAS_NORMAL)
+    const credito = r.cargos.find(
+      (c) => c.concepto === 'Crédito consumo equivalente reliquidado',
+    )
+    expect(credito).toBeDefined()
+    expect(credito?.monto).toBeLessThan(0)
+  })
+
+  it('preserva el signo negativo en ajuste por no registro de lectura', () => {
+    const r = parseMetrogas(METROGAS_NORMAL)
+    const ajuste = r.cargos.find(
+      (c) => c.concepto === 'Ajuste por no registro de lectura',
+    )
+    expect(ajuste).toBeDefined()
+    expect(ajuste?.monto).toBeLessThan(0)
+  })
+
+  it('el total a pagar NO se confunde con un crédito negativo', () => {
+    // Aún si el parser cae al fallback de extractTotal (escaneo de
+    // máximos), debe ignorar líneas con signo negativo.
+    const r = parseMetrogas(METROGAS_NORMAL)
+    expect(r.totales.total).toBeGreaterThan(0)
+    expect(r.totales.total).toBe(114212)
+  })
+
   it('extrae tarifa BCR01R', () => {
     const r = parseMetrogas(METROGAS_NORMAL)
     expect(r.consumo.tarifa).toBe('BCR01R')

@@ -55,6 +55,24 @@ const CARGO_PATTERNS: ReadonlyArray<{ concepto: string; pattern: RegExp }> = [
     concepto: 'Recargo por mora',
     pattern: buildCargoPattern('Recargo\\s+por\\s+mora'),
   },
+  {
+    // Específico del sur de Chile (Grupo Saesa cubre desde Bío Bío hasta
+    // Aysén). El "Recargo por consumo invierno" aplica entre abril y
+    // septiembre cuando el consumo del mes supera el "límite invernal"
+    // (típicamente promedio de octubre a marzo + 20-30%). Puede ser el
+    // cargo más grande de la boleta en zonas frías.
+    concepto: 'Recargo por consumo invierno',
+    pattern: buildCargoPattern(
+      'Recargo\\s+por\\s+consumo\\s+invierno',
+    ),
+  },
+  {
+    // Saldo del período anterior arrastrado a la boleta actual. No es
+    // un cargo nuevo pero suma al "Total a pagar". El usuario tiene
+    // derecho a pedir el detalle.
+    concepto: 'Saldo anterior',
+    pattern: buildCargoPattern('Saldo\\s+anterior'),
+  },
   { concepto: 'IVA 19%', pattern: buildCargoPattern('IVA(?:\\s*19\\s*%)?') },
 ]
 
@@ -67,6 +85,11 @@ function detectarSospecha(cargo: Cargo, text: string): string | null {
   }
   if (cargo.concepto === 'Cargo único') {
     return 'Cargo único no es un componente estándar de la tarifa BT-1. Pide detalle del concepto.'
+  }
+  if (cargo.concepto === 'Recargo por consumo invierno') {
+    // No es sospechoso per se (es legal abr-sep en zonas sur), pero el
+    // usuario debe saber por qué le aparece y cómo se calcula.
+    return 'Recargo invernal: aplica entre abril y septiembre cuando el consumo supera el promedio de tu período de verano. Verifica que el límite invernal en tu boleta sea correcto.'
   }
   return null
 }

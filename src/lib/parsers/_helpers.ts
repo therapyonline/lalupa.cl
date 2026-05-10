@@ -227,8 +227,13 @@ export function extractPeriodo(
 
 /**
  * Construye un regex que matchea "{label} ... {número chileno}".
- * Captura signo opcional `-` antes del número para soportar créditos
- * negativos (ej. Metrogas reliquidación: "-$ 75.847").
+ *
+ * Captura signo opcional `-` para soportar créditos negativos. Cubre
+ * ambos órdenes vistos en boletas chilenas reales:
+ *   - "-$ 75.847" (Metrogas reliquidación, signo antes del $)
+ *   - "$ -75.847" (Metrogas crédito, signo después del $)
+ *   - "$-75.847" (signo pegado al $)
+ *   - "-75.847" (sin $, ej. encabezado de tabla)
  *
  * El `\b` antes del bloque numérico previene matches adentro de tokens
  * tipo "BT1" o "Tarifa12", donde el dígito está pegado a letras y NO
@@ -237,7 +242,7 @@ export function extractPeriodo(
  */
 export function buildCargoPattern(label: string): RegExp {
   return new RegExp(
-    `${label}[^\\n]*?(-?\\s*\\$?\\s*\\b(?:\\d{1,3}(?:\\.\\d{3})+|\\d+)(?:,\\d+)?\\b)`,
+    `${label}[^\\n]*?(-?\\s*\\$?\\s*-?\\s*\\b(?:\\d{1,3}(?:\\.\\d{3})+|\\d+)(?:,\\d+)?\\b)`,
     'i',
   )
 }
@@ -301,18 +306,23 @@ export function extractTotal(text: string): number {
   // Solo si el texto tiene ≥1 mención de "Total" para evitar agarrar
   // un número en otro contexto (ej. histórico).
   if (!/\btotal\b/i.test(text)) return 0
-  const numericPattern = /\$\s*((?:\d{1,3}(?:\.\d{3})+|\d+)(?:,\d+)?)/g
-  const SKIP_LABEL_REGEX = /[úu]ltimo\s+pago|saldo\s+anterior|deuda\s+anterior/i
+  // Capturamos opcionalmente un `-` antes y otro después del `$` para
+  // detectar créditos (Metrogas: "$ -75.847" o "-$ 75.847"). Si la línea
+  // es un crédito, la descartamos del candidato a "total" porque el
+  // total nunca puede ser negativo.
+  const numericPattern = /(-?)\s*\$\s*(-?)\s*((?:\d{1,3}(?:\.\d{3})+|\d+)(?:,\d+)?)/g
+  const SKIP_LABEL_REGEX = /[úu]ltimo\s+pago|saldo\s+anterior|deuda\s+anterior|cr[eé]dito|reliquidaci[óo]n/i
   let max = 0
   for (const match of text.matchAll(numericPattern)) {
     const idx = match.index ?? 0
-    // Skip si la MISMA línea (no las 60 chars previas, que pueden
-    // alcanzar líneas anteriores) contiene un label de descarte.
+    // Skip si hay signo negativo (es un crédito).
+    if (match[1] === '-' || match[2] === '-') continue
+    // Skip si la MISMA línea contiene un label de descarte.
     const lineStart = text.lastIndexOf('\n', idx - 1) + 1
     const lineEnd = text.indexOf('\n', idx)
     const line = text.slice(lineStart, lineEnd === -1 ? text.length : lineEnd)
     if (SKIP_LABEL_REGEX.test(line)) continue
-    const v = parseChileanNumber(match[1])
+    const v = parseChileanNumber(match[3])
     if (Number.isFinite(v) && v > max) max = v
   }
   return max

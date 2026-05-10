@@ -60,7 +60,13 @@ const CARGO_PATTERNS: ReadonlyArray<{ concepto: string; pattern: RegExp }> = [
   },
   {
     concepto: 'Arriendo medidor',
-    pattern: buildCargoPattern('Arriendo\\s+Medidor'),
+    pattern: buildCargoPattern('Arriendo\\s+Medidor(?!\\s+por\\s+Reliquidaci[óo]n)'),
+  },
+  {
+    concepto: 'Crédito arriendo medidor por reliquidación',
+    pattern: buildCargoPattern(
+      'Cr[ée]dito\\s+Arriendo\\s+Medidor\\s+por\\s+Reliquidaci[óo]n',
+    ),
   },
   {
     concepto: 'Reliquidación de consumo',

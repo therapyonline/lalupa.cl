@@ -77,7 +77,11 @@ function lastNumberOnLine(text: string, label: string): number | null {
 
 const CARGO_PATTERNS: ReadonlyArray<{ concepto: string; pattern: RegExp }> = [
   // "Cargo Fijo 914", un solo número, el simple `buildCargoPattern` sirve.
-  { concepto: 'Cargo fijo', pattern: buildCargoPattern('Cargo\\s+Fijo') },
+  // Aguas Andinas también usa "Costo Fijo" en boletas más nuevas.
+  {
+    concepto: 'Cargo fijo',
+    pattern: buildCargoPattern('(?:Cargo|Costo)\\s+Fijo'),
+  },
   {
     concepto: 'Reposición',
     pattern: buildCargoPattern('Reposici[óo]n(?:\\s+de\\s+servicio)?'),
@@ -96,16 +100,51 @@ const CARGO_PATTERNS: ReadonlyArray<{ concepto: string; pattern: RegExp }> = [
       'Ajuste\\s+(?:por\\s+)?lectura\\s+estimada|Ajuste\\s+(?:cargo\\s+)?(?:por\\s+)?no\\s+registro\\s+(?:de\\s+)?[Ll]ectura',
     ),
   },
+  {
+    // Ajuste de redondeo a peso entero. Aparece en ESVAL ("Sencillo
+    // Anterior/Actual") y ESSBIO/Nuevosur ("Ajuste Sencillo
+    // Anterior/Actual"). Puede ser positivo o negativo, valor pequeño.
+    concepto: 'Ajuste sencillo',
+    pattern: buildCargoPattern(
+      '(?:Ajuste\\s+)?Sencillo(?:\\s+(?:Anterior|Actual))?',
+    ),
+  },
+  {
+    // Subsidio agua potable como descuento (negativo en boleta). Visible
+    // como "Subsidio Agua Potable", "Subsidio (14,10m3 45%)" en ESVAL,
+    // o simplemente "Subsidio" en SMAPA.
+    concepto: 'Subsidio agua potable',
+    pattern: buildCargoPattern(
+      'Subsidio(?:\\s+Agua\\s+Potable)?(?:\\s*\\([^)]*\\))?',
+    ),
+  },
 ]
 
 /**
  * Líneas con formato "X m³ × Y Z" donde Z es el cargo real. Procesadas
  * separadamente con `lastNumberOnLine` para extraer el TOTAL al final.
+ *
+ * Variantes regionales:
+ *   - ESVAL usa "Recolección" en vez de "Servicio de Alcantarillado"
+ *     y "Tratamiento" sin "de Aguas Servidas".
+ *   - SMAPA usa "Alcantarillado S/Trata" (Sin Tratamiento) y "TRATAM.
+ *     AGUAS ANDINAS" (outsource del tratamiento).
+ *
+ * El orden importa: probamos primero los labels más específicos para
+ * que "Tratamiento de Aguas Servidas" gane antes que "Tratamiento" solo.
  */
 const MULTI_NUMBER_LABELS: ReadonlyArray<{ concepto: string; label: string }> = [
-  { concepto: 'Consumo agua potable', label: 'Consumo\\s+Agua\\s+Potable' },
-  { concepto: 'Servicio de alcantarillado', label: 'Servicio\\s+de\\s+Alcantarillado' },
-  { concepto: 'Tratamiento de aguas servidas', label: 'Tratamiento\\s+de\\s+Aguas\\s+Servidas' },
+  { concepto: 'Consumo agua potable', label: '(?:Consumo\\s+Agua\\s+Potable|Consumo\\s+Agua)' },
+  {
+    concepto: 'Servicio de alcantarillado',
+    label:
+      '(?:Servicio\\s+de\\s+Alcantarillado|Alcantarillado\\s+S/Trata|Recolecci[óo]n)',
+  },
+  {
+    concepto: 'Tratamiento de aguas servidas',
+    label:
+      '(?:Tratamiento\\s+de\\s+Aguas\\s+Servidas|TRATAM\\.\\s*AGUAS\\s+ANDINAS|Tratamiento(?!\\s+de\\s+Aguas))',
+  },
 ]
 
 const REPOSICION_CONTEXTO_REGEX = /(corte|suspensi[óo]n|reposici[óo]n)/i

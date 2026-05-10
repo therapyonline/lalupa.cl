@@ -32,6 +32,11 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: ESLint
         run: pnpm lint
+      - name: Lint tono editorial (voseo + em-dashes)
+        # Falla si reaparecen patrones rioplatenses (Subí/Probá/vos) o
+        # em-dashes (—) en copy. Em-dash funcional dentro de regex se
+        # exenta con `// lint-tono-disable-next-line`.
+        run: pnpm lint:tono
       - name: TypeScript typecheck (build)
         # `next build` corre tsc + lint + bundle. Si tsc falla, el job falla.
         run: pnpm build

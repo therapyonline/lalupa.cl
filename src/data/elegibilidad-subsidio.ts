@@ -98,6 +98,32 @@ export const CALENDARIO_5TA_CONVOCATORIA = {
   ultimaCuotaFecha: '2026-12-31',
 } as const;
 
+const MESES_ES = [
+  'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+  'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',
+] as const;
+
+/**
+ * Formatea una fecha ISO 'YYYY-MM-DD' a "DD de mes de YYYY" en español.
+ *
+ * Ej: '2026-06-22' → '22 de junio de 2026'.
+ *
+ * Lo usamos para los strings que el usuario lee en el wizard de subsidio.
+ * No usamos `Date` para evitar quirks de timezone (un ISO date sin hora se
+ * parsea como UTC, lo que en CLT puede dar el día anterior). Parseamos
+ * manual los componentes y mapeamos el mes.
+ */
+export function formatFechaCalendario(iso: string): string {
+  const m = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return iso;
+  const year = m[1];
+  const monthIdx = parseInt(m[2], 10) - 1;
+  const day = parseInt(m[3], 10);
+  const mes = MESES_ES[monthIdx] ?? '';
+  if (!mes) return iso;
+  return `${day} de ${mes} de ${year}`;
+}
+
 // ============================================================================
 // FUNCIONES PURAS DE CRITERIOS
 // ============================================================================
@@ -212,7 +238,7 @@ export function evaluarSubsidioElectrico(r: RespuestasUsuario): ResultadoElegibi
 
   if (!cumpleAlDia(r)) {
     bloqueadores.push(
-      `Debes estar al día en el pago de tu cuenta de luz al ${CALENDARIO_5TA_CONVOCATORIA.fechaAlDiaPago} (o tener convenio de pago vigente). Regulariza con tu empresa eléctrica antes de postular.`,
+      `Debes estar al día en el pago de tu cuenta de luz al ${formatFechaCalendario(CALENDARIO_5TA_CONVOCATORIA.fechaAlDiaPago)} (o tener convenio de pago vigente). Regulariza con tu empresa eléctrica antes de postular.`,
     );
   }
 
@@ -283,11 +309,11 @@ function descripcionMotivoCalifica(r: RespuestasUsuario, prioridad: 'alta' | 'me
 
 function pasosCalificas(r: RespuestasUsuario): string[] {
   const pasos: string[] = [
-    `Postulá entre el ${CALENDARIO_5TA_CONVOCATORIA.postulacionInicio} y el ${CALENDARIO_5TA_CONVOCATORIA.postulacionFin} en https://www.subsidioelectrico.cl/`,
-    'Iniciá sesión con tu ClaveÚnica',
-    'Tené a mano tu boleta de luz para copiar el número de cliente exacto (con dígito verificador, puntos y guiones)',
-    'Completá: región, comuna, empresa eléctrica, número de cliente, correo y teléfono',
-    'Declará si vives en agrupación de viviendas (varias casas con un solo empalme)',
+    `Postula entre el ${formatFechaCalendario(CALENDARIO_5TA_CONVOCATORIA.postulacionInicio)} y el ${formatFechaCalendario(CALENDARIO_5TA_CONVOCATORIA.postulacionFin)} en https://www.subsidioelectrico.cl/`,
+    'Inicia sesión con tu ClaveÚnica',
+    'Ten a mano tu boleta de luz para copiar el número de cliente exacto (con dígito verificador, puntos y guiones)',
+    'Completa: región, comuna, empresa eléctrica, número de cliente, correo y teléfono',
+    'Declara si vives en agrupación de viviendas (varias casas con un solo empalme)',
   ];
 
   if (r.hayElectrodependiente) {
@@ -308,11 +334,11 @@ function pasosNoCalificas(r: RespuestasUsuario): string[] {
 
   if (!r.estaEnRSH) {
     pasos.push(
-      'Inscribite en el Registro Social de Hogares: https://www.ventanillaunicasocial.gob.cl/',
+      'Inscríbete en el Registro Social de Hogares: https://www.ventanillaunicasocial.gob.cl/',
     );
   } else if (r.tramoCSE !== '0-40' && !r.hayElectrodependiente) {
     pasos.push(
-      'Si tu situación socioeconómica cambió, actualizá tu RSH: https://www.ventanillaunicasocial.gob.cl/',
+      'Si tu situación socioeconómica cambió, actualiza tu RSH: https://www.ventanillaunicasocial.gob.cl/',
     );
     pasos.push(
       'Si en tu hogar hay una persona electrodependiente, inscríbela en el Registro de Personas Electrodependientes con tu empresa eléctrica (necesitas certificado médico).',
@@ -321,7 +347,7 @@ function pasosNoCalificas(r: RespuestasUsuario): string[] {
 
   if (!r.estaAlDia) {
     pasos.push(
-      'Regularizá tu deuda con la empresa eléctrica antes del 22 de junio de 2026 (puede ser convenio de pago).',
+      `Regulariza tu deuda con la empresa eléctrica antes del ${formatFechaCalendario(CALENDARIO_5TA_CONVOCATORIA.fechaAlDiaPago)} (puede ser convenio de pago).`,
     );
   }
 
@@ -332,7 +358,7 @@ function pasosNoCalificas(r: RespuestasUsuario): string[] {
   }
 
   // Otros subsidios alternativos
-  pasos.push('Considerá otros beneficios: SAP (agua), Bono Gas Licuado, Aporte Familiar Permanente.');
+  pasos.push('Considera otros beneficios: SAP (agua), Bono Gas Licuado, Aporte Familiar Permanente.');
 
   return pasos;
 }

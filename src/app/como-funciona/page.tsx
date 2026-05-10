@@ -47,7 +47,7 @@ const PRINCIPLES: Array<{
     Icon: Cpu,
     title: 'Open por diseño',
     description:
-      'El parser se ejecuta como JavaScript que vos puedes inspeccionar. Validamos contra tarifas SEC/SISS oficiales públicas.',
+      'El parser se ejecuta como JavaScript que tú mismo puedes inspeccionar. Validamos contra tarifas SEC/SISS oficiales públicas.',
   },
 ]
 
@@ -117,7 +117,7 @@ export default function ComoFuncionaPage() {
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-body">
             Lalupa fue construida bajo un principio simple: no almacenamos lo
             que no necesitamos, y no necesitamos casi nada. Esta página explica
-            exactamente cómo lo hacemos, incluyendo cómo verificarlo vos
+            exactamente cómo lo hacemos, incluyendo cómo verificarlo tú
             mismo.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -158,20 +158,20 @@ export default function ComoFuncionaPage() {
         <Container>
           <div className="rounded-[20px] border border-border bg-white p-6 md:p-10">
             <p className="font-mono text-xs uppercase tracking-[0.1em] text-soft">
-              Cómo verificarlo vos mismo
+              Cómo verificarlo tú mismo
             </p>
             <h2 className="mt-3 text-2xl font-medium tracking-tight text-ink md:text-3xl">
-              Abrí las DevTools y mira la pestaña Network
+              Abre las DevTools y mira la pestaña Network
             </h2>
             <ol className="mt-5 list-decimal space-y-3 pl-6 text-body">
               <li>
                 Anda a <Link href="/boleta-luz" className="font-medium text-primary underline underline-offset-4 hover:no-underline">/boleta-luz</Link> en tu navegador.
               </li>
               <li>
-                Apretá <kbd className="rounded border border-border bg-cream-warm px-1.5 py-0.5 font-mono text-xs">F12</kbd>{' '}
+                Presiona <kbd className="rounded border border-border bg-cream-warm px-1.5 py-0.5 font-mono text-xs">F12</kbd>{' '}
                 (o <kbd className="rounded border border-border bg-cream-warm px-1.5 py-0.5 font-mono text-xs">Cmd+Opt+I</kbd> en Mac) y anda a la pestaña Network.
               </li>
-              <li>Limpiá el log y sube un PDF de prueba.</li>
+              <li>Limpia el log y sube un PDF de prueba.</li>
               <li>
                 Verifica: vas a ver requests para los chunks de JS, fonts y un par de cosas estáticas. <strong className="text-ink">No vas a ver ningún POST con tu PDF como payload.</strong>
               </li>

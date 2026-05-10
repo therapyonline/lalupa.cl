@@ -31,7 +31,7 @@ export async function generateMetadata({
     title: 'Resultado',
     robots: { index: false, follow: false },
     // Canonical apunta a la ruta indexable padre (/boleta-luz) en lugar
-    // del default de layout (/) — más semánticamente correcto aunque la
+    // del default de layout (/), más semánticamente correcto aunque la
     // página sea noindex.
     alternates: { canonical: '/boleta-luz' },
   }

@@ -88,7 +88,7 @@ export function FileDrop({ onFiles, className, statusMessage }: FileDropProps) {
       const allImages = files.every((f) => f.type.startsWith('image/'))
       if (hasPdf) {
         setError(
-          'Subí el PDF como archivo único, sin combinar con imágenes.',
+          'Sube el PDF como archivo único, sin combinar con imágenes.',
         )
         setState('error')
         return
@@ -146,7 +146,7 @@ export function FileDrop({ onFiles, className, statusMessage }: FileDropProps) {
     <div
       role="button"
       tabIndex={0}
-      aria-label="Arrastra tu boleta acá o tócalo para elegir un archivo. Si son varias fotos, podés subirlas juntas."
+      aria-label="Arrastra tu boleta acá o tócalo para elegir un archivo. Si son varias fotos, puedes subirlas juntas."
       aria-busy={state === 'processing'}
       onClick={openPicker}
       onKeyDown={handleKeyDown}
@@ -170,7 +170,7 @@ export function FileDrop({ onFiles, className, statusMessage }: FileDropProps) {
         multiple
         onChange={handleInputChange}
         className="hidden"
-        aria-hidden
+        aria-label="Seleccionar archivo de boleta"
         tabIndex={-1}
       />
 

@@ -57,10 +57,16 @@ function AlertRoot({
 }: AlertProps) {
   const resolved: AlertVariant = variant ?? 'info'
   const Icon = ICON_MAP[resolved]
+  // ARIA `role="alert"` interrumpe al lector de pantalla apenas aparece
+  // el elemento. Eso es deseable para danger/warning (cobro indebido,
+  // error de parser), pero ruido para info/success. Para esos usamos
+  // `role="status"` que se anuncia educadamente sin interrumpir.
+  const role =
+    resolved === 'danger' || resolved === 'warning' ? 'alert' : 'status'
 
   return (
     <div
-      role="alert"
+      role={role}
       className={cn(alertVariants({ variant }), className)}
       {...props}
     >

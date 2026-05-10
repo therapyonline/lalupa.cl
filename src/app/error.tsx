@@ -31,7 +31,7 @@ export default function GlobalError({
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-body">
             Tuvimos un error inesperado al renderizar esta página. Tu boleta y
             tu histórico siguen seguros, nada salió de tu dispositivo.
-            Intentá recargar.
+            Intenta recargar.
           </p>
           {error.digest && (
             <p className="mt-4 font-mono text-xs text-soft">

@@ -181,8 +181,11 @@ export function formatPeriod({
   if (sameMonth) {
     return format(desde, "MMMM 'de' yyyy", { locale: es })
   }
+  // En-dash con espacios alrededor en ambas ramas para consistencia.
+  // En-dash (U+2013) en vez de hyphen ASCII para rangos de fecha es la
+  // convención tipográfica correcta en español.
   if (sameYear) {
-    return `${format(desde, 'MMMM', { locale: es })}–${format(hasta, "MMMM 'de' yyyy", { locale: es })}`
+    return `${format(desde, 'MMMM', { locale: es })} – ${format(hasta, "MMMM 'de' yyyy", { locale: es })}`
   }
   return `${format(desde, 'MMM yyyy', { locale: es })} – ${format(hasta, 'MMM yyyy', { locale: es })}`
 }

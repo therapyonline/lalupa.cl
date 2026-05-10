@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Menu, X } from 'lucide-react'
 import { Container } from './Container'
 import { cn } from '@/lib/utils'
@@ -26,6 +26,17 @@ function isActive(pathname: string, href: string) {
 export function Header() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
+
+  // Cierra el menú móvil con Escape (consistencia con modal del tracker
+  // y pattern AT esperado para overlays).
+  useEffect(() => {
+    if (!open) return
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [open])
 
   const pillBase =
     'rounded-full px-4 py-2 text-xs font-medium uppercase tracking-wide transition-colors'

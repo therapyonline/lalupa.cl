@@ -62,7 +62,7 @@ const CATEGORIES: ReadonlyArray<{
     label: 'Derechos',
     title: 'Derechos del consumidor',
     description:
-      'Tus derechos cuando reclamás un cobro a una empresa de servicios básicos en Chile: Ley 19.496, plazos, vías formales y compensaciones.',
+      'Tus derechos cuando reclamas un cobro a una empresa de servicios básicos en Chile: Ley 19.496, plazos, vías formales y compensaciones.',
     keywords: [
       'derechos consumidor servicios básicos',
       'reclamar cobro indebido chile',

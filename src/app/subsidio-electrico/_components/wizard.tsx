@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/Input'
 import { Pill } from '@/components/ui/Pill'
 import {
   CALENDARIO_5TA_CONVOCATORIA,
+  formatFechaCalendario,
   PREGUNTAS_2026,
   type PreguntaWizard,
   type ResultadoElegibilidad,
@@ -76,7 +77,7 @@ export function SubsidioWizard() {
     }
     if (p.tipo === 'number') {
       const n = typeof value === 'number' ? value : parseInt(String(value), 10)
-      if (Number.isNaN(n)) return 'Ingresá un número válido.'
+      if (Number.isNaN(n)) return 'Ingresa un número válido.'
       if (p.min !== undefined && n < p.min) return `Mínimo ${p.min}.`
       if (p.max !== undefined && n > p.max) return `Máximo ${p.max}.`
     }
@@ -473,8 +474,8 @@ function ResultView({
                 subsidioelectrico.cl
               </a>{' '}
               con tu ClaveÚnica. Las fechas vigentes (postulación hasta el{' '}
-              {CALENDARIO_5TA_CONVOCATORIA.postulacionFin}, estar al día hasta
-              el {CALENDARIO_5TA_CONVOCATORIA.fechaAlDiaPago}) las publica la
+              {formatFechaCalendario(CALENDARIO_5TA_CONVOCATORIA.postulacionFin)}, estar al día hasta
+              el {formatFechaCalendario(CALENDARIO_5TA_CONVOCATORIA.fechaAlDiaPago)}) las publica la
               SEC y pueden cambiar.
             </Alert.Body>
           </Alert>

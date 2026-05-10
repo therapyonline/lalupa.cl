@@ -56,7 +56,7 @@ const CONFIGS = {
     detect: detectDistribuidora,
     slugs: EMPRESA_SLUGS,
     notFoundMessage:
-      'No pudimos identificar la distribuidora desde tu boleta. Elegila manualmente más abajo.',
+      'No pudimos identificar la distribuidora desde tu boleta. Elígela manualmente más abajo.',
   } satisfies UploadConfig<EmpresaElectrica, string>,
   agua: {
     servicio: 'agua' as const,
@@ -64,7 +64,7 @@ const CONFIGS = {
     detect: detectSanitaria,
     slugs: AGUA_SLUGS,
     notFoundMessage:
-      'No pudimos identificar la sanitaria desde tu boleta. Elegila manualmente más abajo.',
+      'No pudimos identificar la sanitaria desde tu boleta. Elígela manualmente más abajo.',
   } satisfies UploadConfig<EmpresaSanitaria, string>,
   gas: {
     servicio: 'gas' as const,
@@ -72,7 +72,7 @@ const CONFIGS = {
     detect: detectGas,
     slugs: GAS_SLUGS,
     notFoundMessage:
-      'No pudimos identificar la empresa de gas desde tu boleta. Elegila manualmente más abajo.',
+      'No pudimos identificar la empresa de gas desde tu boleta. Elígela manualmente más abajo.',
   } satisfies UploadConfig<EmpresaGas, string>,
 } as const
 

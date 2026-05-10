@@ -30,8 +30,8 @@ export const metadata = buildMetadata({
 
 const EMPRESAS_GAS = [
   { id: 'metrogas', label: 'Metrogas', tipo: 'Gas natural por red' },
-  { id: 'lipigas', label: 'Lipigas', tipo: 'Cilindros GLP' },
-  { id: 'abastible', label: 'Abastible', tipo: 'Cilindros GLP' },
+  { id: 'lipigas', label: 'Lipigas', tipo: 'Gas por red' },
+  { id: 'abastible', label: 'Abastible', tipo: 'Gas por red' },
   { id: 'gasco-glp', label: 'Gasco GLP', tipo: 'Cilindros GLP' },
 ] as const
 
@@ -65,11 +65,11 @@ const FAQ_ITEMS = [
   },
   {
     q: '¿Funciona para cilindros y para gas por red?',
-    a: 'Sí. Metrogas (gas natural por red) tiene un layout distinto al de Lipigas/Abastible/Gasco (cilindros). La lupa los reconoce y aplica el análisis adecuado a cada tipo.',
+    a: 'Sí, con cobertura distinta. Para gas por red analizamos boletas de Metrogas, Lipigas y Abastible. Para cilindros GLP, hoy solo cubrimos Gasco GLP. Estamos trabajando en agregar Lipigas y Abastible cilindro pronto.',
   },
   {
-    q: '¿De dónde saco una boleta de cilindro en PDF?',
-    a: 'Lipigas, Abastible y Gasco generan boleta digital cuando el delivery se paga con tarjeta. Si pagaste en efectivo y solo tienes la boleta en papel, sacale una foto nítida (JPG o PNG) y súbela, corremos OCR en tu navegador para extraer los datos.',
+    q: '¿De dónde saco una boleta de cilindro o gas por red en PDF?',
+    a: 'Las empresas generan boleta digital cuando el pago es con tarjeta o débito automático. Si pagaste en efectivo y solo tienes papel, sácale una foto nítida (JPG o PNG) y súbela, corremos OCR en tu navegador para extraer los datos.',
   },
   {
     q: '¿Qué hago si la lupa encuentra un problema?',
@@ -108,8 +108,8 @@ export default function BoletaGasPage() {
             Revisa tu boleta de gas en segundos.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-body md:text-xl">
-            Soportamos Metrogas (red) y Lipigas, Abastible y Gasco (cilindros).
-            Tu PDF o foto nunca sale de este celular.
+            Cubrimos Metrogas, Lipigas y Abastible (gas por red), y Gasco GLP
+            (cilindros). Tu PDF o foto nunca sale de este celular.
           </p>
         </Container>
       </section>

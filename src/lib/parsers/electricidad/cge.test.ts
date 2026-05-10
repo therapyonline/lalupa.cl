@@ -11,7 +11,7 @@
 import { describe, expect, it } from 'vitest'
 import { CGE_SYNTHETIC_NORMAL } from '../__fixtures__/cge-synthetic'
 import { ParserError } from '../errors'
-import { parseCGE, parseChileanDate, parseChileanNumber } from './cge'
+import { parseCGE } from './cge'
 
 const BOLETA_NORMAL = CGE_SYNTHETIC_NORMAL
 
@@ -49,52 +49,8 @@ Período: 01/04/2026 al 30/04/2026
 Total a pagar $ 87.450
 `
 
-describe('parseChileanNumber', () => {
-  it('parsea miles con punto', () => {
-    expect(parseChileanNumber('111.543')).toBe(111543)
-  })
-
-  it('parsea decimales con coma', () => {
-    expect(parseChileanNumber('1.048,46')).toBeCloseTo(1048.46)
-  })
-
-  it('parsea negativos', () => {
-    expect(parseChileanNumber('-2.500')).toBe(-2500)
-  })
-
-  it('parsea enteros sin separador de miles', () => {
-    expect(parseChileanNumber('1048')).toBe(1048)
-  })
-
-  it('devuelve NaN para entrada vacía', () => {
-    expect(Number.isNaN(parseChileanNumber(''))).toBe(true)
-  })
-})
-
-describe('parseChileanDate', () => {
-  it('parsea formato DD/MM/YYYY', () => {
-    const d = parseChileanDate('15/04/2026')
-    expect(d?.getFullYear()).toBe(2026)
-    expect(d?.getMonth()).toBe(3)
-    expect(d?.getDate()).toBe(15)
-  })
-
-  it('parsea formato DD <mes> YYYY', () => {
-    const d = parseChileanDate('25 abril 2026')
-    expect(d?.getMonth()).toBe(3)
-    expect(d?.getDate()).toBe(25)
-  })
-
-  it('parsea formato DD-MM-YY con año de dos dígitos', () => {
-    const d = parseChileanDate('05-12-26')
-    expect(d?.getFullYear()).toBe(2026)
-    expect(d?.getMonth()).toBe(11)
-  })
-
-  it('devuelve null para entrada inválida', () => {
-    expect(parseChileanDate('no es una fecha')).toBeNull()
-  })
-})
+// Tests para parseChileanNumber y parseChileanDate viven en
+// _helpers.test.ts; CGE ahora usa esas funciones compartidas.
 
 describe('Caso 1: boleta CGE estándar de período normal', () => {
   it('marca empresa CGE y servicio electricidad', () => {

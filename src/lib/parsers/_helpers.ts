@@ -51,7 +51,7 @@ export function normalizeOcrText(text: string): string {
   )
 
   // Variantes de "RUT" con primera letra mangled: "PUT", "FtUT",
-  // "FlUT", "ItUT" — solo si seguido por dos puntos o espacio antes
+  // "FlUT", "ItUT", solo si seguido por dos puntos o espacio antes
   // de un patrón numérico.
   out = out.replace(
     /(^|\n|\s)(?:PUT|FtUT|FlUT|ItUT|RUI)([\s:.])(?=\s*\d)/g,
@@ -75,7 +75,7 @@ export function normalizeOcrText(text: string): string {
   //
   // Importante: estos regex usan clases tipo `[1i]` que tambien matchean
   // la palabra intacta, así que solo aplicamos la corrección cuando el
-  // match contiene al menos un dígito (0/1) — i.e., cuando OCR realmente
+  // match contiene al menos un dígito (0/1), o sea cuando OCR realmente
   // mangleó. Sin este guard, "servicio" intacto se vuelve "Servicio"
   // (case change espurio).
   const replaceIfMangled = (re: RegExp, canonical: string) =>
@@ -229,10 +229,15 @@ export function extractPeriodo(
  * Construye un regex que matchea "{label} ... {número chileno}".
  * Captura signo opcional `-` antes del número para soportar créditos
  * negativos (ej. Metrogas reliquidación: "-$ 75.847").
+ *
+ * El `\b` antes del bloque numérico previene matches adentro de tokens
+ * tipo "BT1" o "Tarifa12", donde el dígito está pegado a letras y NO
+ * es un monto. Sin esto, "Cargo fijo BT1 ......... $ 1.048" matcheaba
+ * "1" en BT1 en vez de "1.048".
  */
 export function buildCargoPattern(label: string): RegExp {
   return new RegExp(
-    `${label}[^\\n]*?(-?\\s*\\$?\\s*(?:\\d{1,3}(?:\\.\\d{3})+|\\d+)(?:,\\d+)?)`,
+    `${label}[^\\n]*?(-?\\s*\\$?\\s*\\b(?:\\d{1,3}(?:\\.\\d{3})+|\\d+)(?:,\\d+)?\\b)`,
     'i',
   )
 }
@@ -321,7 +326,7 @@ export function extractIVA(text: string): number {
   return Number.isFinite(v) ? v : 0
 }
 
-// `N[°º]` requiere ° o º — el OCR a veces los destroza a apóstrofo
+// `N[°º]` requiere ° o º; el OCR a veces los destroza a apóstrofo
 // (`N'`), backtick (`` N` ``) o "No" / "Nro" / "Num". Toleramos todos.
 //
 // Capture restringido a "número/RUT-like": solo dígitos, guiones, puntos
@@ -329,6 +334,7 @@ export function extractIVA(text: string): number {
 // cuando OCR pega "Fecha" como capture si el label no tiene separador
 // claro (ej. "N'Cliente Fecha de vencimiento").
 const NUMERO_CLIENTE_REGEX =
+  // lint-tono-disable-next-line (em-dash funcional en character class de regex OCR)
   /(?:N[°º'`]?\s*(?:Cliente|Servicio)|N(?:ro|um)\.?\s*Cliente|C[óo]digo\s+Cliente|N[úu]mero\s+de\s+Cliente|Cliente\s*N[°º'`]?)[\s:.\-–—]*(\d[\d.\-/kK]{2,})/i
 
 export function extractNumeroCliente(text: string): string | undefined {
@@ -339,8 +345,9 @@ export function extractNumeroCliente(text: string): string | undefined {
 }
 
 // Separadores entre label y valor: cualquier whitespace, dos puntos,
-// puntos, em-dash, en-dash, hyphen. El OCR mete em-dashes (`——`) entre
+// puntos, em-dash, en-dash, hyphen. El OCR mete em-dashes entre
 // label y date típicamente.
+// lint-tono-disable-next-line
 const LABEL_VALUE_SEP = '[\\s:.\\-–—]*'
 
 const FECHA_EMISION_REGEX = new RegExp(

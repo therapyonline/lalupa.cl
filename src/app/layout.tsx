@@ -100,6 +100,11 @@ export default function RootLayout({
         </a>
         <JsonLd schema={[organizationSchema(), websiteSchema()]} />
         <Header />
+        {/* `contents` hace que el div no genere box, así el children
+            (que es un <main>) se posiciona como hijo directo del body
+            para layout flex. El skip link salta al main interno (el
+            que cada page renderiza), no a este wrapper invisible.
+            `tabIndex={-1}` mantiene el target programático para AT. */}
         <div id="contenido-principal" tabIndex={-1} className="contents">
           {children}
         </div>

@@ -138,6 +138,7 @@ function formatCLP(n: number): string {
 export function Tracker() {
   const [boletas, setBoletas] = useState<BoletaGuardada[]>([])
   const [loaded, setLoaded] = useState(false)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [year, setYear] = useState(new Date().getFullYear())
   const [selectedMonth, setSelectedMonth] = useState<MonthBucket | null>(null)
   const [refresh, setRefresh] = useState(0)
@@ -146,9 +147,21 @@ export function Tracker() {
     listarBoletas()
       .then((all) => {
         setBoletas(all)
+        setLoadError(null)
         setLoaded(true)
       })
-      .catch(() => setLoaded(true))
+      .catch((e) => {
+        // No silenciamos el error, lo exponemos en UI. Antes el catch
+        // vacío hacía pensar al usuario que su histórico estaba vacío
+        // cuando en realidad IndexedDB rechazaba la lectura (incógnito,
+        // db corrupta, version mismatch).
+        setLoadError(
+          e instanceof Error
+            ? e.message
+            : 'No pudimos leer tu histórico local.',
+        )
+        setLoaded(true)
+      })
   }, [refresh])
 
   const buckets = useMemo(() => bucketsForYear(boletas, year), [boletas, year])
@@ -217,6 +230,29 @@ export function Tracker() {
                 className="font-mono text-xs uppercase tracking-[0.1em] text-soft"
               >
                 Cargando tu histórico…
+              </p>
+            </div>
+          </Container>
+        </section>
+      ) : loadError ? (
+        <section className="bg-cream pb-20">
+          <Container>
+            <div className="min-h-[420px] rounded-[20px] border border-danger/20 bg-danger/5 p-10">
+              <p className="font-mono text-xs uppercase tracking-[0.1em] text-soft">
+                Error de almacenamiento
+              </p>
+              <h2 className="mt-3 text-2xl font-medium tracking-tight text-ink md:text-3xl">
+                No pudimos leer tu histórico
+              </h2>
+              <p className="mt-3 max-w-md text-body">
+                Tu navegador rechazó la lectura de IndexedDB. Esto suele
+                pasar en modo incógnito, con storage bloqueado para este
+                sitio, o si la base se corrompió. Tus boletas siguen en
+                tu dispositivo (no las perdiste), pero la app no puede
+                leerlas en este momento.
+              </p>
+              <p className="mt-2 max-w-md font-mono text-xs text-soft">
+                {loadError}
               </p>
             </div>
           </Container>
@@ -631,6 +667,53 @@ function LineChart({
           </span>
         ))}
       </div>
+
+      {/* Tabla alternativa para screen readers y usuarios sin mouse.
+          El SVG anuncia "Evolución mensual de gasto por servicio" pero
+          los <title> en hover solo se anuncian con mouse. La tabla
+          expone los mismos datos numéricos en formato accesible. */}
+      <details className="mt-4 text-xs">
+        <summary className="cursor-pointer font-mono uppercase tracking-wide text-soft hover:text-ink">
+          Ver datos en tabla
+        </summary>
+        <div className="mt-2 overflow-x-auto">
+          <table className="min-w-full text-left text-xs">
+            <caption className="sr-only">
+              Gasto mensual por servicio en pesos chilenos
+            </caption>
+            <thead>
+              <tr className="border-b border-border">
+                <th scope="col" className="py-2 pr-3 font-medium text-ink">
+                  Mes
+                </th>
+                {SERVICIOS.map((s) => (
+                  <th
+                    key={s}
+                    scope="col"
+                    className="py-2 pr-3 font-medium text-ink"
+                  >
+                    {SERVICIO_LABEL[s]}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {buckets.map((b) => (
+                <tr key={`${b.year}-${b.monthIdx}`} className="border-b border-border/40">
+                  <th scope="row" className="py-2 pr-3 font-mono uppercase text-body">
+                    {b.label} {b.year}
+                  </th>
+                  {SERVICIOS.map((s) => (
+                    <td key={s} className="py-2 pr-3 text-body">
+                      {b.byService[s] > 0 ? formatCLP(b.byService[s]) : '–'}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </details>
     </div>
   )
 }
@@ -644,9 +727,50 @@ function MonthModal({
   onClose: () => void
   onDeleted: () => void
 }) {
+  // Refs para focus management:
+  //   - `triggerRef` apunta al elemento que tenía focus antes de abrir
+  //     el modal (el botón mes que disparó), para devolverlo al cerrar.
+  //   - `closeBtnRef` recibe focus al montar, así un usuario con
+  //     teclado/SR sabe inmediatamente dónde está parado.
+  //   - `modalRef` envuelve el panel y se usa para detectar Tab fuera
+  //     del modal (focus trap simple).
+  const triggerRef = useRef<HTMLElement | null>(null)
+  const closeBtnRef = useRef<HTMLButtonElement>(null)
+  const modalRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    triggerRef.current = (document.activeElement as HTMLElement) ?? null
+    closeBtnRef.current?.focus()
+    return () => {
+      // Restaurar focus al disparador al desmontar (cerrar modal).
+      triggerRef.current?.focus?.()
+    }
+  }, [])
+
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape') {
+        onClose()
+        return
+      }
+      // Focus trap simple: si el foco está por salir del modal con Tab
+      // (forward o Shift+Tab), lo redirigimos a los extremos.
+      if (e.key === 'Tab' && modalRef.current) {
+        const focusables = modalRef.current.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])',
+        )
+        if (focusables.length === 0) return
+        const first = focusables[0]
+        const last = focusables[focusables.length - 1]
+        const active = document.activeElement
+        if (e.shiftKey && active === first) {
+          e.preventDefault()
+          last.focus()
+        } else if (!e.shiftKey && active === last) {
+          e.preventDefault()
+          first.focus()
+        }
+      }
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
@@ -658,14 +782,18 @@ function MonthModal({
     onDeleted()
   }
 
+  const titleId = 'month-modal-title'
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4"
       onClick={onClose}
       role="dialog"
       aria-modal
+      aria-labelledby={titleId}
     >
       <div
+        ref={modalRef}
         className="w-full max-w-2xl overflow-hidden rounded-[20px] border border-border bg-white"
         onClick={(e) => e.stopPropagation()}
       >
@@ -674,7 +802,7 @@ function MonthModal({
             <p className="font-mono text-xs uppercase tracking-[0.1em] text-soft">
               {bucket.label} {bucket.year}
             </p>
-            <h3 className="mt-1 text-2xl font-medium tracking-tight text-ink">
+            <h3 id={titleId} className="mt-1 text-2xl font-medium tracking-tight text-ink">
               {formatCLP(bucket.total)}
             </h3>
             <p className="text-xs text-body">
@@ -682,6 +810,7 @@ function MonthModal({
             </p>
           </div>
           <button
+            ref={closeBtnRef}
             type="button"
             onClick={onClose}
             aria-label="Cerrar"
@@ -895,7 +1024,7 @@ function ManagementPanel({ onChanged }: { onChanged: () => void }) {
         <Alert.Body>
           Todo se guarda en IndexedDB de tu navegador (db `lalupa`). No hay
           servidor que sincronice. Si limpias los datos del navegador o
-          cambias de celular, se pierde, usá Exportar para hacer respaldo.
+          cambias de celular, se pierde, usa Exportar para hacer respaldo.
         </Alert.Body>
       </Alert>
     </div>

@@ -249,7 +249,7 @@ export async function extractTextFromImages(
     }
     if (!f.type.startsWith('image/')) {
       throw new Error(
-        `Para subir varias páginas, cada archivo debe ser imagen (JPG/PNG/WebP). Si querés subir un PDF, mándalo como un único archivo.`,
+        `Para subir varias páginas, cada archivo debe ser imagen (JPG/PNG/WebP). Si quieres subir un PDF, mándalo como un único archivo.`,
       )
     }
   }
@@ -297,7 +297,7 @@ export async function extractTextFromBoleta(
 ): Promise<string> {
   if (isHeicFile(file)) {
     throw new Error(
-      'iOS guarda fotos en formato HEIC, que el navegador no puede leer. En tu iPhone: Ajustes > Cámara > Formatos > "Más compatible" (JPEG). O convertí la foto a JPG antes de subirla.',
+      'iOS guarda fotos en formato HEIC, que el navegador no puede leer. En tu iPhone: Ajustes > Cámara > Formatos > "Más compatible" (JPEG). O convierte la foto a JPG antes de subirla.',
     )
   }
 

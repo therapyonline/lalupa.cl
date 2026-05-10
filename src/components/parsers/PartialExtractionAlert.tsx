@@ -5,7 +5,7 @@ import { AddPagesButton } from './AddPagesButton'
 
 /**
  * A partir de cuántos intentos consideramos que "ya probaron varias
- * veces" y conviene escalar el copy a "subí el PDF original" en vez
+ * veces" y conviene escalar el copy a "sube el PDF original" en vez
  * de seguir empujando fotos. Pico empírico: 2 add-page = 3 fotos
  * intentadas en total (la inicial + 2 sumadas), suficiente para
  * detectar que el OCR no va a llegar.
@@ -26,7 +26,7 @@ const ESCALATION_THRESHOLD = 2
  * combinado para que el caller re-parsee.
  *
  * Después de `ESCALATION_THRESHOLD` intentos fallidos cambiamos el
- * mensaje a "subí el PDF original" y escondemos el botón. La realidad
+ * mensaje a "sube el PDF original" y escondemos el botón. La realidad
  * es que si OCR no leyó cargos en 3 fotos, no los va a leer en la 4ta.
  *
  * El `<details>` con el texto OCR ayuda al usuario a entender por qué

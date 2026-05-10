@@ -33,6 +33,7 @@ export {
   calcularMontoMensual,
   calcularMontoSemestral,
   evaluarSubsidioElectrico,
+  formatFechaCalendario,
 } from './elegibilidad-subsidio'
 
 export type TipoPregunta = 'boolean' | 'select' | 'number'

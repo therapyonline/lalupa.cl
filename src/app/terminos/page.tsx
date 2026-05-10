@@ -69,7 +69,7 @@ export default function TerminosPage() {
                 lalupa son{' '}
                 <strong className="text-ink">referenciales</strong>. No
                 constituyen asesoría legal, financiera ni regulatoria. Si tu
-                caso es complejo o de monto alto, consultá con un abogado o
+                caso es complejo o de monto alto, consulta con un abogado o
                 con la superintendencia que corresponda.
               </p>
               <p className={P}>
@@ -159,7 +159,7 @@ export default function TerminosPage() {
                   muestra la herramienta.
                 </strong>{' '}
                 Si vas a presentar un reclamo formal o tomar una acción legal,
-                respaldate con los documentos oficiales y, si el monto lo
+                respáldate con los documentos oficiales y, si el monto lo
                 justifica, con asesoría profesional.
               </p>
             </div>
@@ -195,8 +195,8 @@ export default function TerminosPage() {
                 familiares, o uso académico. Está prohibido raspar el sitio
                 automatizadamente, alterar el código en producción, o usar
                 la herramienta para fines ilegales. La generación de cartas
-                de reclamo SERNAC asume que sos el titular legítimo del
-                servicio que reclamás.
+                de reclamo SERNAC asume que eres el titular legítimo del
+                servicio que reclamas.
               </p>
             </div>
 

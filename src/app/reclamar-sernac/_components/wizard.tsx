@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { z } from 'zod'
 
 // Zod 4 usa `new Function()` para JIT de validación, lo cual viola la CSP
@@ -46,8 +46,8 @@ const EMPTY: ReclamoFormData = {
 
 const rutSchema = z
   .string()
-  .min(1, 'Ingresá tu RUT')
-  .refine(validateRut, 'RUT inválido (revisá el dígito verificador)')
+  .min(1, 'Ingresa tu RUT')
+  .refine(validateRut, 'RUT inválido (revisa el dígito verificador)')
 
 const stepSchemas = {
   1: z.object({
@@ -64,23 +64,23 @@ const stepSchemas = {
       .string()
       .min(8, 'Mínimo 8 dígitos')
       .max(20, 'Máximo 20 caracteres'),
-    direccion: z.string().min(5, 'Ingresá una dirección postal'),
+    direccion: z.string().min(5, 'Ingresa una dirección postal'),
   }),
   3: z.object({
-    empresaRazonSocial: z.string().min(2, 'Ingresá la razón social'),
+    empresaRazonSocial: z.string().min(2, 'Ingresa la razón social'),
     empresaRut: z
       .string()
-      .min(1, 'Ingresá el RUT de la empresa')
+      .min(1, 'Ingresa el RUT de la empresa')
       .refine(
         (v) => /^[\dkK.\-]+$/.test(v),
         'Solo dígitos, puntos y guion',
       ),
-    empresaDireccion: z.string().min(5, 'Ingresá una dirección de notificación'),
+    empresaDireccion: z.string().min(5, 'Ingresa una dirección de notificación'),
   }),
   4: z.object({
     hechos: z
       .string()
-      .min(100, 'Describí los hechos en al menos 100 caracteres'),
+      .min(100, 'Describe los hechos en al menos 100 caracteres'),
   }),
   5: z.object({
     peticion: z.string().min(20, 'Mínimo 20 caracteres'),
@@ -742,7 +742,7 @@ function Step4({
         Hechos
       </h2>
       <p className="mt-2 text-body">
-        Pre-armamos un texto base con los datos de tu boleta. Editalo si hace
+        Pre-armamos un texto base con los datos de tu boleta. Edítalo si hace
         falta, es lo que SERNAC va a leer primero.
       </p>
       <Textarea
@@ -751,6 +751,7 @@ function Step4({
         rows={10}
         helper={`${value.trim().length} caracteres · mínimo 100`}
         error={error}
+        ariaLabel="Hechos del reclamo"
       />
     </div>
   )
@@ -779,6 +780,7 @@ function Step5({
         rows={8}
         helper={`${value.trim().length} caracteres · mínimo 20`}
         error={error}
+        ariaLabel="Petición a SERNAC"
       />
     </div>
   )
@@ -790,14 +792,28 @@ function Textarea({
   rows = 6,
   helper,
   error,
+  ariaLabel,
 }: {
   value: string
   onChange: (v: string) => void
   rows?: number
   helper?: string
   error?: string
+  /**
+   * Etiqueta accesible para screen readers. El Textarea no tiene un
+   * `<label>` visible cerca (el contexto lo da el heading del Step),
+   * así que el caller debe pasar uno explícito.
+   */
+  ariaLabel?: string
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const helperId = useId()
+  const errorId = useId()
+  // `aria-describedby` apunta a el helper o al error para que el SR
+  // lea el feedback junto al campo. Si hay error, usamos `aria-invalid`
+  // para que se anuncie como inválido.
+  const describedBy = error ? errorId : helper ? helperId : undefined
+
   return (
     <div className="mt-6">
       <textarea
@@ -805,6 +821,9 @@ function Textarea({
         rows={rows}
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        aria-label={ariaLabel}
+        aria-invalid={!!error}
+        aria-describedby={describedBy}
         className={cn(
           'w-full resize-vertical rounded-md border-[1.5px] border-border bg-white px-4 py-3 text-base leading-relaxed text-ink transition-colors',
           'placeholder:text-soft',
@@ -814,6 +833,7 @@ function Textarea({
       />
       {(helper || error) && (
         <p
+          id={describedBy}
           className={cn(
             'mt-1.5 text-[13px]',
             error ? 'text-danger' : 'text-soft',

@@ -22,7 +22,7 @@ const CANALES = [
   {
     eyebrow: 'Bugs',
     title: 'El parser falló o algo se rompió',
-    body: 'Cuéntanos qué empresa, qué pasó, y si puedes sumá una captura sin datos personales.',
+    body: 'Cuéntanos qué empresa, qué pasó, y si puedes suma una captura sin datos personales.',
     email: 'bugs@lalupa.cl',
     subject: 'Bug en lalupa',
   },
@@ -65,7 +65,7 @@ export default function ContactoPage() {
             Si algo no calza, escríbenos.
           </h1>
           <p className="mt-6 max-w-2xl text-[17px] leading-[1.65] text-body">
-            Sin formulario, sin almacenamiento de datos. Solo email, vos
+            Sin formulario, sin almacenamiento de datos. Solo email, tú
             controlas qué compartes y nosotros mantenemos la promesa
             privacy-first hasta el final del flujo.
           </p>

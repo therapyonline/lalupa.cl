@@ -2,7 +2,7 @@
 
 Registro de actualizaciones de los datasets en `src/data/`. Cada fila refleja el origen y la fecha en que el archivo fue extraído de fuentes primarias.
 
-> Cuando hagas un refresh de cualquier dataset, agregá una entrada nueva acá con la fecha y un resumen de qué cambió.
+> Cuando hagas un refresh de cualquier dataset, agrega una entrada nueva acá con la fecha y un resumen de qué cambió.
 
 ---
 

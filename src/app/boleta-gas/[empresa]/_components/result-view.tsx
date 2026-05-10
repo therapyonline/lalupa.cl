@@ -2,20 +2,19 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Container } from '@/components/layout/Container'
-import { Alert } from '@/components/ui/Alert'
 import { Button } from '@/components/ui/Button'
-import {
-  Comparativa,
-  ComparativaSkeleton,
-} from '@/components/parsers/Comparativa'
+import { BoletaErrorView } from '@/components/parsers/BoletaErrorView'
+import { ComparativaSection } from '@/components/parsers/ComparativaSection'
 import { PartialExtractionAlert } from '@/components/parsers/PartialExtractionAlert'
+import { PrivacyExportImport } from '@/components/parsers/PrivacyExportImport'
 import {
   ResultBlock,
   ResultBlockSkeleton,
   formatPeriod,
 } from '@/components/parsers/ResultBlock'
+import { SaveButton } from '@/components/parsers/SaveButton'
 import {
   type EmpresaGas,
   type GasSlug,
@@ -28,13 +27,8 @@ import {
   safeSessionRemove,
   safeSessionSet,
 } from '@/lib/session-storage'
-import {
-  type BoletaGuardada,
-  exportarHistorial,
-  guardarBoleta,
-  importarHistorial,
-  listarBoletas,
-} from '@/lib/storage/historial'
+// (Subcomponentes Save/Comparativa/Privacy/Error ahora viven en
+// src/components/parsers/, compartidos entre los 3 result-view.)
 
 const SESSION_KEY = 'lalupa:lastParsed'
 const REDIRECT_MESSAGE_KEY = 'lalupa:redirect-message'
@@ -192,19 +186,21 @@ export function ResultViewGas({ empresaSlug }: { empresaSlug: string }) {
 
   if (state.kind === 'parser-error') {
     return (
-      <ErrorView
+      <BoletaErrorView
         title="No pudimos analizar tu boleta"
         description="El parser detectó la empresa pero no logró extraer los datos. Prueba con la versión digital del PDF (no escaneada)."
         detail={state.error}
+        backHref="/boleta-gas"
       />
     )
   }
 
   if (state.kind === 'unsupported') {
     return (
-      <ErrorView
+      <BoletaErrorView
         title={`Aún no analizamos boletas de ${state.empresa}`}
         description={`El parser de ${state.empresa} todavía no está implementado, necesitamos una boleta real para mapear el formato exacto. Mientras tanto puedes volver a subir o probar con otra herramienta.`}
+        backHref="/boleta-gas"
       />
     )
   }
@@ -356,294 +352,3 @@ export function ResultViewGas({ empresaSlug }: { empresaSlug: string }) {
   )
 }
 
-function ErrorView({
-  title,
-  description,
-  detail,
-}: {
-  title: string
-  description: string
-  detail?: string
-}) {
-  return (
-    <main className="flex-1">
-      <section className="bg-cream py-12 md:py-16">
-        <Container>
-          <p className="font-mono text-xs uppercase tracking-[0.1em] text-soft">
-            Resultado
-          </p>
-          <h1 className="mt-4 text-[clamp(32px,4vw,48px)] font-medium leading-[1.1] tracking-tight text-ink">
-            {title}
-          </h1>
-        </Container>
-      </section>
-      <section className="bg-cream pb-20">
-        <Container>
-          <Alert variant="danger">
-            <Alert.Title>{title}</Alert.Title>
-            <Alert.Body>
-              {description}
-              {detail && (
-                <span className="mt-2 block font-mono text-xs text-ink/70">
-                  {detail}
-                </span>
-              )}
-            </Alert.Body>
-          </Alert>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button asChild variant="dark" size="lg">
-              <Link href="/boleta-gas">Volver a subir</Link>
-            </Button>
-          </div>
-        </Container>
-      </section>
-    </main>
-  )
-}
-
-function SaveButton({
-  boleta,
-  onSaved,
-}: {
-  boleta: ParsedBoleta
-  onSaved?: () => void
-}) {
-  const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>(
-    'idle',
-  )
-  const [errorMsg, setErrorMsg] = useState<string | null>(null)
-
-  async function handleSave() {
-    setStatus('saving')
-    setErrorMsg(null)
-    try {
-      await guardarBoleta(boleta)
-      setStatus('saved')
-      onSaved?.()
-    } catch (err) {
-      setErrorMsg(
-        err instanceof Error ? err.message : 'Error guardando en histórico.',
-      )
-      setStatus('error')
-    }
-  }
-
-  if (status === 'saved') {
-    return (
-      <Button variant="primary" size="lg" disabled>
-        Guardado en histórico ✓
-      </Button>
-    )
-  }
-
-  return (
-    <div className="flex flex-col gap-2">
-      <Button
-        variant="dark"
-        size="lg"
-        onClick={handleSave}
-        disabled={status === 'saving'}
-      >
-        {status === 'saving' ? 'Guardando…' : 'Guardar en mi histórico'}
-      </Button>
-      {errorMsg && (
-        <p className="text-xs text-danger" role="alert">
-          {errorMsg}
-        </p>
-      )}
-    </div>
-  )
-}
-
-function ComparativaSection({
-  empresa,
-  actual,
-  slug,
-  refreshTick,
-}: {
-  empresa: EmpresaGas
-  actual: ParsedBoleta
-  slug: GasSlug
-  refreshTick: number
-}) {
-  const [historicas, setHistoricas] = useState<BoletaGuardada[]>([])
-  const [loaded, setLoaded] = useState(false)
-
-  useEffect(() => {
-    listarBoletas(empresa, actual.servicio)
-      .then((all) => {
-        const dedup = all.filter(
-          (b) => b.periodo.desde.getTime() !== actual.periodo.desde.getTime(),
-        )
-        setHistoricas(dedup.slice(-5))
-        setLoaded(true)
-      })
-      .catch(() => {
-        setHistoricas([])
-        setLoaded(true)
-      })
-  }, [empresa, actual.servicio, actual.periodo.desde, refreshTick])
-
-  if (!loaded) {
-    return (
-      <section className="bg-white py-16" aria-label={`Histórico ${empresa}`}>
-        <Container>
-          <p className="font-mono text-xs uppercase tracking-[0.1em] text-soft">
-            Histórico {empresa} · {slug}
-          </p>
-          <h2 className="mt-3 text-3xl font-medium tracking-tight text-ink md:text-4xl">
-            Cargando tu histórico…
-          </h2>
-          <ComparativaSkeleton className="mt-8" rows={4} />
-        </Container>
-      </section>
-    )
-  }
-
-  if (historicas.length === 0) {
-    return (
-      <section className="bg-white py-16" aria-label={`Histórico ${empresa}`}>
-        <Container>
-          <div className="rounded-[20px] border border-border bg-cream-warm/30 p-8 text-center md:p-12">
-            <p className="font-mono text-xs uppercase tracking-[0.1em] text-soft">
-              Histórico {empresa}
-            </p>
-            <h2 className="mt-3 text-2xl font-medium tracking-tight text-ink md:text-3xl">
-              {actual.tipoVenta === 'producto'
-                ? 'Esta es tu primera compra acá'
-                : 'Esta es tu primera boleta acá'}
-            </h2>
-            <p className="mx-auto mt-3 max-w-md text-body">
-              Cuando guardes esto en tu histórico (botón de arriba), empezamos a
-              comparar mes a mes y te avisamos si subió sin razón aparente.
-            </p>
-          </div>
-        </Container>
-      </section>
-    )
-  }
-
-  return (
-    <section className="bg-white py-16" aria-label={`Histórico ${empresa}`}>
-      <Container>
-        <p className="font-mono text-xs uppercase tracking-[0.1em] text-soft">
-          Histórico {empresa} · {slug}
-        </p>
-        <h2 className="mt-3 text-3xl font-medium tracking-tight text-ink md:text-4xl">
-          Tus últimos {historicas.length + 1}{' '}
-          {actual.tipoVenta === 'producto' ? 'compras' : 'períodos'}
-        </h2>
-        <p className="mt-3 max-w-2xl text-body">
-          Comparamos las últimas boletas guardadas contra la actual. Si la
-          actual supera el promedio, la fila queda destacada.
-        </p>
-
-        <Comparativa
-          className="mt-8"
-          historicas={historicas}
-          actual={actual}
-        />
-      </Container>
-    </section>
-  )
-}
-
-function PrivacyExportImport({ onImported }: { onImported?: () => void }) {
-  const inputRef = useRef<HTMLInputElement>(null)
-  const [feedback, setFeedback] = useState<{
-    kind: 'success' | 'error'
-    message: string
-  } | null>(null)
-
-  const handleExport = useCallback(async () => {
-    setFeedback(null)
-    try {
-      const blob = await exportarHistorial()
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      const ts = new Date().toISOString().slice(0, 10)
-      a.href = url
-      a.download = `lalupa-historial-${ts}.json`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
-    } catch (err) {
-      setFeedback({
-        kind: 'error',
-        message:
-          err instanceof Error ? err.message : 'No pudimos exportar tu historial.',
-      })
-    }
-  }, [])
-
-  const handleImport = useCallback(
-    async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0]
-      e.target.value = ''
-      if (!file) return
-      setFeedback(null)
-      try {
-        const count = await importarHistorial(file)
-        setFeedback({
-          kind: 'success',
-          message: `Importadas ${count} ${count === 1 ? 'boleta' : 'boletas'} a tu histórico local.`,
-        })
-        onImported?.()
-      } catch (err) {
-        setFeedback({
-          kind: 'error',
-          message: err instanceof Error ? err.message : 'No pudimos importar.',
-        })
-      }
-    },
-    [onImported],
-  )
-
-  return (
-    <div className="rounded-[20px] border border-border bg-cream-warm/50 p-6 md:p-8">
-      <p className="font-mono text-xs uppercase tracking-[0.1em] text-ink">
-        Privacidad
-      </p>
-      <p className="mt-3 text-base leading-relaxed text-ink md:text-lg">
-        Tu histórico vive solo en este celular. Nada sale a internet.
-      </p>
-      <div className="mt-5 flex flex-wrap items-center gap-3">
-        <Button variant="ghost" size="sm" onClick={handleExport}>
-          Exportar JSON
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => inputRef.current?.click()}
-        >
-          Importar JSON
-        </Button>
-        <input
-          ref={inputRef}
-          type="file"
-          accept="application/json,.json"
-          onChange={handleImport}
-          className="hidden"
-          aria-hidden
-          tabIndex={-1}
-        />
-        <span className="text-xs text-body">
-          para mover entre dispositivos.
-        </span>
-      </div>
-      {feedback && (
-        <p
-          role="status"
-          className={
-            feedback.kind === 'success'
-              ? 'mt-4 text-sm text-success'
-              : 'mt-4 text-sm text-danger'
-          }
-        >
-          {feedback.message}
-        </p>
-      )}
-    </div>
-  )
-}

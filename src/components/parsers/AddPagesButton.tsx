@@ -1,6 +1,6 @@
 'use client'
 
-import { useId, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { extractTextFromImages, type OcrProgress } from '@/lib/parsers'
 
@@ -47,6 +47,17 @@ export function AddPagesButton({ onAddText }: Props) {
   const [busy, setBusy] = useState(false)
   const [status, setStatus] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  // Ref para limpiar el setTimeout del status al desmontar el componente
+  // (evita "setState on unmounted component" warning si el usuario
+  // navega antes del fade del último mensaje).
+  const statusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(() => {
+    return () => {
+      if (statusTimerRef.current) {
+        clearTimeout(statusTimerRef.current)
+      }
+    }
+  }, [])
 
   function validate(files: File[]): string | null {
     if (files.length === 0) return null
@@ -95,7 +106,7 @@ export function AddPagesButton({ onAddText }: Props) {
       })
       if (!text.trim()) {
         throw new Error(
-          'No pudimos leer texto en las fotos adicionales. Probá con mejor iluminación.',
+          'No pudimos leer texto en las fotos adicionales. Prueba con mejor iluminación.',
         )
       }
       onAddText(text)
@@ -107,8 +118,10 @@ export function AddPagesButton({ onAddText }: Props) {
     } finally {
       setBusy(false)
       // Mantenemos el último status visible un instante para que el
-      // usuario vea el feedback antes de que cambie el resultado.
-      setTimeout(() => setStatus(null), 1500)
+      // usuario vea el feedback antes de que cambie el resultado. El
+      // ref permite cancelar el timer si el componente se desmonta antes.
+      if (statusTimerRef.current) clearTimeout(statusTimerRef.current)
+      statusTimerRef.current = setTimeout(() => setStatus(null), 1500)
     }
   }
 

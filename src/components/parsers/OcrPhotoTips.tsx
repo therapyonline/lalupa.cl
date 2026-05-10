@@ -53,7 +53,7 @@ export function OcrPhotoTips({ className }: { className?: string }) {
         ))}
       </ul>
       <p className="mt-3 text-xs text-soft">
-        Si tienes el PDF original (descargado del sitio de la empresa), preferilo
+        Si tienes el PDF original (descargado del sitio de la empresa), prefiérelo
         siempre, es más exacto que cualquier foto.
       </p>
     </details>

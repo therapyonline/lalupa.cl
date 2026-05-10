@@ -158,6 +158,39 @@ export function buildLetterText(form: ReclamoFormData): string {
   ].join('\n')
 }
 
+/**
+ * Sanitiza texto antes de pasárselo a `drawText` de pdf-lib con la
+ * fuente Helvetica WinAnsi. Helvetica solo soporta Latin-1 (ISO-8859-1
+ * extendido); caracteres fuera de ese rango (emoji, símbolos exóticos,
+ * caracteres asiáticos, flechas Unicode) tiran un error de encoding.
+ *
+ * Para no agregar 150KB de fuente TrueType al bundle (penalty real en
+ * mobile data plans), reemplazamos los chars problemáticos con un fallback
+ * legible. Cubrimos los casos más comunes en boletas chilenas: símbolos
+ * de moneda no-CLP, emojis pegados al copiar/pegar, comillas curly
+ * peor formateadas.
+ */
+function sanitizeForLatin1(text: string): string {
+  if (!text) return ''
+  // Reemplazos explícitos de chars que el usuario podría pegar:
+  // comillas y guiones tipográficos → ASCII equivalentes.
+  const out = text
+    .replace(/[‘’]/g, "'") // smart quotes single
+    .replace(/[“”]/g, '"') // smart quotes double
+    // lint-tono-disable-next-line (en-dash y em-dash funcionales)
+    .replace(/[–—]/g, '-') // en-dash y em-dash
+    .replace(/…/g, '...') // ellipsis
+    .replace(/ /g, ' ') // nbsp → space
+  // Char por char: si el code point está fuera de Latin-1 (>255),
+  // reemplazamos con `?`. Mejor un signo visible que un crash.
+  let result = ''
+  for (let i = 0; i < out.length; i++) {
+    const code = out.charCodeAt(i)
+    result += code <= 255 ? out[i] : '?'
+  }
+  return result
+}
+
 export async function buildLetterPdf(form: ReclamoFormData): Promise<Blob> {
   const { PDFDocument, StandardFonts, rgb } = await import('pdf-lib')
 
@@ -215,14 +248,14 @@ export async function buildLetterPdf(form: ReclamoFormData): Promise<Blob> {
     const size = opts?.size ?? FONT_SIZE
     const f = opts?.bold ? fontBold : font
     ensureSpace(size + 4)
-    page.drawText(text, { x: MARGIN_X, y, size, font: f, color: rgb(0.13, 0.13, 0.13) })
+    page.drawText(sanitizeForLatin1(text), { x: MARGIN_X, y, size, font: f, color: rgb(0.13, 0.13, 0.13) })
     y -= LINE_HEIGHT
   }
 
   function drawParagraph(text: string, opts?: { bold?: boolean; size?: number }) {
     const size = opts?.size ?? FONT_SIZE
     const f = opts?.bold ? fontBold : font
-    const lines = wrapWords(text, f, size)
+    const lines = wrapWords(sanitizeForLatin1(text), f, size)
     for (const line of lines) {
       ensureSpace(size + 4)
       page.drawText(line, { x: MARGIN_X, y, size, font: f, color: rgb(0.13, 0.13, 0.13) })

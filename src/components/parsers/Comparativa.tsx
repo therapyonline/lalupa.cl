@@ -70,6 +70,11 @@ export function Comparativa({
     },
   ].slice(-maxFilas)
 
+  // Guard: si filas está vacío (caso impossible-but-defensive: sin
+  // historicas Y actual con total inválido), retornamos null en vez de
+  // calcular Math.max(...[]) === -Infinity y división por cero.
+  if (filas.length === 0) return null
+
   const max = Math.max(...filas.map((f) => (Number.isFinite(f.monto) ? f.monto : 0)))
   const promedio = filas.reduce((sum, f) => sum + f.monto, 0) / filas.length
 

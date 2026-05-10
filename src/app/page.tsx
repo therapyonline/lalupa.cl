@@ -114,7 +114,7 @@ export default async function HomePage() {
           </h1>
 
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-body md:text-xl">
-            Sube el PDF o sacale una foto. La lupa la procesa en tu propio
+            Sube el PDF o sácale una foto. La lupa la procesa en tu propio
             celular (nunca sale de tu dispositivo) y te dice si te están
             cobrando lo justo.
           </p>
@@ -294,7 +294,6 @@ export default async function HomePage() {
         </Container>
       </section>
 
-      {/* TODO: mover a archivo de constantes / API con tarifas reales SEC. */}
       <section className="bg-cream-warm py-20">
         <Container>
           <h3 className="text-3xl font-medium tracking-tight text-ink md:text-4xl">

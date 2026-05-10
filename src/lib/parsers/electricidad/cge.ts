@@ -12,6 +12,7 @@ import {
   parseChileanNumber,
 } from '../_helpers'
 import type { Cargo, ParsedBoleta, ParserModule } from '../types'
+import { BT2_CARGO_PATTERNS } from './_bt2-cargos'
 
 const CGE_MARKERS_REGEX =
   /(\bCGE\b|99\.513\.400-4|compa[ñn][ií]a\s+general\s+de\s+electricidad)/i
@@ -46,6 +47,11 @@ const CARGO_PATTERNS: Array<{ concepto: string; pattern: RegExp }> = [
     ),
   },
   { concepto: 'IVA 19%', pattern: buildCargoPattern('IVA(?:\\s*19\\s*%)?') },
+  // Cargos BT-2/BT-3 canónicos (hogares con potencia contratada,
+  // comercio mediano, industriales). Definidos en `_bt2-cargos.ts` con
+  // los 10 cargos extra del catálogo SEC que no aparecen en BT-1
+  // residencial típico.
+  ...BT2_CARGO_PATTERNS,
 ]
 
 function extractConsumoCge(text: string): {

@@ -265,6 +265,16 @@ export function extractCargosFromPatterns(
     if (!Number.isFinite(monto)) continue
     cargos.push({ concepto, monto })
   }
+  // Registrar telemetría client-side (solo localStorage del usuario).
+  // Lazy-loaded para evitar dependencia circular y no afectar SSR.
+  // Si el módulo falla por cualquier razón, el parser sigue funcionando.
+  try {
+    void import('./telemetry').then(({ trackAnalisis }) => {
+      trackAnalisis(cargos.map((c) => c.concepto))
+    })
+  } catch {
+    // ignore
+  }
   return cargos
 }
 

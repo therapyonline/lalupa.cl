@@ -70,3 +70,5 @@ export {
   parseCGE,
   saesaParser,
 }
+
+export { clasificarTarifa, type TipoTarifa } from './_clasificar-tarifa'

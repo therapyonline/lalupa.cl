@@ -21,6 +21,7 @@ import {
   extractTotal,
 } from '../_helpers'
 import type { Cargo, ParsedBoleta, ParserModule } from '../types'
+import { BT2_CARGO_PATTERNS } from './_bt2-cargos'
 
 const ENEL_KEYWORDS = [
   'Enel',
@@ -89,6 +90,10 @@ const ENEL_CARGO_PATTERNS: ReadonlyArray<{ concepto: string; pattern: RegExp }> 
       pattern: buildCargoPattern('Recargo\\s+por\\s+mora'),
     },
     { concepto: 'IVA 19%', pattern: buildCargoPattern('IVA(?:\\s*19\\s*%)?') },
+    // Cargos BT-2/BT-3 canónicos (clientes con potencia contratada).
+    // Enel tiene clientes BT-2 en sectores residenciales altos (Las
+    // Condes, Vitacura) con calefacción eléctrica o aire central.
+    ...BT2_CARGO_PATTERNS,
   ]
 
 const CONTEXTO_CORTE_REGEX = /(corte|suspensi[óo]n|desconexi[óo]n|reconexi[óo]n)/i

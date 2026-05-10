@@ -19,6 +19,7 @@ import {
   extractTotal,
 } from '../_helpers'
 import type { Cargo, EmpresaElectrica, ParsedBoleta } from '../types'
+import { BT2_CARGO_PATTERNS } from './_bt2-cargos'
 
 const TARIFA_REGEX =
   /(?:Tipo\s+de\s+tarifa\s+contratada|Opci[óo]n\s+tarifaria|Tarifa)[\s:]*([A-Z]{2,5}-?\d?[A-Z]?\d{0,2})/i
@@ -74,6 +75,9 @@ const CARGO_PATTERNS: ReadonlyArray<{ concepto: string; pattern: RegExp }> = [
     pattern: buildCargoPattern('Saldo\\s+anterior'),
   },
   { concepto: 'IVA 19%', pattern: buildCargoPattern('IVA(?:\\s*19\\s*%)?') },
+  // Cargos BT-2/BT-3 canónicos (clientes con potencia contratada,
+  // común en zonas del sur con calefacción eléctrica residencial).
+  ...BT2_CARGO_PATTERNS,
 ]
 
 const CONTEXTO_CORTE_REGEX =

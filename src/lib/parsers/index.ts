@@ -53,6 +53,7 @@ export {
   ELECTRICIDAD_PARSERS,
   cgeParser,
   chilquintaParser,
+  clasificarTarifa,
   enelParser,
   frontelParser,
   isElectricidadParserImplemented,
@@ -61,10 +62,11 @@ export {
   saesaParser,
 } from './electricidad'
 
-export type { ParserElectricidad } from './electricidad'
+export type { ParserElectricidad, TipoTarifa } from './electricidad'
 
 export {
   AGUA_PARSERS,
+  aguasDelValleParser,
   aguasandinasParser,
   essbioParser,
   esvalParser,

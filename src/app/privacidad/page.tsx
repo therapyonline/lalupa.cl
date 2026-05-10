@@ -1,6 +1,7 @@
 import { Container } from '@/components/layout/Container'
 import { JsonLd } from '@/components/JsonLd'
 import { breadcrumbsSchema, buildMetadata } from '@/lib/seo'
+import { TelemetryInspector } from './_components/TelemetryInspector'
 
 export const metadata = buildMetadata({
   title: 'Privacidad',
@@ -299,6 +300,21 @@ export default function PrivacidadPage() {
                   </a>
                 </li>
               </ul>
+            </div>
+
+            {/* ───────────────── INSPECTOR TELEMETRÍA ───────────────── */}
+            <div className={SECTION} id="telemetria-local">
+              <h2 className={H2}>¿Qué guardamos en tu navegador?</h2>
+              <p className={P}>
+                Para mejorar los parsers (saber qué tipos de cargo
+                detectamos y cuáles nunca matchean en boletas reales),
+                guardamos un contador local con los nombres de los
+                conceptos detectados. Nada sale de este navegador. Acá
+                puedes ver literalmente qué hay y borrarlo cuando quieras.
+              </p>
+              <div className="mt-6">
+                <TelemetryInspector />
+              </div>
             </div>
 
             {/* ───────────────── CAMBIOS ───────────────── */}

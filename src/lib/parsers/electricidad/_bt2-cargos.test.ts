@@ -147,4 +147,218 @@ describe('clasificarTarifa', () => {
   it('devuelve "desconocida" para undefined', () => {
     expect(clasificarTarifa(undefined).tipo).toBe('desconocida')
   })
+
+  it('detecta sufijo "PRESENTE EN PUNTA" en BT-3', () => {
+    const r = clasificarTarifa('BT 3 PRESENTE EN PUNTA')
+    expect(r.tipo).toBe('BT-3')
+    expect(r.presenteEnPunta).toBe(true)
+    expect(r.presenteEnPuntaSubtipo).toBeUndefined()
+    expect(r.nota).toMatch(/presente en punta/i)
+  })
+
+  it('detecta sufijo "PARCIALMENTE PRESENTE EN PUNTA" como subtipo PARCIAL', () => {
+    const r = clasificarTarifa('BT 3 PARCIALMENTE PRESENTE EN PUNTA')
+    expect(r.tipo).toBe('BT-3')
+    expect(r.presenteEnPunta).toBe(true)
+    expect(r.presenteEnPuntaSubtipo).toBe('PARCIAL')
+    expect(r.nota).toMatch(/parcialmente presente en punta/i)
+  })
+
+  it('detecta AT 3 PRESENTE EN PUNTA', () => {
+    const r = clasificarTarifa('AT 3 PRESENTE EN PUNTA')
+    expect(r.tipo).toBe('AT')
+    expect(r.presenteEnPunta).toBe(true)
+  })
+
+  it('detecta AT 2 PRESENTE EN PUNTA', () => {
+    const r = clasificarTarifa('AT 2 PRESENTE EN PUNTA')
+    expect(r.tipo).toBe('AT')
+    expect(r.presenteEnPunta).toBe(true)
+  })
+
+  it('detecta AT 4.3 sin PEP', () => {
+    const r = clasificarTarifa('AT 4.3')
+    expect(r.tipo).toBe('AT')
+    expect(r.presenteEnPunta).toBe(false)
+  })
+
+  it('tarifa BT-1 sin PEP no menciona punta en nota', () => {
+    const r = clasificarTarifa('BT-1')
+    expect(r.presenteEnPunta).toBe(false)
+    expect(r.nota).not.toMatch(/presente en punta/i)
+  })
+})
+
+// Fixture sintética: boleta CGE AT-4.3 industrial (hospital naval)
+// con todos los cargos canónicos vistos en muestras reales 2018.
+const CGE_AT43_FIXTURE = `
+COMPAÑIA GENERAL DE ELECTRICIDAD S.A.
+RUT: 99.513.400-4
+www.cge.cl
+
+Hospital Naval Almirante Adriazola, Talcahuano
+N° Cliente: 99887766-K
+Tipo de tarifa contratada: AT 4.3
+Período facturado: 01/01/2018 al 31/01/2018
+Fecha de emisión: 05/02/2018
+Fecha de vencimiento: 20/02/2018
+
+Consumo: 149.781 kWh
+Potencia leída: 324 kW
+Factor potencia: 0,895
+
+DETALLE DE LA CUENTA / FACTURACION:
+Administracion del Servicio                                  $    1.362
+Coordinacion y Transporte de Electricidad                  $   394.973
+Electricidad Consumida (149.781 kWh)                    $ 11.132.023
+Cargo por Demanda Maxima de Potencia Suministrada          $   775.007
+Cargo Demanda Maxima Leida de Potencia en horas punta    $ 1.440.328
+Multa por Consumo Reactivo (10 %)                          $   533.894
+Arriendo de Medidor                                          $    3.492
+Arriendo Otros Equipos                                       $   65.453
+
+Total a pagar                                              $ 17.072.400
+`
+
+describe('CGE AT-4.3 industrial (hospital)', () => {
+  it('extrae arriendo de medidor y otros equipos', () => {
+    const r = parseCGE(CGE_AT43_FIXTURE)
+    const conceptos = r.cargos.map((c) => c.concepto)
+    expect(conceptos).toContain('Arriendo de Medidor')
+    expect(conceptos).toContain('Arriendo Otros Equipos')
+  })
+
+  it('extrae multa por consumo reactivo con porcentaje variable', () => {
+    const r = parseCGE(CGE_AT43_FIXTURE)
+    const multa = r.cargos.find((c) => c.concepto === 'Multa por Consumo Reactivo')
+    expect(multa).toBeDefined()
+    expect(multa?.monto).toBe(533894)
+  })
+
+  it('extrae demanda máxima leída en hora punta sin colisionar con otras demandas', () => {
+    const r = parseCGE(CGE_AT43_FIXTURE)
+    const punta = r.cargos.find(
+      (c) =>
+        c.concepto ===
+        'Cargo por demanda máxima de potencia leída en horas de punta',
+    )
+    expect(punta).toBeDefined()
+    expect(punta?.monto).toBe(1440328)
+  })
+
+  it('total a pagar es 17.072.400 sin confusión con cargos individuales', () => {
+    const r = parseCGE(CGE_AT43_FIXTURE)
+    expect(r.totales.total).toBe(17072400)
+  })
+})
+
+// Fixture CGE BT-3 PEP basado en Hospital Hernán Henríquez Aravena
+// Temuco enero 2018, base SAMU.
+const CGE_BT3_PEP_FIXTURE = `
+COMPAÑIA GENERAL DE ELECTRICIDAD S.A.
+RUT: 99.513.400-4
+www.cge.cl
+
+Hospital Hernán Henríquez Aravena, Temuco
+N° Cliente: 11223344-5
+Tipo de tarifa contratada: BT 3 PRESENTE EN PUNTA
+
+DETALLE DE LA CUENTA / FACTURACION:
+Administracion del Servicio                                  $    1.334
+Transporte de Electricidad                                   $    4.235
+Electricidad Consumida (1.751 kWh)                         $  139.042
+Cargo por Potencia Presente en Punta (23,335 kW)           $  318.326
+Multa por Consumo Reactivo (16 %)                           $   73.179
+Otros Cargos                                                 $      -78
+Ajuste para Facilitar el Pago en Efectivo, Mes Anterior      $       13
+Ajuste para Facilitar el Pago en Efectivo, Mes Actual        $       -1
+
+Total a pagar                                              $ 637.900
+`
+
+describe('CGE BT-3 PRESENTE EN PUNTA (hospital SAMU)', () => {
+  it('extrae "Cargo por Potencia Presente en Punta"', () => {
+    const r = parseCGE(CGE_BT3_PEP_FIXTURE)
+    const pep = r.cargos.find(
+      (c) => c.concepto === 'Cargo por Potencia Presente en Punta',
+    )
+    expect(pep).toBeDefined()
+    expect(pep?.monto).toBe(318326)
+  })
+
+  it('extrae ajuste mes anterior y mes actual como dos cargos distintos', () => {
+    const r = parseCGE(CGE_BT3_PEP_FIXTURE)
+    const ant = r.cargos.find(
+      (c) =>
+        c.concepto === 'Ajuste para Facilitar el Pago en Efectivo, Mes Anterior',
+    )
+    const act = r.cargos.find(
+      (c) => c.concepto === 'Ajuste para Facilitar el Pago en Efectivo, Mes Actual',
+    )
+    expect(ant?.monto).toBe(13)
+    expect(act?.monto).toBe(-1)
+  })
+
+  it('extrae Otros Cargos con signo negativo', () => {
+    const r = parseCGE(CGE_BT3_PEP_FIXTURE)
+    const otros = r.cargos.find((c) => c.concepto === 'Otros Cargos')
+    expect(otros).toBeDefined()
+    expect(otros?.monto).toBeLessThan(0)
+  })
+})
+
+// Fixture CGE AT-3 PEP con 3 líneas de saldo anterior independientes.
+const CGE_AT3_PEP_FIXTURE = `
+COMPAÑIA GENERAL DE ELECTRICIDAD S.A.
+RUT: 99.513.400-4
+www.cge.cl
+
+Tipo de tarifa contratada: AT 3 PRESENTE EN PUNTA
+N° Cliente: 55667788-9
+
+Administracion del Servicio                                  $    1.333
+Transporte de Electricidad                                 $ 1.632.659
+Electricidad Consumida (619.135,2 kWh)                  $ 46.015.366
+Cargo por Potencia Presente en Punta (1.320,6 kW)        $ 10.118.173
+Multa por Consumo Reactivo (4 %)                           $ 2.245.342
+Arriendo de Medidor                                          $    3.514
+Pago de la Cuenta Fuera de Plazo                             $      161
+Arriendo Otros Equipos                                       $   21.674
+Otros Cargos                                                 $        5
+Saldo Anterior Vencido                                    $ 77.321.000
+Saldo Anterior Servicio Electrico                         $ 75.923.401
+Otro Saldo Anterior                                        $ 4.397.599
+
+Total a pagar                                            $ 149.513.000
+`
+
+describe('CGE AT-3 PEP con 3 saldos anteriores (hospital regional)', () => {
+  it('extrae las 3 líneas de saldo anterior como cargos independientes', () => {
+    const r = parseCGE(CGE_AT3_PEP_FIXTURE)
+    const conceptos = r.cargos.map((c) => c.concepto)
+    expect(conceptos).toContain('Saldo Anterior Vencido')
+    expect(conceptos).toContain('Saldo Anterior Servicio Eléctrico')
+    expect(conceptos).toContain('Otro Saldo Anterior')
+  })
+
+  it('saldos anteriores tienen montos distintos (no dedup ni colisión)', () => {
+    const r = parseCGE(CGE_AT3_PEP_FIXTURE)
+    const venc = r.cargos.find((c) => c.concepto === 'Saldo Anterior Vencido')
+    const serv = r.cargos.find(
+      (c) => c.concepto === 'Saldo Anterior Servicio Eléctrico',
+    )
+    const otro = r.cargos.find((c) => c.concepto === 'Otro Saldo Anterior')
+    expect(venc?.monto).toBe(77321000)
+    expect(serv?.monto).toBe(75923401)
+    expect(otro?.monto).toBe(4397599)
+  })
+
+  it('extrae "Pago de la Cuenta Fuera de Plazo" como cargo de mora', () => {
+    const r = parseCGE(CGE_AT3_PEP_FIXTURE)
+    const mora = r.cargos.find(
+      (c) => c.concepto === 'Pago de la Cuenta Fuera de Plazo',
+    )
+    expect(mora).toBeDefined()
+    expect(mora?.monto).toBe(161)
+  })
 })

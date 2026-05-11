@@ -82,6 +82,8 @@ export {
   GAS_PARSERS,
   abastibleParser,
   gascoParser,
+  gasSurParser,
+  gasvalpoParser,
   isGasParserImplemented,
   lipigasParser,
   metrogasParser,

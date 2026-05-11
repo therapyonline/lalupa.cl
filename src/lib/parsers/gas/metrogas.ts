@@ -39,7 +39,7 @@ const METROGAS_DETECT_REGEX = /\bMetrogas\b|metrogas\.cl|96\.7[27]2\.460-K/i
 const METROGAS_MARKERS_REGEX = METROGAS_DETECT_REGEX
 
 const OTHER_EMPRESA_MARKERS_REGEX =
-  /(\bLipigas\b|96\.928\.510-K|\bAbastible\b|91\.806\.000-6|GASCO\s+GLP|96\.568\.740-8)/i
+  /(\bLipigas\b|96\.928\.510-K|\bAbastible\b|91\.806\.000-6|GASCO\s+GLP|96\.568\.740-8|\bGasvalpo\b|gasvalpo\.cl|\bGas\s+Sur\b|GASSUR)/i
 
 // Tarifas Metrogas:
 //   - `BCR01R` residencial

@@ -13,7 +13,13 @@ export type EmpresaSanitaria =
   | 'SMAPA'
   | 'Aguas del Valle'
 
-export type EmpresaGas = 'Metrogas' | 'Lipigas' | 'Abastible' | 'Gasco GLP'
+export type EmpresaGas =
+  | 'Metrogas'
+  | 'Lipigas'
+  | 'Abastible'
+  | 'Gasco GLP'
+  | 'Gasvalpo'
+  | 'Gas Sur'
 
 export type Empresa = EmpresaElectrica | EmpresaSanitaria | EmpresaGas
 
@@ -99,13 +105,21 @@ export const SLUG_TO_EMPRESA_SANITARIA: Record<AguaSlug, EmpresaSanitaria> = {
   'aguas-del-valle': 'Aguas del Valle',
 }
 
-export type GasSlug = 'metrogas' | 'lipigas' | 'abastible' | 'gasco-glp'
+export type GasSlug =
+  | 'metrogas'
+  | 'lipigas'
+  | 'abastible'
+  | 'gasco-glp'
+  | 'gasvalpo'
+  | 'gas-sur'
 
 export const GAS_SLUGS: Record<EmpresaGas, GasSlug> = {
   Metrogas: 'metrogas',
   Lipigas: 'lipigas',
   Abastible: 'abastible',
   'Gasco GLP': 'gasco-glp',
+  Gasvalpo: 'gasvalpo',
+  'Gas Sur': 'gas-sur',
 }
 
 /** Reverse map para manual override desde chip. */
@@ -114,6 +128,8 @@ export const SLUG_TO_EMPRESA_GAS: Record<GasSlug, EmpresaGas> = {
   lipigas: 'Lipigas',
   abastible: 'Abastible',
   'gasco-glp': 'Gasco GLP',
+  gasvalpo: 'Gasvalpo',
+  'gas-sur': 'Gas Sur',
 }
 
 export interface Fingerprint {

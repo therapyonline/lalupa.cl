@@ -29,34 +29,95 @@ export type TipoTarifa =
   | 'AT' // alta tensión
   | 'desconocida'
 
+export interface TarifaClasificada {
+  tipo: TipoTarifa
+  esResidencial: boolean
+  conPotenciaContratada: boolean
+  /**
+   * Si el cliente tiene consumo presente en horario punta. CGE marca
+   * esto con sufijo "PRESENTE EN PUNTA" o "PARCIALMENTE PRESENTE EN
+   * PUNTA" en el código tarifario. Visto en BT-3, AT-3, AT-4 reales.
+   */
+  presenteEnPunta: boolean
+  /** Subtipo legible si aplica (ej. "PARCIAL"). */
+  presenteEnPuntaSubtipo?: 'PARCIAL'
+  nota: string
+}
+
+/**
+ * Detecta sufijo "PRESENTE EN PUNTA" / "PARCIALMENTE PRESENTE EN PUNTA"
+ * del código tarifario CGE industrial. Retorna info y código base
+ * limpio para el resto de la clasificación.
+ *
+ * Códigos vistos en facturas reales (Hospital Hernán Henríquez Temuco,
+ * Hospital Naval Talcahuano):
+ *   - `AT 3 PRESENTE EN PUNTA`
+ *   - `BT 3 PRESENTE EN PUNTA`
+ *   - `BT 3 PARCIALMENTE PRESENTE EN PUNTA`
+ *   - `AT 2 PRESENTE EN PUNTA`
+ *   - `AT 4.3` (sin PEP)
+ *
+ * Notar que CGE usa SPACE entre "AT/BT" y el número, no guión.
+ */
+function extraerPresenteEnPunta(codigo: string): {
+  codigoBase: string
+  presenteEnPunta: boolean
+  presenteEnPuntaSubtipo?: 'PARCIAL'
+} {
+  const upper = codigo.toUpperCase()
+  if (/PARCIALMENTE\s+PRESENTE\s+EN\s+PUNTA/.test(upper)) {
+    return {
+      codigoBase: upper.replace(/PARCIALMENTE\s+PRESENTE\s+EN\s+PUNTA/, '').trim(),
+      presenteEnPunta: true,
+      presenteEnPuntaSubtipo: 'PARCIAL',
+    }
+  }
+  if (/PRESENTE\s+EN\s+PUNTA/.test(upper)) {
+    return {
+      codigoBase: upper.replace(/PRESENTE\s+EN\s+PUNTA/, '').trim(),
+      presenteEnPunta: true,
+    }
+  }
+  return { codigoBase: codigo, presenteEnPunta: false }
+}
+
 /**
  * Parsea el código tarifario y devuelve el tipo de tarifa + nota
  * legible para el usuario.
  */
-export function clasificarTarifa(codigo: string | undefined): {
-  tipo: TipoTarifa
-  esResidencial: boolean
-  conPotenciaContratada: boolean
-  nota: string
-} {
+export function clasificarTarifa(
+  codigo: string | undefined,
+): TarifaClasificada {
   if (!codigo) {
     return {
       tipo: 'desconocida',
       esResidencial: false,
       conPotenciaContratada: false,
+      presenteEnPunta: false,
       nota: 'No detectamos el código tarifario en tu boleta.',
     }
   }
 
-  const normalizada = codigo.toUpperCase().replace(/\s+/g, '')
+  // Extrae sufijo PEP antes de normalizar para no perderlo.
+  const { codigoBase, presenteEnPunta, presenteEnPuntaSubtipo } =
+    extraerPresenteEnPunta(codigo)
+  const normalizada = codigoBase.toUpperCase().replace(/\s+/g, '')
+  const pepNota = presenteEnPunta
+    ? presenteEnPuntaSubtipo === 'PARCIAL'
+      ? ' Tu consumo es parcialmente presente en punta (algunos meses tienes consumo en horario punta).'
+      : ' Tu consumo es presente en punta: se cobra cargo por potencia en hora de mayor demanda.'
+    : ''
 
   if (/^(TR)?BT-?1[A-Z]?$/.test(normalizada)) {
     return {
       tipo: 'BT-1',
       esResidencial: true,
       conPotenciaContratada: false,
+      presenteEnPunta,
+      presenteEnPuntaSubtipo,
       nota:
-        'Tarifa BT-1 residencial estándar. Pagas cargo fijo + cargo por energía consumida.',
+        'Tarifa BT-1 residencial estándar. Pagas cargo fijo + cargo por energía consumida.' +
+        pepNota,
     }
   }
 
@@ -65,8 +126,11 @@ export function clasificarTarifa(codigo: string | undefined): {
       tipo: 'BT-2',
       esResidencial: true,
       conPotenciaContratada: true,
+      presenteEnPunta,
+      presenteEnPuntaSubtipo,
       nota:
-        'Tarifa BT-2 con potencia contratada. Pagas cargo fijo + energía + un cargo extra por potencia, aunque no la uses. Común en hogares con calefacción eléctrica, sauna o aire acondicionado central.',
+        'Tarifa BT-2 con potencia contratada. Pagas cargo fijo + energía + un cargo extra por potencia, aunque no la uses. Común en hogares con calefacción eléctrica, sauna o aire acondicionado central.' +
+        pepNota,
     }
   }
 
@@ -75,8 +139,11 @@ export function clasificarTarifa(codigo: string | undefined): {
       tipo: 'BT-3',
       esResidencial: false,
       conPotenciaContratada: true,
+      presenteEnPunta,
+      presenteEnPuntaSubtipo,
       nota:
-        'Tarifa BT-3 con horario punta y fuera de punta. Típica de comercio mediano.',
+        'Tarifa BT-3 con horario punta y fuera de punta. Típica de comercio mediano.' +
+        pepNota,
     }
   }
 
@@ -85,18 +152,24 @@ export function clasificarTarifa(codigo: string | undefined): {
       tipo: 'BT-industrial',
       esResidencial: false,
       conPotenciaContratada: true,
+      presenteEnPunta,
+      presenteEnPuntaSubtipo,
       nota:
-        'Tarifa BT industrial. Boleta con cargos específicos por demanda máxima y servicios.',
+        'Tarifa BT industrial. Boleta con cargos específicos por demanda máxima y servicios.' +
+        pepNota,
     }
   }
 
-  if (/^(TR)?AT-?[2-4]\d*$/.test(normalizada)) {
+  if (/^(TR)?AT-?[2-4](\.\d+)?\d*$/.test(normalizada)) {
     return {
       tipo: 'AT',
       esResidencial: false,
       conPotenciaContratada: true,
+      presenteEnPunta,
+      presenteEnPuntaSubtipo,
       nota:
-        'Tarifa de Alta Tensión. Boleta industrial con cargos de potencia leída en hora punta.',
+        'Tarifa de Alta Tensión. Boleta industrial con cargos de potencia leída en hora punta.' +
+        pepNota,
     }
   }
 
@@ -104,6 +177,8 @@ export function clasificarTarifa(codigo: string | undefined): {
     tipo: 'desconocida',
     esResidencial: false,
     conPotenciaContratada: false,
+    presenteEnPunta,
+    presenteEnPuntaSubtipo,
     nota: `Código tarifario "${codigo}" no reconocido en el catálogo SEC.`,
   }
 }

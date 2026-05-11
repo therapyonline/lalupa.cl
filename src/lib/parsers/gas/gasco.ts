@@ -33,7 +33,7 @@ const GASCO_DETECT_REGEX =
 const GASCO_MARKERS_REGEX = GASCO_DETECT_REGEX
 
 const OTHER_EMPRESA_MARKERS_REGEX =
-  /(\bMetrogas\b|96\.722\.460-K|\bLipigas\b|96\.928\.510-K|\bAbastible\b|91\.806\.000-6)/i
+  /(\bMetrogas\b|96\.722\.460-K|\bLipigas\b|96\.928\.510-K|\bAbastible\b|91\.806\.000-6|\bGasvalpo\b|gasvalpo\.cl|\bGas\s+Sur\b|GASSUR)/i
 
 const TOTAL_REGEX = new RegExp(
   `(?:Total\\s+a\\s+pagar|Total\\s+Boleta)\\s*\\$?\\s*${CL_NUMBER}`,

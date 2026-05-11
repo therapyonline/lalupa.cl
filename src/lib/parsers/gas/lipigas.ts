@@ -31,7 +31,7 @@ const LIPIGAS_DETECT_REGEX = /\bLipigas\b|lipigas\.cl|96\.928\.510-K/i
 const LIPIGAS_MARKERS_REGEX = LIPIGAS_DETECT_REGEX
 
 const OTHER_EMPRESA_MARKERS_REGEX =
-  /(\bMetrogas\b|96\.722\.460-K|\bAbastible\b|91\.806\.000-6|GASCO\s+GLP|96\.568\.740-8)/i
+  /(\bMetrogas\b|96\.722\.460-K|\bAbastible\b|91\.806\.000-6|GASCO\s+GLP|96\.568\.740-8|\bGasvalpo\b|gasvalpo\.cl|\bGas\s+Sur\b|GASSUR)/i
 
 const TARIFA_REGEX = /Tarifa\s*:?\s*([A-Z]{2,5}\d{0,3}[A-Z]?|[Gg]as\s+[A-Za-z]+)/i
 

@@ -31,7 +31,7 @@ const ABASTIBLE_DETECT_REGEX = /\bAbastible\b|abastible\.cl|91\.806\.000-6/i
 const ABASTIBLE_MARKERS_REGEX = ABASTIBLE_DETECT_REGEX
 
 const OTHER_EMPRESA_MARKERS_REGEX =
-  /(\bMetrogas\b|96\.722\.460-K|\bLipigas\b|96\.928\.510-K|GASCO\s+GLP|96\.568\.740-8)/i
+  /(\bMetrogas\b|96\.722\.460-K|\bLipigas\b|96\.928\.510-K|GASCO\s+GLP|96\.568\.740-8|\bGasvalpo\b|gasvalpo\.cl|\bGas\s+Sur\b|GASSUR)/i
 
 const TARIFA_REGEX = /Tarifa\s+contratada\s*:?\s*([A-Z]{2,5}\d{0,3}[A-Z]?)/i
 

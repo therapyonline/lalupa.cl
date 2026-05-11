@@ -49,6 +49,17 @@ interface FilaComparativa {
   isCurrent: boolean
 }
 
+/**
+ * Coerce a un número finito o 0. Defensa contra histórico importado
+ * o IndexedDB corrupta que devuelva totales en `string`, `NaN`,
+ * `Infinity` o `undefined`. Sin esta guard, una boleta corrupta
+ * crasheaba el cálculo de promedio (NaN) y la barra de progreso de
+ * todas las filas (NaN%).
+ */
+function toFiniteNumber(value: unknown): number {
+  return typeof value === 'number' && Number.isFinite(value) ? value : 0
+}
+
 export function Comparativa({
   historicas,
   actual,
@@ -59,13 +70,13 @@ export function Comparativa({
     ...historicas.map<FilaComparativa>((h) => ({
       key: h.id,
       label: formatPeriod(h.periodo),
-      monto: h.totales.total,
+      monto: toFiniteNumber(h.totales?.total),
       isCurrent: false,
     })),
     {
       key: 'actual',
       label: formatPeriod(actual.periodo),
-      monto: actual.totales.total,
+      monto: toFiniteNumber(actual.totales?.total),
       isCurrent: true,
     },
   ].slice(-maxFilas)
@@ -75,7 +86,7 @@ export function Comparativa({
   // calcular Math.max(...[]) === -Infinity y división por cero.
   if (filas.length === 0) return null
 
-  const max = Math.max(...filas.map((f) => (Number.isFinite(f.monto) ? f.monto : 0)))
+  const max = Math.max(...filas.map((f) => f.monto))
   const promedio = filas.reduce((sum, f) => sum + f.monto, 0) / filas.length
 
   return (

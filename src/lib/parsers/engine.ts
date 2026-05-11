@@ -108,13 +108,29 @@ export async function extractTextFromPDF(file: File): Promise<string> {
 
   let pdf
   try {
-    pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise
+    // Flags de hardening contra PDFs maliciosos:
+    //   - `disableFontFace: true`: bloquea instalación de @font-face,
+    //     evita exploits via fuentes embebidas malformadas (CVE histórico
+    //     en pdfjs-dist).
+    //   - `useWorkerFetch: false`: el worker no hace fetch a network,
+    //     evita SSRF via PDF con URLs externas.
+    //   - `verbosity: 0`: silencia warnings que filtrarían info de PDFs
+    //     internos por la consola del usuario.
+    //
+    // Nota: `isEvalSupported` se removió del type en pdfjs-dist 5.x
+    // (CVE-2024-4367 cerrado por upgrade), no necesitamos pasarlo.
+    pdf = await pdfjs.getDocument({
+      data: arrayBuffer,
+      disableFontFace: true,
+      useWorkerFetch: false,
+      verbosity: 0,
+    }).promise
   } catch (err) {
     const name = (err as { name?: string })?.name ?? ''
     const msg = (err as { message?: string })?.message ?? String(err)
     if (name === 'PasswordException' || /password/i.test(msg)) {
       throw new Error(
-        'Este PDF está protegido con contraseña. Remové la protección antes de subirlo (en Acrobat: Archivo > Propiedades > Seguridad > Sin seguridad).',
+        'Este PDF está protegido con contraseña. Quita la protección antes de subirlo (en Acrobat: Archivo > Propiedades > Seguridad > Sin seguridad).',
       )
     }
     if (name === 'InvalidPDFException' || /invalid/i.test(msg)) {
@@ -158,7 +174,13 @@ async function rasterizePdfPages(file: File): Promise<Blob | null> {
   if (typeof window === 'undefined') return null
   const pdfjs = await loadPdfJs()
   const arrayBuffer = await file.arrayBuffer()
-  const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise
+  // Mismo hardening que en extractTextFromPDF; ver comentarios ahí.
+  const pdf = await pdfjs.getDocument({
+    data: arrayBuffer,
+    disableFontFace: true,
+    useWorkerFetch: false,
+    verbosity: 0,
+  }).promise
   if (pdf.numPages < 1) return null
 
   const pagesToRender = Math.min(pdf.numPages, MAX_PDF_PAGES_TO_RASTERIZE)

@@ -33,6 +33,14 @@ const SECURITY_HEADERS = [
       'camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()',
   },
   { key: 'X-DNS-Prefetch-Control', value: 'on' },
+  // COOP previene que ventanas abiertas via `window.open` accedan a
+  // `window.opener` cross-origin. Defense-in-depth ante clickjacking
+  // y leaks de `window.opener`.
+  { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
+  // CORP previene que otros origins embeban nuestros recursos como
+  // `<img>` o `<script>`. Para una app sin recursos que se deban
+  // compartir cross-origin, `same-origin` es lo correcto.
+  { key: 'Cross-Origin-Resource-Policy', value: 'same-origin' },
   {
     key: 'Content-Security-Policy',
     value: [

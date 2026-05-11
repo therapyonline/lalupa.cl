@@ -1,5 +1,76 @@
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb'
+import { z } from 'zod'
 import type { ParsedBoleta } from '@/lib/parsers'
+
+/**
+ * Caps defensivos para protegerse contra JSON malicioso al importar:
+ *   - Cantidad máxima de boletas en el archivo (razonable para uso
+ *     personal; un usuario activo guarda ~24 boletas/año).
+ *   - Tamaño máximo de cada string para no llenar la cuota IndexedDB.
+ */
+const MAX_BOLETAS_IMPORT = 500
+const MAX_STRING_LENGTH = 4096
+const MAX_RAW_TEXT_LENGTH = 200_000 // boleta OCR puede tener ~50KB; cap a 200KB
+
+/**
+ * Schema Zod del payload de export/import. Valida shape, tipos y caps
+ * de tamaño antes de persistir en IndexedDB. Si el archivo es malicioso
+ * o corrupto, falla con error legible en vez de corromper la base.
+ *
+ * `passthrough()` solo en campos opcionales que podrían tener
+ * extensiones futuras; los críticos son `strict()` implícito.
+ */
+const cappedString = (max = MAX_STRING_LENGTH) =>
+  z.string().max(max, `Campo excede ${max} caracteres`)
+
+const cargoSchema = z.object({
+  concepto: cappedString(),
+  monto: z.number().finite(),
+  detalle: cappedString().optional(),
+  sospechoso: z.boolean().optional(),
+  razonSospecha: cappedString().optional(),
+})
+
+const importBoletaSchema = z.object({
+  id: cappedString(),
+  empresa: cappedString(),
+  servicio: z.enum(['electricidad', 'agua', 'gas']),
+  tipoVenta: z.enum(['consumo', 'producto']).optional(),
+  periodo: z.object({
+    desde: z.union([z.string(), z.date()]),
+    hasta: z.union([z.string(), z.date()]),
+  }),
+  cliente: z
+    .object({
+      nombre: cappedString().optional(),
+      direccion: cappedString().optional(),
+      numeroCliente: cappedString().optional(),
+    })
+    .default({}),
+  consumo: z.object({
+    unidad: z.enum(['kWh', 'm3', 'kg', 'unidades']),
+    valor: z.number().finite(),
+    tarifa: cappedString().optional(),
+  }),
+  cargos: z.array(cargoSchema).max(100, 'Máximo 100 cargos por boleta'),
+  totales: z.object({
+    subtotal: z.number().finite(),
+    iva: z.number().finite(),
+    total: z.number().finite(),
+  }),
+  fechaEmision: z.union([z.string(), z.date()]).optional(),
+  fechaVencimiento: z.union([z.string(), z.date()]).optional(),
+  raw: cappedString(MAX_RAW_TEXT_LENGTH),
+  guardadoEn: z.union([z.string(), z.date()]),
+})
+
+const importPayloadSchema = z.object({
+  version: z.literal(1),
+  exportadoEn: cappedString().optional(),
+  boletas: z
+    .array(importBoletaSchema)
+    .max(MAX_BOLETAS_IMPORT, `Máximo ${MAX_BOLETAS_IMPORT} boletas por archivo`),
+})
 
 const DB_NAME = 'lalupa'
 const DB_VERSION = 1
@@ -195,25 +266,30 @@ function reviveBoleta(raw: BoletaGuardada): BoletaGuardada {
 
 export async function importarHistorial(file: File): Promise<number> {
   const text = await file.text()
-  let data: ExportPayload
+  let raw: unknown
   try {
-    data = JSON.parse(text) as ExportPayload
+    raw = JSON.parse(text)
   } catch {
     throw new Error('El archivo no es un JSON válido.')
   }
 
-  if (!data || !Array.isArray(data.boletas)) {
+  // Validación con Zod ANTES de tocar IndexedDB. Previene importar
+  // JSON malicioso o corrupto que crashearía la UI al renderizar
+  // (números no finitos, strings gigantes, arrays sin shape esperada).
+  const parsed = importPayloadSchema.safeParse(raw)
+  if (!parsed.success) {
+    const issue = parsed.error.issues[0]
+    const path = issue.path.length > 0 ? ` (en ${issue.path.join('.')})` : ''
     throw new Error(
-      'Formato no reconocido: falta el campo `boletas` con un array de entradas.',
+      `Formato no reconocido: ${issue.message}${path}. Solo se aceptan JSON exportados por lalupa.cl.`,
     )
   }
 
   const db = await getDb()
   const tx = db.transaction(STORE, 'readwrite')
   let count = 0
-  for (const raw of data.boletas) {
-    if (!raw || typeof raw.id !== 'string') continue
-    await tx.store.put(reviveBoleta(raw))
+  for (const validated of parsed.data.boletas) {
+    await tx.store.put(reviveBoleta(validated as unknown as BoletaGuardada))
     count++
   }
   await tx.done

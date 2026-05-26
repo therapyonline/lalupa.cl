@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { compileMDX } from 'next-mdx-remote/rsc'
 import rehypeSlug from 'rehype-slug'
+import remarkGfm from 'remark-gfm'
 import { format, parseISO } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { Container } from '@/components/layout/Container'
@@ -74,6 +75,10 @@ export default async function GuiaPage({
       options: {
         parseFrontmatter: true,
         mdxOptions: {
+          // `remark-gfm` habilita sintaxis GFM en las guías MDX:
+          // tablas con pipes, strikethrough, task lists, autolinks.
+          // Sin esto, una tabla markdown se renderiza como texto literal.
+          remarkPlugins: [remarkGfm],
           rehypePlugins: [rehypeSlug],
         },
       },

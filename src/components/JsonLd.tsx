@@ -15,10 +15,16 @@ export function JsonLd({
 }: {
   schema: Record<string, unknown> | Record<string, unknown>[]
 }) {
+  // Defensive guards: si el schema es undefined/null o si
+  // JSON.stringify devuelve undefined (cycle, función embebida),
+  // no renderizamos el bloque. Mejor sin schema que crashear el build.
+  if (!schema) return null
+  const raw = JSON.stringify(schema)
+  if (!raw) return null
   // Reemplazo defensivo de cualquier `<` antes de inyectar. Mantiene
   // el JSON estructuralmente válido (los parsers JSON aceptan
   // `<`) y previene escape del contenedor `<script>`.
-  const json = JSON.stringify(schema).replace(/</g, '\\u003c')
+  const json = raw.replace(/</g, '\\u003c')
   return (
     <script
       type="application/ld+json"

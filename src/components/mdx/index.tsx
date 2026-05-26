@@ -1,4 +1,5 @@
 import type { ComponentType } from 'react'
+import { JsonLd } from '@/components/JsonLd'
 import { Alert } from '@/components/ui/Alert'
 import { Pill } from '@/components/ui/Pill'
 import { Callout } from './Callout'
@@ -15,6 +16,9 @@ export const mdxComponents: Record<string, ComponentType<any>> = {
   Callout,
   RelatedTool,
   DataPoint,
+  // JsonLd permite que cada guía agregue su propio FAQPage / HowTo /
+  // VideoObject schema desde el MDX sin tocar la page template.
+  JsonLd: JsonLd as ComponentType<unknown>,
 }
 
-export { Alert, Callout, DataPoint, Pill, RelatedTool }
+export { Alert, Callout, DataPoint, JsonLd, Pill, RelatedTool }

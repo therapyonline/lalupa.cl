@@ -19,16 +19,36 @@ export {
 
 const GUIAS_DIR = path.join(process.cwd(), 'src', 'content', 'guias')
 
+/**
+ * Una pregunta-respuesta del bloque FAQPage al final de una guía.
+ * Se renderiza como sección visible en el body de la página Y como
+ * structured data JSON-LD para que Google muestre rich results.
+ */
+export interface GuiaFaqItem {
+  q: string
+  a: string
+}
+
 export interface GuiaFrontmatter {
   title: string
   slug: string
   description: string
+  /** Override opcional del title para `og:title` (suele ser más punchy que el title de SEO). */
+  ogTitle?: string
   publishedAt: string
   updatedAt: string
   category: CategoriaGuia
   keywords: string[]
   relatedTools?: string[]
   author?: string
+  /**
+   * Lista opcional de Q&A. Si está presente, la página genera
+   * automáticamente FAQPage JSON-LD para rich results en Google.
+   * NOTA: el contenido visible de las FAQ todavía vive en el MDX
+   * dentro de un H2 "Preguntas frecuentes"; este array es solo el
+   * espejo estructurado para SEO.
+   */
+  faqs?: GuiaFaqItem[]
 }
 
 export interface GuiaMeta extends GuiaFrontmatter {

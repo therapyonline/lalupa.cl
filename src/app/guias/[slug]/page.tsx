@@ -22,6 +22,7 @@ import {
   articleSchema,
   breadcrumbsSchema,
   buildMetadata,
+  faqPageSchema,
 } from '@/lib/seo'
 
 const CATEGORY_LABEL: Record<CategoriaGuia, string> = {
@@ -86,29 +87,38 @@ export default async function GuiaPage({
   const wasUpdated =
     guia.frontmatter.updatedAt !== guia.frontmatter.publishedAt
 
+  // Schemas JSON-LD: siempre Article + Breadcrumbs. Si la guía declara
+  // `faqs` en su frontmatter, sumamos FAQPage para que Google genere
+  // rich results.
+  const schemas: Record<string, unknown>[] = [
+    articleSchema({
+      title: guia.frontmatter.title,
+      description: guia.frontmatter.description,
+      path: `/guias/${slug}`,
+      publishedAt: guia.frontmatter.publishedAt,
+      updatedAt: guia.frontmatter.updatedAt,
+      author: guia.frontmatter.author,
+      keywords: guia.frontmatter.keywords,
+    }),
+    breadcrumbsSchema([
+      { name: 'Inicio', href: '/' },
+      { name: 'Guías', href: '/guias' },
+      {
+        name: guia.frontmatter.title,
+        href: `/guias/${slug}`,
+      },
+    ]),
+  ]
+  if (
+    Array.isArray(guia.frontmatter.faqs) &&
+    guia.frontmatter.faqs.length > 0
+  ) {
+    schemas.push(faqPageSchema(guia.frontmatter.faqs))
+  }
+
   return (
     <main className="flex-1">
-      <JsonLd
-        schema={[
-          articleSchema({
-            title: guia.frontmatter.title,
-            description: guia.frontmatter.description,
-            path: `/guias/${slug}`,
-            publishedAt: guia.frontmatter.publishedAt,
-            updatedAt: guia.frontmatter.updatedAt,
-            author: guia.frontmatter.author,
-            keywords: guia.frontmatter.keywords,
-          }),
-          breadcrumbsSchema([
-            { name: 'Inicio', href: '/' },
-            { name: 'Guías', href: '/guias' },
-            {
-              name: guia.frontmatter.title,
-              href: `/guias/${slug}`,
-            },
-          ]),
-        ]}
-      />
+      <JsonLd schema={schemas} />
       <section className="bg-cream py-12 md:py-16">
         <Container>
           <p className="font-mono text-xs uppercase tracking-[0.1em] text-soft">

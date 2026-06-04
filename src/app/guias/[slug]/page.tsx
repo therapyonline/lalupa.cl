@@ -24,6 +24,7 @@ import {
   breadcrumbsSchema,
   buildMetadata,
   faqPageSchema,
+  howToSchema,
 } from '@/lib/seo'
 
 const CATEGORY_LABEL: Record<CategoriaGuia, string> = {
@@ -119,6 +120,16 @@ export default async function GuiaPage({
     guia.frontmatter.faqs.length > 0
   ) {
     schemas.push(faqPageSchema(guia.frontmatter.faqs))
+  }
+  // HowTo opcional: guías que tienen instrucciones paso a paso
+  // (verificar cobertura, completar wizard, etc.) declaran `howTo`
+  // en el frontmatter y obtienen rich result HowTo en Google.
+  if (
+    guia.frontmatter.howTo &&
+    Array.isArray(guia.frontmatter.howTo.steps) &&
+    guia.frontmatter.howTo.steps.length > 0
+  ) {
+    schemas.push(howToSchema(guia.frontmatter.howTo))
   }
 
   return (

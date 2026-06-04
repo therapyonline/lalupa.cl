@@ -237,3 +237,25 @@ export function faqPageSchema(qas: ReadonlyArray<{ q: string; a: string }>) {
     })),
   }
 }
+
+/**
+ * Schema HowTo para instrucciones paso a paso. Google muestra esto
+ * como rich result con los pasos numerados y descripciones.
+ */
+export function howToSchema(howTo: {
+  name: string
+  description: string
+  steps: ReadonlyArray<{ name: string; text: string }>
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: howTo.name,
+    description: howTo.description,
+    step: howTo.steps.map((s) => ({
+      '@type': 'HowToStep',
+      name: s.name,
+      text: s.text,
+    })),
+  }
+}

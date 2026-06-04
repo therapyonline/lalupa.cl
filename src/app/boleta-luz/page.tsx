@@ -200,6 +200,32 @@ export default function BoletaLuzPage() {
           <p className="mt-10 text-xs text-soft">
             Herramienta referencial. Para reclamos formales: SERNAC, SEC, SISS.
           </p>
+
+          <div className="mt-10 rounded-[20px] border border-border bg-cream-warm/30 p-6 md:p-8">
+            <p className="font-mono text-xs uppercase tracking-[0.1em] text-soft">
+              Otros servicios del hogar
+            </p>
+            <ul className="mt-3 flex flex-col gap-2 text-sm leading-relaxed text-body">
+              <li>
+                <Link
+                  href="/guias/fibra-vs-cable-internet-chile"
+                  className="font-medium text-ink underline underline-offset-4 hover:no-underline"
+                >
+                  Fibra óptica vs cable en Chile 2026
+                </Link>
+                : cómo elegir plan de internet hogar y diferencias entre FTTH y HFC.
+              </li>
+              <li>
+                <Link
+                  href="/guias/gas-red-vs-cilindro-cual-conviene"
+                  className="font-medium text-ink underline underline-offset-4 hover:no-underline"
+                >
+                  Gas red vs cilindro
+                </Link>
+                : cuál conviene según tu consumo mensual.
+              </li>
+            </ul>
+          </div>
         </Container>
       </section>
 

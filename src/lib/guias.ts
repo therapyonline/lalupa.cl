@@ -29,6 +29,22 @@ export interface GuiaFaqItem {
   a: string
 }
 
+/**
+ * Un paso del bloque HowTo. Los steps se exponen como JSON-LD para
+ * Google Rich Results. El contenido visible vive en el MDX como una
+ * lista normal; este array es solo el espejo estructurado para SEO.
+ */
+export interface GuiaHowToStep {
+  name: string
+  text: string
+}
+
+export interface GuiaHowTo {
+  name: string
+  description: string
+  steps: GuiaHowToStep[]
+}
+
 export interface GuiaFrontmatter {
   title: string
   slug: string
@@ -49,6 +65,13 @@ export interface GuiaFrontmatter {
    * espejo estructurado para SEO.
    */
   faqs?: GuiaFaqItem[]
+  /**
+   * Bloque HowTo opcional. Si está presente, la página genera HowTo
+   * JSON-LD para rich results de instrucciones paso a paso. El
+   * contenido visible vive en el MDX; este objeto es el espejo
+   * estructurado.
+   */
+  howTo?: GuiaHowTo
 }
 
 export interface GuiaMeta extends GuiaFrontmatter {

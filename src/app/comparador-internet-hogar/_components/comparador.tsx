@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { Container } from '@/components/layout/Container'
 import { Alert } from '@/components/ui/Alert'
@@ -124,6 +125,17 @@ export function Comparador() {
             Comparamos planes de fibra y cable de las 7 principales empresas
             chilenas. Filtra por lo que necesitas y mira la letra chica antes
             de firmar.
+          </p>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-soft">
+            Si quieres entender primero la diferencia técnica entre fibra
+            óptica (FTTH) y cable (HFC), lee la{' '}
+            <Link
+              href="/guias/fibra-vs-cable-internet-chile"
+              className="font-medium text-ink underline underline-offset-4 hover:no-underline"
+            >
+              guía completa de fibra vs cable en Chile 2026
+            </Link>
+            .
           </p>
 
           <div className="mt-8" aria-label="Filtros sugeridos">

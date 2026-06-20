@@ -570,6 +570,57 @@ function analizarRatioAlcantarillado(
   return null
 }
 
+/**
+ * Electricidad y agua: la boleta menciona un posible corte por mora.
+ * Recuerda el plazo legal de aviso previo de 15 días (en gas son 10,
+ * cubierto por analizarAvisoCorteGas).
+ */
+function analizarAvisoCorteLuzAgua(boleta: ParsedBoleta): AnalisisLegal | null {
+  if (boleta.servicio !== 'electricidad' && boleta.servicio !== 'agua') {
+    return null
+  }
+  const mencionaCorte =
+    /aviso\s+de\s+corte|suspensi[óo]n\s+(?:del?\s+)?(?:suministro|servicio)|corte\s+por\s+(?:no\s+pago|mora)|fecha\s+de\s+corte/i.test(
+      boleta.raw,
+    )
+  if (!mencionaCorte) return null
+  const referenciaId =
+    boleta.servicio === 'electricidad'
+      ? 'electricidad-aviso-corte-15d'
+      : 'agua-aviso-corte-15d'
+  return buildAnalisis(
+    `aviso-corte-15dias-${boleta.servicio}`,
+    'informativo',
+    'Tu boleta menciona un posible corte',
+    'Antes de cortar el suministro por mora, la empresa debe avisarte por escrito (boleta o carta) con al menos 15 días de anticipación, indicando el monto adeudado y la fecha de corte. El corte no procede en fines de semana ni feriados, ni si en tu hogar hay una persona electrodependiente inscrita.',
+    'Si recibiste aviso con menos de 15 días, o si te cortaron sin aviso escrito válido, el corte es irregular: la reposición debe ser rápida y sin cobrarte. Documenta las fechas y reclama a la SEC o SISS según corresponda.',
+    referenciaId,
+  )
+}
+
+const OTROS_CARGOS_REGEX = /^(?:otros\s+cargos?|otros|varios)$/i
+
+/**
+ * Cobro genérico "Otros cargos" / "Otros" sin desglose. El consumidor
+ * tiene derecho a recibir el detalle de cada cargo.
+ */
+function analizarOtrosCargosSinDesglose(
+  boleta: ParsedBoleta,
+): AnalisisLegal | null {
+  const generico = boleta.cargos.find(
+    (c) => OTROS_CARGOS_REGEX.test(c.concepto.trim()) && c.monto > 0,
+  )
+  if (!generico) return null
+  return buildAnalisis(
+    'otros-cargos-sin-desglose',
+    'derecho_disponible',
+    'Tu boleta tiene un cargo genérico sin desglose',
+    `Aparece un cargo etiquetado como "${generico.concepto.trim()}" por ${formatCLP(generico.monto)} sin detalle de a qué corresponde. Tienes derecho a recibir el desglose de cada concepto que te cobran.`,
+    'Pide por escrito a la empresa el detalle de ese cargo: qué partidas incluye y bajo qué fundamento. Tienen 5 días hábiles para responder. Si no lo justifican, puedes impugnarlo.',
+    'comun-derecho-desglose',
+  )
+}
+
 // =============================================================================
 // ENTRY POINT
 // =============================================================================
@@ -603,6 +654,8 @@ export function analizarLegalmente(boleta: ParsedBoleta): AnalisisLegal[] {
     analizarCompensacionCorteNoAplicada,
     analizarRecargoInviernoFueraTemporada,
     analizarRatioAlcantarillado,
+    analizarAvisoCorteLuzAgua,
+    analizarOtrosCargosSinDesglose,
   ]
   const SEVERIDAD_ORDEN: Record<SeveridadAnalisis, number> = {
     alerta_legal: 0,

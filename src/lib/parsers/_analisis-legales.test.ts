@@ -426,6 +426,50 @@ describe('analizarLegalmente: alcantarillado sin agua potable', () => {
   })
 })
 
+describe('analizarLegalmente: aviso corte luz/agua 15 días', () => {
+  it('informa plazo 15 días en electricidad', () => {
+    const boleta = makeBoletaElectricidad({
+      raw: 'Aviso de corte por no pago programado para el 05/07/2026',
+    })
+    const r = analizarLegalmente(boleta)
+    const h = r.find((a) => a.id === 'aviso-corte-15dias-electricidad')
+    expect(h).toBeDefined()
+    expect(h?.descripcion).toMatch(/15 d[íi]as/)
+  })
+
+  it('informa plazo 15 días en agua', () => {
+    const boleta = makeBoletaAgua({
+      raw: 'Suspensión del servicio por mora',
+    })
+    const r = analizarLegalmente(boleta)
+    expect(r.find((a) => a.id === 'aviso-corte-15dias-agua')).toBeDefined()
+  })
+})
+
+describe('analizarLegalmente: otros cargos sin desglose', () => {
+  it('marca derecho cuando hay un cargo "Otros"', () => {
+    const boleta = makeBoletaElectricidad({
+      cargos: [
+        { concepto: 'Cargo fijo', monto: 1048 },
+        { concepto: 'Otros', monto: 3500 },
+      ],
+    })
+    const r = analizarLegalmente(boleta)
+    expect(r.find((a) => a.id === 'otros-cargos-sin-desglose')).toBeDefined()
+  })
+
+  it('no marca cuando el cargo tiene concepto específico', () => {
+    const boleta = makeBoletaElectricidad({
+      cargos: [
+        { concepto: 'Cargo fijo', monto: 1048 },
+        { concepto: 'Cargo por uso del sistema de transmisión', monto: 3500 },
+      ],
+    })
+    const r = analizarLegalmente(boleta)
+    expect(r.find((a) => a.id === 'otros-cargos-sin-desglose')).toBeUndefined()
+  })
+})
+
 describe('analizarLegalmente: boleta limpia', () => {
   it('no devuelve hallazgos para una boleta normal sin anomalías', () => {
     const boleta = makeBoletaElectricidad()

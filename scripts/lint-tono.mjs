@@ -30,8 +30,8 @@ const VOSEO_IMPERATIVES = [
   'borrá', 'borrame', 'buscá',
   'cambiá', 'cargá', 'chequeá', 'comunicate', 'completá', 'considerá', 'consultá', 'contactá', 'continuá',
   'copiá', 'cuestioná',
-  'declará', 'denunciá', 'descargá', 'describí', 'detené',
-  'editalo', 'editala', 'elegí', 'elegila', 'elegilo', 'enviá', 'escribí', 'escribime', 'esperá', 'exportá',
+  'declará', 'denunciá', 'descargá', 'describí', 'detené', 'documentá',
+  'editalo', 'editala', 'elegí', 'elegila', 'elegilo', 'enviá', 'escribí', 'escribime', 'esperá', 'exigí', 'exportá',
   'firmá', 'fijate', 'fíjate',
   'guardá', 'guardame',
   'hacé', 'hacelo',
@@ -39,6 +39,7 @@ const VOSEO_IMPERATIVES = [
   'leélo', 'levantá', 'limpiá', 'llamá', 'llevá',
   'mandá', 'mirá', 'mostrame',
   'pegá', 'pedí', 'preferilo', 'preguntá', 'preparate', 'prepará', 'presioná', 'probá', 'probalo',
+  'comparalo', 'comparala', 'cambiala', 'cambialo',
   'reclamá', 'recordá', 'regularizá', 'registrá', 'reportá', 'respaldate', 'revisá',
   'sacale', 'seguí', 'sentate', 'subí', 'subila', 'subilo', 'sumá', 'sumalo', 'sumale',
   'tené', 'tenelo', 'teneme', 'tomá', 'traé',
@@ -51,6 +52,7 @@ const VOSEO_INDICATIVE = [
   'querés', 'tenés', 'sabés', 'podés', 'debés', 'salís', 'venís', 'sentís', 'preferís',
   'elegís', 'seguís', 'conocés', 'leés', 'comés', 'escribís', 'hacés', 'tirás', 'empezás',
   'terminás', 'pensás', 'necesitás', 'encontrás', 'reclamás', 'sos',
+  'mudás', 'postulás', 'pagás', 'gastás', 'ahorrás', 'firmás', 'cambiás',
 ]
 
 // Patrón final: pronombre "vos" + todos los verbos.
@@ -79,9 +81,19 @@ const FORBIDDEN_CHARS = [
 // Solución: lookbehind/lookahead que excluyan letras del español
 // completo (incluyendo tildes y ñ) en ambos lados.
 const SPANISH_LETTER = '[A-Za-zÁÉÍÓÚÑáéíóúñ]'
-const escapedPatterns = PATTERNS.map(
-  (p) => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
-).join('|')
+// Incluimos cada patrón con su primera letra en mayúscula para cazar
+// voseo a inicio de frase ("Exportá", "Configurá", "Probá"). No usamos
+// flag 'i' global para no marcar siglas legítimas en mayúscula como
+// "SOS"/"VOS".
+function capitalizar(s) {
+  return s.charAt(0).toUpperCase() + s.slice(1)
+}
+const escapedPatterns = PATTERNS.flatMap((p) => {
+  const cap = capitalizar(p)
+  return cap === p ? [p] : [p, cap]
+})
+  .map((p) => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+  .join('|')
 const VOSEO_REGEX = new RegExp(
   `(?<!${SPANISH_LETTER})(${escapedPatterns})(?!${SPANISH_LETTER})`,
   'g',

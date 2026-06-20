@@ -286,11 +286,32 @@ export function Wizard() {
     }
   }
 
+  // Detecta marcadores sin completar arrastrados desde la plantilla
+  // (ej. "[completar motivo]", "[fecha de emisión no detectada]") o
+  // frases que indican que el dato faltó. Bloqueamos la generación para
+  // que el reclamo no salga con huecos visibles.
+  function tienePlaceholdersSinCompletar(): string | null {
+    const corchetes = /\[[^\]]+\]/
+    const frases = /no\s+detectad[oa]|completar\s+(?:el|la|aqu[íi])|\(completar\)/i
+    for (const campo of [data.hechos ?? '', data.peticion ?? '']) {
+      if (corchetes.test(campo) || frases.test(campo)) {
+        return 'Tu reclamo tiene partes sin completar (marcadas con corchetes o "no detectado"). Revisa los pasos de Hechos y Petición y reemplaza esos espacios antes de generar el documento.'
+      }
+    }
+    return null
+  }
+
   async function handleGeneratePdf() {
     if (!validateAll()) {
       const firstError = Object.keys(errors)[0]
       const fieldStep = stepForField(firstError)
       if (fieldStep) setStep(fieldStep)
+      return
+    }
+    const placeholderMsg = tienePlaceholdersSinCompletar()
+    if (placeholderMsg) {
+      setPdfStatus({ kind: 'error', message: placeholderMsg })
+      setStep(4)
       return
     }
     setPdfStatus({ kind: 'generating' })
@@ -310,6 +331,12 @@ export function Wizard() {
 
   async function handleCopyText() {
     if (!validateAll()) return
+    const placeholderMsg = tienePlaceholdersSinCompletar()
+    if (placeholderMsg) {
+      setPdfStatus({ kind: 'error', message: placeholderMsg })
+      setStep(4)
+      return
+    }
     try {
       const text = buildLetterText(data)
       await navigator.clipboard.writeText(text)

@@ -227,3 +227,31 @@ body {
 .prose-guia hr {
   border-color: var(--border);
 }
+
+/* Tablas GFM de las guías. El wrapper con overflow vive en el componente
+   MdxTable (mdx/index.tsx); acá solo el estilo visual. Sin estas reglas,
+   Preflight de Tailwind deja las tablas sin bordes ni padding. */
+.prose-guia table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+  margin-top: 0.5rem;
+}
+
+.prose-guia thead {
+  background: var(--cream-warm);
+}
+
+.prose-guia th,
+.prose-guia td {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.prose-guia th {
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+}

@@ -966,8 +966,8 @@ function ManagementPanel({ onChanged }: { onChanged: () => void }) {
         Gestión del histórico
       </p>
       <p className="mt-3 max-w-2xl text-base leading-relaxed text-body">
-        Tu histórico vive solo en este celular. Exportá un JSON para mover a
-        otro dispositivo o respaldar; importá uno existente para recuperarlo.
+        Tu histórico vive solo en este celular. Exporta un JSON para mover a
+        otro dispositivo o respaldar; importa uno existente para recuperarlo.
       </p>
       <div className="mt-6 flex flex-wrap gap-3">
         <Button variant="dark" size="md" onClick={handleExport}>

@@ -46,11 +46,21 @@ export function FileDrop({ onFiles, className, statusMessage }: FileDropProps) {
     const looksHeicByExt = HEIC_EXTENSIONS.some((ext) =>
       lowerName.endsWith(ext),
     )
+    // HEIC se "acepta" en el input solo para dar el mensaje accionable
+    // de inmediato (no podemos decodificarlo en el navegador). Lo
+    // rechazamos acá mismo, sin pasar a estado processing, igual que
+    // AddPagesButton.
+    const isHeic =
+      file.type === 'image/heic' ||
+      file.type === 'image/heif' ||
+      looksHeicByExt
+    if (isHeic) {
+      return 'iOS guarda fotos en HEIC. En Ajustes > Cámara > Formatos elige "Más compatible" (JPEG), o convierte la foto a JPG antes de subirla.'
+    }
     const accepted =
       ACCEPTED_TYPES.includes(file.type) ||
       // Algunos navegadores Android dejan type vacío y mandan extensión.
-      (file.type === '' && /\.(jpe?g|png|webp|pdf)$/i.test(lowerName)) ||
-      looksHeicByExt
+      (file.type === '' && /\.(jpe?g|png|webp|pdf)$/i.test(lowerName))
     if (!accepted) {
       return 'Formato no soportado. Aceptamos PDF, JPG, PNG y WebP.'
     }

@@ -36,7 +36,8 @@ export function BoletaErrorView({
       <section className="bg-cream pb-20">
         <Container>
           <Alert variant="danger">
-            <Alert.Title>{title}</Alert.Title>
+            {/* El <h1> de arriba ya muestra el título; el Alert no lo
+                repite para no duplicar el mensaje. */}
             <Alert.Body>
               {description}
               {detail && (

@@ -7,12 +7,14 @@ import { FileDrop } from '@/components/ui/FileDrop'
 import { ExtractedTextPreview } from '@/components/parsers/ExtractedTextPreview'
 import { OcrPhotoTips } from '@/components/parsers/OcrPhotoTips'
 import { useBoletaUpload } from '@/lib/parsers/use-boleta-upload'
+import { RedirectMessage } from '@/components/parsers/RedirectMessage'
 
 export function UploadHubAgua() {
   const { handleFiles, error, ocrStatus, resetKey } = useBoletaUpload('agua')
 
   return (
     <div>
+      <RedirectMessage />
       <FileDrop key={resetKey} onFiles={handleFiles} statusMessage={ocrStatus} />
       <OcrPhotoTips />
       {error && (

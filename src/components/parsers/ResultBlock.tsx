@@ -19,7 +19,7 @@ export function ResultBlockSkeleton({ className }: { className?: string }) {
       )}
       aria-hidden
     >
-      <header className="flex items-start justify-between gap-8 bg-ink px-10 py-8">
+      <header className="flex items-start justify-between gap-4 bg-ink px-5 py-6 sm:gap-8 sm:px-10 sm:py-8">
         <div>
           <Skeleton className="h-3 w-32 bg-cream/20" />
           <Skeleton className="mt-3 h-7 w-48 bg-cream/20" />
@@ -30,14 +30,14 @@ export function ResultBlockSkeleton({ className }: { className?: string }) {
         {Array.from({ length: 6 }).map((_, i) => (
           <li
             key={i}
-            className="flex items-center justify-between gap-4 px-10 py-5"
+            className="flex items-center justify-between gap-4 px-5 py-5 sm:px-10"
           >
             <Skeleton className="h-4 w-1/2" />
             <Skeleton className="h-4 w-20" />
           </li>
         ))}
       </ul>
-      <footer className="flex flex-col gap-6 bg-cream px-10 py-8 sm:flex-row sm:items-end sm:justify-between">
+      <footer className="flex flex-col gap-6 bg-cream px-5 py-6 sm:flex-row sm:px-10 sm:py-8 sm:items-end sm:justify-between">
         <div>
           <Skeleton className="h-3 w-24" />
           <Skeleton className="mt-3 h-9 w-44" />
@@ -63,7 +63,7 @@ export function ResultBlock({ boleta, className }: ResultBlockProps) {
         className,
       )}
     >
-      <header className="flex items-start justify-between gap-8 bg-ink px-10 py-8 text-cream">
+      <header className="flex items-start justify-between gap-4 bg-ink px-5 py-6 sm:gap-8 sm:px-10 sm:py-8 text-cream">
         <div>
           <p className="font-mono text-xs uppercase tracking-[0.1em] text-cream/70">
             {boleta.empresa} · {capitalize(boleta.servicio)}
@@ -83,7 +83,7 @@ export function ResultBlock({ boleta, className }: ResultBlockProps) {
         ))}
       </ul>
 
-      <footer className="flex flex-col gap-6 bg-cream px-10 py-8 sm:flex-row sm:items-end sm:justify-between">
+      <footer className="flex flex-col gap-6 bg-cream px-5 py-6 sm:flex-row sm:px-10 sm:py-8 sm:items-end sm:justify-between">
         <div>
           <p className="font-mono text-xs uppercase tracking-[0.1em] text-soft">
             Total a pagar
@@ -122,7 +122,7 @@ function ResultRow({ cargo }: { cargo: Cargo }) {
   return (
     <li
       className={cn(
-        'flex items-start justify-between gap-6 border-b border-border px-10 py-4 last:border-b-0',
+        'flex items-start justify-between gap-4 border-b border-border px-5 py-4 sm:gap-6 sm:px-10 last:border-b-0',
         flagged && 'border-l-4 border-l-accent bg-accent-soft',
       )}
     >

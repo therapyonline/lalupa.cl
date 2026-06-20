@@ -1,10 +1,34 @@
 import type { ComponentProps, ComponentType } from 'react'
+import Link from 'next/link'
 import { JsonLd } from '@/components/JsonLd'
 import { Alert } from '@/components/ui/Alert'
 import { Pill } from '@/components/ui/Pill'
 import { Callout } from './Callout'
 import { DataPoint } from './DataPoint'
 import { RelatedTool } from './RelatedTool'
+
+/**
+ * Enlaces dentro del MDX. Los internos (href que empieza con "/") usan
+ * next/link para navegación cliente (sin recargar toda la página). Los
+ * externos (http) abren en pestaña nueva con rel de seguridad. Así las
+ * guías no necesitan recordar target/rel a mano.
+ */
+function MdxLink({ href, children, ...rest }: ComponentProps<'a'>) {
+  const url = typeof href === 'string' ? href : ''
+  const esInterno = url.startsWith('/') || url.startsWith('#')
+  if (esInterno) {
+    return (
+      <Link href={url} {...rest}>
+        {children}
+      </Link>
+    )
+  }
+  return (
+    <a href={url} target="_blank" rel="noopener noreferrer" {...rest}>
+      {children}
+    </a>
+  )
+}
 
 /**
  * Envuelve cada `<table>` GFM en un contenedor con scroll horizontal.
@@ -36,6 +60,8 @@ export const mdxComponents: Record<string, ComponentType<any>> = {
   JsonLd: JsonLd as ComponentType<unknown>,
   // Tablas GFM con scroll horizontal contenido (no rompen mobile).
   table: MdxTable as ComponentType<unknown>,
+  // Enlaces: internos vía next/link, externos con target/rel seguro.
+  a: MdxLink as ComponentType<unknown>,
 }
 
 export { Alert, Callout, DataPoint, JsonLd, Pill, RelatedTool }

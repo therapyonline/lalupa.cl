@@ -489,6 +489,19 @@ function Toolbar({
   )
 }
 
+// Etiqueta de tecnología honesta: "simétrica" se deriva de los datos
+// (subida === bajada), no se asume por ser fibra. Si la subida es mucho
+// menor que la bajada (típico de cable HFC), lo decimos.
+function tecnologiaLabel(plan: PlanScored): string {
+  const simetrica = plan.velocidad.subida >= plan.velocidad.bajada
+  if (plan.tecnologia === 'fibra') {
+    return simetrica ? 'Fibra simétrica' : 'Fibra asimétrica'
+  }
+  if (plan.tecnologia === 'cable') return 'Cable (HFC)'
+  if (plan.tecnologia === '5g') return '5G'
+  return 'Inalámbrica'
+}
+
 function PlanCard({
   plan,
   comuna,
@@ -499,6 +512,9 @@ function PlanCard({
   esMejorCostoReal?: boolean
 }) {
   const subePct = deltaPct(plan.precio.mes1a12, plan.precio.mes13plus)
+  // Subida muy inferior a la bajada (típico de cable): relevante para
+  // videollamadas, teletrabajo, subir archivos y gaming.
+  const asimetrica = plan.velocidad.subida < plan.velocidad.bajada * 0.5
   // Umbral 30% (no 50%) para no esconder alzas de 30-49% que igual duelen,
   // y el mes real del alza se deriva de promoDuraMeses (Movistar 600 sube
   // al mes 7, no al 13). Es lo honesto y consistente con el Stat de la tarjeta.
@@ -534,13 +550,7 @@ function PlanCard({
               {plan.plan}
             </h2>
             <p className="mt-1 text-xs uppercase tracking-wide text-soft">
-              {plan.tecnologia === 'fibra'
-                ? 'Fibra simétrica'
-                : plan.tecnologia === 'cable'
-                  ? 'Cable'
-                  : plan.tecnologia === '5g'
-                    ? '5G'
-                    : 'Inalámbrica'}
+              {tecnologiaLabel(plan)}
             </p>
           </div>
           <ScoreBadge score={plan.score} />
@@ -585,6 +595,11 @@ function PlanCard({
             <Pill variant="success">Sin permanencia</Pill>
           )}
           {subeFlag && <Pill variant="warning">{subeFlag}</Pill>}
+          {asimetrica && (
+            <Pill variant="warning">
+              Subida {plan.velocidad.subida} Mbps (lenta para videollamadas y subir archivos)
+            </Pill>
+          )}
           {plan.alertas.map((a) => {
             // Alertas de alto riesgo (multa, alza fuerte, compromiso largo,
             // costo oculto) van en warning; las de cobertura/asimetría

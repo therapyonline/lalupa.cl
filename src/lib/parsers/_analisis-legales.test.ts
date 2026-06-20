@@ -229,6 +229,203 @@ describe('analizarLegalmente: orden por severidad', () => {
   })
 })
 
+describe('analizarLegalmente: subsidio SAP agua ausente', () => {
+  it('marca derecho cuando menciona SAP pero no hay descuento', () => {
+    const boleta = makeBoletaAgua({
+      raw: 'Recuerde postular al Subsidio al Pago del Consumo de Agua Potable (Ley 18.778)',
+    })
+    const r = analizarLegalmente(boleta)
+    expect(r.find((a) => a.id === 'agua-subsidio-sap-ausente')).toBeDefined()
+  })
+
+  it('no alerta cuando el subsidio agua sí aparece como cargo negativo', () => {
+    const boleta = makeBoletaAgua({
+      raw: 'Subsidio agua potable aplicado',
+      cargos: [
+        { concepto: 'Cargo fijo', monto: 914 },
+        { concepto: 'Subsidio agua potable', monto: -5000 },
+      ],
+    })
+    const r = analizarLegalmente(boleta)
+    expect(r.find((a) => a.id === 'agua-subsidio-sap-ausente')).toBeUndefined()
+  })
+})
+
+describe('analizarLegalmente: cilindro GLP', () => {
+  function makeCilindro(kg: number, overrides: Partial<ParsedBoleta> = {}) {
+    return {
+      empresa: 'Gasco GLP' as const,
+      servicio: 'gas' as const,
+      tipoVenta: 'producto' as const,
+      periodo: { desde: new Date('2026-05-01'), hasta: new Date('2026-05-01') },
+      cliente: {},
+      consumo: { unidad: 'kg' as const, valor: kg },
+      cargos: [{ concepto: 'Vale de carga GLP', monto: 19990 }],
+      totales: { subtotal: 16798, iva: 3192, total: 19990 },
+      raw: 'Boleta cilindro',
+      ...overrides,
+    } as ParsedBoleta
+  }
+
+  it('marca formato no estándar para cilindro de 13 kg', () => {
+    const r = analizarLegalmente(makeCilindro(13))
+    expect(r.find((a) => a.id === 'gas-cilindro-formato-no-estandar')).toBeDefined()
+  })
+
+  it('no alerta para cilindro estándar de 15 kg', () => {
+    const r = analizarLegalmente(makeCilindro(15))
+    expect(r.find((a) => a.id === 'gas-cilindro-formato-no-estandar')).toBeUndefined()
+  })
+
+  it('detecta recargo de delivery como derecho', () => {
+    const r = analizarLegalmente(
+      makeCilindro(15, {
+        cargos: [
+          { concepto: 'Vale de carga GLP', monto: 19990 },
+          { concepto: 'Recargo de delivery', monto: 2000 },
+        ],
+      }),
+    )
+    expect(r.find((a) => a.id === 'gas-recargo-delivery-no-publicado')).toBeDefined()
+  })
+})
+
+describe('analizarLegalmente: aviso corte gas red', () => {
+  it('informa plazo 10 días cuando menciona corte', () => {
+    const boleta: ParsedBoleta = {
+      empresa: 'Metrogas',
+      servicio: 'gas',
+      periodo: { desde: new Date('2026-05-01'), hasta: new Date('2026-05-31') },
+      cliente: {},
+      consumo: { unidad: 'm3', valor: 40 },
+      cargos: [{ concepto: 'Gas consumido', monto: 50000 }],
+      totales: { subtotal: 42017, iva: 7983, total: 50000 },
+      raw: 'Aviso de corte por no pago a partir del 20/06/2026',
+    }
+    const r = analizarLegalmente(boleta)
+    const hallazgo = r.find((a) => a.id === 'gas-aviso-corte-10dias')
+    expect(hallazgo).toBeDefined()
+    expect(hallazgo?.descripcion).toMatch(/10 d[íi]as/)
+  })
+})
+
+describe('analizarLegalmente: interés mora sobre TMC', () => {
+  it('alerta cuando la tasa mensual explícita supera 2.5%', () => {
+    const boleta = makeBoletaElectricidad({
+      raw: 'Interés por mora de 4% mensual sobre saldos vencidos',
+    })
+    const r = analizarLegalmente(boleta)
+    const hallazgo = r.find((a) => a.id === 'interes-mora-sobre-tmc')
+    expect(hallazgo).toBeDefined()
+    expect(hallazgo?.severidad).toBe('alerta_legal')
+  })
+
+  it('no alerta con tasa baja (1.5% mensual)', () => {
+    const boleta = makeBoletaElectricidad({
+      raw: 'Interés 1,5% mensual',
+    })
+    const r = analizarLegalmente(boleta)
+    expect(r.find((a) => a.id === 'interes-mora-sobre-tmc')).toBeUndefined()
+  })
+
+  it('informa derecho cuando hay cargo de mora sin tasa explícita', () => {
+    const boleta = makeBoletaElectricidad({
+      cargos: [
+        { concepto: 'Cargo fijo', monto: 1048 },
+        { concepto: 'Recargo por mora', monto: 3000 },
+      ],
+      raw: 'Boleta con recargo por mora sin tasa indicada',
+    })
+    const r = analizarLegalmente(boleta)
+    expect(r.find((a) => a.id === 'interes-mora-verificar-tmc')).toBeDefined()
+  })
+})
+
+describe('analizarLegalmente: compensación corte no aplicada', () => {
+  it('marca derecho cuando menciona interrupción sin compensación', () => {
+    const boleta = makeBoletaElectricidad({
+      raw: 'Evento de interrupción de suministro registrado: 30 horas sin servicio',
+    })
+    const r = analizarLegalmente(boleta)
+    expect(
+      r.find((a) => a.id === 'compensacion-corte-no-aplicada'),
+    ).toBeDefined()
+  })
+
+  it('no alerta cuando la compensación sí está en el texto', () => {
+    const boleta = makeBoletaElectricidad({
+      raw: 'Interrupción de suministro. Compensación aplicada en esta boleta.',
+    })
+    const r = analizarLegalmente(boleta)
+    expect(
+      r.find((a) => a.id === 'compensacion-corte-no-aplicada'),
+    ).toBeUndefined()
+  })
+})
+
+describe('analizarLegalmente: recargo invierno fuera de temporada', () => {
+  it('alerta cuando hay recargo invierno en boleta de diciembre', () => {
+    const boleta = makeBoletaElectricidad({
+      empresa: 'SAESA',
+      fechaEmision: new Date('2026-12-15'),
+      consumo: { unidad: 'kWh', valor: 300, tarifa: 'BT-1' },
+      cargos: [
+        { concepto: 'Cargo fijo', monto: 1201 },
+        { concepto: 'Recargo por consumo invierno', monto: 8000 },
+      ],
+    })
+    const r = analizarLegalmente(boleta)
+    expect(
+      r.find((a) => a.id === 'recargo-invierno-fuera-temporada'),
+    ).toBeDefined()
+  })
+
+  it('no alerta cuando es julio (dentro del período invernal)', () => {
+    const boleta = makeBoletaElectricidad({
+      empresa: 'SAESA',
+      fechaEmision: new Date('2026-07-15'),
+      cargos: [
+        { concepto: 'Cargo fijo', monto: 1201 },
+        { concepto: 'Recargo por consumo invierno', monto: 8000 },
+      ],
+    })
+    const r = analizarLegalmente(boleta)
+    expect(
+      r.find((a) => a.id === 'recargo-invierno-fuera-temporada'),
+    ).toBeUndefined()
+  })
+})
+
+describe('analizarLegalmente: alcantarillado sin agua potable', () => {
+  it('alerta cuando cobran alcantarillado sin agua potable y hay consumo', () => {
+    const boleta = makeBoletaAgua({
+      consumo: { unidad: 'm3', valor: 12 },
+      cargos: [
+        { concepto: 'Cargo fijo', monto: 914 },
+        { concepto: 'Servicio de alcantarillado', monto: 9000 },
+      ],
+    })
+    const r = analizarLegalmente(boleta)
+    expect(
+      r.find((a) => a.id === 'agua-alcantarillado-sin-agua-potable'),
+    ).toBeDefined()
+  })
+
+  it('no alerta cuando sí hay cargo de agua potable', () => {
+    const boleta = makeBoletaAgua({
+      cargos: [
+        { concepto: 'Cargo fijo', monto: 914 },
+        { concepto: 'Consumo agua potable', monto: 7000 },
+        { concepto: 'Servicio de alcantarillado', monto: 9000 },
+      ],
+    })
+    const r = analizarLegalmente(boleta)
+    expect(
+      r.find((a) => a.id === 'agua-alcantarillado-sin-agua-potable'),
+    ).toBeUndefined()
+  })
+})
+
 describe('analizarLegalmente: boleta limpia', () => {
   it('no devuelve hallazgos para una boleta normal sin anomalías', () => {
     const boleta = makeBoletaElectricidad()

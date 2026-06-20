@@ -325,6 +325,251 @@ function analizarElectrodependientes(
   )
 }
 
+/**
+ * Agua: el texto menciona el subsidio de agua potable (SAP / Ley 18.778)
+ * pero no aparece como descuento (cargo con monto negativo). Análogo al
+ * check de subsidio eléctrico, para agua.
+ */
+function analizarSubsidioSapAusente(boleta: ParsedBoleta): AnalisisLegal | null {
+  if (boleta.servicio !== 'agua') return null
+  const mencionaSubsidio =
+    /Subsidio(?:\s+(?:al\s+)?(?:Pago|Consumo))?(?:\s+Agua)?|\bSAP\b|Ley\s+18\.?778/i.test(
+      boleta.raw,
+    )
+  if (!mencionaSubsidio) return null
+
+  const tieneSubsidioComoDescuento = boleta.cargos.some(
+    (c) => /Subsidio/i.test(c.concepto) && c.monto < 0,
+  )
+  if (tieneSubsidioComoDescuento) return null
+
+  return buildAnalisis(
+    'agua-subsidio-sap-ausente',
+    'derecho_disponible',
+    'La boleta menciona el subsidio de agua potable pero no aparece como descuento',
+    'En el texto de tu boleta aparece referencia al Subsidio al Pago del Consumo de Agua Potable (SAP), pero no detectamos la línea con monto negativo que corresponde al descuento aplicado. Si calificas y fuiste seleccionado, la sanitaria debe reflejarlo en la cuenta hasta los primeros 15 m³ (20 m³ para el tramo más vulnerable).',
+    'El subsidio SAP se gestiona en tu municipalidad, no en la sanitaria. Verifica tu estado de postulación en el municipio. Si efectivamente fuiste seleccionado y el descuento no aparece, exígelo a la sanitaria y reporta a la SISS.',
+    'agua-subsidio-sap',
+  )
+}
+
+/**
+ * Gas cilindro (tipoVenta producto): formato de cilindro no estándar.
+ * El peso debe ser uno de los formatos legales (5, 11, 15, 45 kg) y el
+ * cilindro debe entregar el peso neto declarado.
+ */
+function analizarPrecioCilindroGLP(boleta: ParsedBoleta): AnalisisLegal | null {
+  if (
+    boleta.tipoVenta !== 'producto' ||
+    boleta.servicio !== 'gas' ||
+    boleta.consumo.unidad !== 'kg'
+  ) {
+    return null
+  }
+  const FORMATOS_LEGALES = [5, 11, 15, 45]
+  const kg = boleta.consumo.valor
+  if (kg <= 0 || FORMATOS_LEGALES.includes(Math.round(kg))) return null
+
+  return buildAnalisis(
+    'gas-cilindro-formato-no-estandar',
+    'derecho_disponible',
+    'El cilindro facturado no tiene un formato estándar',
+    `El cilindro facturado declara ${kg} kg, que no coincide con los formatos estándar de gas licuado en Chile (5, 11, 15 o 45 kg). Verifica que el peso neto entregado corresponda al que pagaste.`,
+    'Pesa el cilindro con una balanza casera descontando la tara (el peso del cilindro vacío viene marcado en la parte superior). Si el gas neto pesa menos que el formato declarado, estás pagando por gas que no recibiste y puedes reclamar a la empresa y a la SEC.',
+    'gas-peso-cilindro-exacto',
+  )
+}
+
+/**
+ * Gas cilindro: recargo de delivery cobrado como línea aparte. El
+ * precio total (producto + delivery) debe estar publicado antes de la
+ * compra (Ley 19.496 art. 28 y 30).
+ */
+function analizarRecargoDeliveryGLP(
+  boleta: ParsedBoleta,
+): AnalisisLegal | null {
+  if (boleta.servicio !== 'gas' || boleta.tipoVenta !== 'producto') return null
+  const recargo = boleta.cargos.find(
+    (c) =>
+      /recargo\s+(?:de\s+)?(?:delivery|despacho|reparto)/i.test(c.concepto) &&
+      c.monto > 0,
+  )
+  if (!recargo) return null
+
+  return buildAnalisis(
+    'gas-recargo-delivery-no-publicado',
+    'derecho_disponible',
+    'Te cobran un recargo de delivery como línea aparte',
+    `Tu boleta de cilindro incluye un recargo de ${formatCLP(recargo.monto)} por delivery o despacho como línea separada. El precio total que pagas (cilindro más delivery) debe estar informado antes de que confirmes la compra.`,
+    'Si este recargo no estaba publicado en el sitio web o el punto de venta al momento de hacer el pedido, es un cobro indebido por falta de información del precio. Pide el detalle y, si corresponde, reclama a SERNAC.',
+    'gas-recargo-delivery-publicado',
+  )
+}
+
+/** Helper local para formatear CLP en descripciones. */
+function formatCLP(n: number): string {
+  return `$ ${Math.round(n).toLocaleString('es-CL')}`
+}
+
+/**
+ * Gas por red: la boleta menciona un posible corte por mora. Recuerda
+ * el plazo legal de aviso previo de 10 días (distinto del de 15 días
+ * de electricidad y agua).
+ */
+function analizarAvisoCorteGas(boleta: ParsedBoleta): AnalisisLegal | null {
+  if (boleta.servicio !== 'gas' || boleta.tipoVenta === 'producto') return null
+  const mencionaCorte =
+    /aviso\s+de\s+corte|suspensi[óo]n\s+(?:del?\s+)?(?:suministro|servicio)|corte\s+por\s+(?:no\s+pago|mora)|fecha\s+de\s+corte/i.test(
+      boleta.raw,
+    )
+  if (!mencionaCorte) return null
+
+  return buildAnalisis(
+    'gas-aviso-corte-10dias',
+    'informativo',
+    'Tu boleta menciona un posible corte de gas',
+    'Antes de cortar el suministro de gas natural por red por mora, la empresa debe avisarte por escrito con al menos 10 días de anticipación (en gas el plazo es 10 días, no 15 como en luz y agua). El corte no puede ejecutarse en fines de semana ni feriados.',
+    'Si recibiste aviso con menos de 10 días, o si te cortaron sin aviso escrito válido, el corte es irregular. Documenta las fechas y reclama a la SEC.',
+    'gas-aviso-corte-10d',
+  )
+}
+
+const TASA_MENSUAL_REGEX =
+  /(?:inter[ée]s|tasa)[^%\n]{0,40}?(\d{1,2}(?:[.,]\d{1,2})?)\s*%\s*(?:mensual|al\s+mes|\/\s*mes|mes)/i
+
+const MORA_CARGO_REGEX = /recargo\s+por\s+mora|inter[ée]s\s+(?:por\s+)?mora/i
+
+/**
+ * Interés moratorio que excede la Tasa Máxima Convencional. Si la boleta
+ * declara una tasa mensual explícita sobre ~2,5% (≈34,5% anual), supera
+ * el techo TMC para operaciones de monto bajo y es usura.
+ */
+function analizarInteresMoraSobreTMC(
+  boleta: ParsedBoleta,
+): AnalisisLegal | null {
+  const m = boleta.raw.match(TASA_MENSUAL_REGEX)
+  if (m) {
+    const tasa = parseFloat(m[1].replace(',', '.'))
+    if (Number.isFinite(tasa) && tasa > 2.5) {
+      return buildAnalisis(
+        'interes-mora-sobre-tmc',
+        'alerta_legal',
+        `Te cobran un interés por mora de ${tasa}% mensual`,
+        `Tu boleta declara una tasa de interés por mora de ${tasa}% mensual, equivalente a más de 34% anual. Eso probablemente supera la Tasa Máxima Convencional que publica mensualmente la CMF para operaciones de monto bajo, lo que constituiría usura.`,
+        'Compara la tasa con la Tasa Máxima Convencional vigente en cmfchile.cl. Si tu boleta la supera, el cobro del interés es nulo en su exceso. Reclama a SERNAC y a la CMF.',
+        'comun-interes-mora-max-cmf',
+      )
+    }
+    return null
+  }
+  // Fallback: hay cargo de mora pero sin tasa explícita. Solo informamos
+  // el derecho (no podemos afirmar el incumplimiento sin la tasa).
+  const tieneMora = boleta.cargos.some((c) => MORA_CARGO_REGEX.test(c.concepto))
+  if (!tieneMora) return null
+  return buildAnalisis(
+    'interes-mora-verificar-tmc',
+    'derecho_disponible',
+    'Tu boleta tiene un recargo por mora',
+    'Detectamos un recargo o interés por mora. El interés moratorio en boletas de servicios básicos no puede superar la Tasa Máxima Convencional que publica la CMF cada mes. Tienes derecho a pedir el detalle de cómo se calculó.',
+    'Pide a la empresa la tasa mensual aplicada y compárala con la Tasa Máxima Convencional vigente en cmfchile.cl. Si la supera, reclama el exceso.',
+    'comun-interes-mora-max-cmf',
+  )
+}
+
+const INTERRUPCION_PROLONGADA_REGEX =
+  /interrupci[óo]n\s+(?:de\s+)?(?:suministro|servicio)|horas?\s+sin\s+(?:suministro|luz|servicio)|d[íi]as?\s+sin\s+suministro|evento\s+de\s+(?:falla|interrupci[óo]n)/i
+
+const COMPENSACION_REGEX = /compensaci[óo]n|descuento\s+por\s+(?:corte|interrupci)/i
+
+/**
+ * Electricidad: la boleta menciona interrupción prolongada pero no
+ * aparece compensación automática (Ley 21.194). No podemos probar el
+ * incumplimiento solo desde la boleta, así que es derecho_disponible.
+ */
+function analizarCompensacionCorteNoAplicada(
+  boleta: ParsedBoleta,
+): AnalisisLegal | null {
+  if (boleta.servicio !== 'electricidad') return null
+  if (!INTERRUPCION_PROLONGADA_REGEX.test(boleta.raw)) return null
+  const tieneCompensacion =
+    boleta.cargos.some((c) => COMPENSACION_REGEX.test(c.concepto) && c.monto < 0) ||
+    COMPENSACION_REGEX.test(boleta.raw)
+  if (tieneCompensacion) return null
+
+  return buildAnalisis(
+    'compensacion-corte-no-aplicada',
+    'derecho_disponible',
+    'Tu boleta menciona una interrupción pero no vemos compensación',
+    'La boleta hace referencia a una interrupción del suministro, pero no detectamos una línea de compensación con monto negativo. Si la interrupción superó el estándar de calidad (típicamente más de 22 horas continuas para clientes residenciales), tienes derecho a compensación automática que la distribuidora debe abonar en tu boleta.',
+    'Revisa cuántas horas estuviste sin luz. Si superó el estándar y no aparece compensación en esta boleta ni en la siguiente, reclama a la SEC: la compensación es automática y la empresa está obligada a aplicarla.',
+    'electricidad-compensacion-corte',
+  )
+}
+
+const RECARGO_INVIERNO_REGEX =
+  /recargo\s+por\s+consumo\s+invierno|recargo\s+(?:de\s+|por\s+)?invierno/i
+
+/**
+ * Electricidad: recargo de invierno aplicado fuera del período legal
+ * abril-septiembre. Solo zonas sur (SAESA/Frontel) lo usan.
+ */
+function analizarRecargoInviernoFueraTemporada(
+  boleta: ParsedBoleta,
+): AnalisisLegal | null {
+  if (boleta.servicio !== 'electricidad') return null
+  const fechaEmision = boleta.fechaEmision
+  if (!fechaEmision || isNaN(fechaEmision.getTime())) return null
+  const mes = fechaEmision.getMonth() // 0-11
+  // Período invernal legal: abril (3) a septiembre (8).
+  const esInvierno = mes >= 3 && mes <= 8
+  if (esInvierno) return null
+
+  const tieneRecargoInvierno = boleta.cargos.some(
+    (c) => RECARGO_INVIERNO_REGEX.test(c.concepto) && c.monto > 0,
+  )
+  if (!tieneRecargoInvierno) return null
+
+  return buildAnalisis(
+    'recargo-invierno-fuera-temporada',
+    'alerta_legal',
+    'Te cobran recargo de invierno fuera de temporada',
+    'Tu boleta incluye un recargo de consumo de invierno, pero la fecha de emisión está fuera del período abril-septiembre en que este recargo aplica. Es un error de facturación.',
+    'Pide a la distribuidora el detalle del cargo y el período del consumo medido. Si fue medido fuera del período invernal, exige retiro del recargo y refacturación.',
+    'electricidad-recargo-invierno-temporada',
+  )
+}
+
+/**
+ * Agua: cobran alcantarillado pero no facturan agua potable. El cargo
+ * de recolección es proporcional al consumo de agua potable, así que
+ * alcantarillado sin agua potable carece de base.
+ */
+function analizarRatioAlcantarillado(
+  boleta: ParsedBoleta,
+): AnalisisLegal | null {
+  if (boleta.servicio !== 'agua') return null
+  const sumarPositivos = (re: RegExp) =>
+    boleta.cargos
+      .filter((c) => re.test(c.concepto) && c.monto > 0)
+      .reduce((s, c) => s + c.monto, 0)
+  const alc = sumarPositivos(/alcantarillado|recolecci[óo]n/i)
+  const ap = sumarPositivos(/consumo\s+agua\s+potable|consumo\s+agua/i)
+
+  // Solo el caso sólido: alcantarillado cobrado sin agua potable
+  // facturada, habiendo consumo medido.
+  if (alc > 0 && ap === 0 && boleta.consumo.valor > 0) {
+    return buildAnalisis(
+      'agua-alcantarillado-sin-agua-potable',
+      'alerta_legal',
+      'Te cobran alcantarillado sin agua potable facturada',
+      'Tu boleta tiene un cargo de alcantarillado (recolección) pero no aparece el cargo de consumo de agua potable, a pesar de que sí hay consumo medido. El cargo de alcantarillado se calcula proporcional al agua potable consumida, así que un alcantarillado sin agua potable facturada no tiene base.',
+      'Pide a la sanitaria el desglose completo: cuánto cobran por agua potable y cuánto por alcantarillado. Si efectivamente falta la base de agua potable, el cargo de alcantarillado es indebido.',
+      'agua-alcantarillado-proporcional',
+    )
+  }
+  return null
+}
+
 // =============================================================================
 // ENTRY POINT
 // =============================================================================
@@ -348,6 +593,16 @@ export function analizarLegalmente(boleta: ParsedBoleta): AnalisisLegal[] {
     analizarCargoUnicoBT1,
     analizarSubsidio21667Ausente,
     analizarElectrodependientes,
+    // Checks agregados en la ronda 2 del audit (verificados
+    // adversarialmente, fundamento en normativa-chilena.ts).
+    analizarSubsidioSapAusente,
+    analizarPrecioCilindroGLP,
+    analizarRecargoDeliveryGLP,
+    analizarAvisoCorteGas,
+    analizarInteresMoraSobreTMC,
+    analizarCompensacionCorteNoAplicada,
+    analizarRecargoInviernoFueraTemporada,
+    analizarRatioAlcantarillado,
   ]
   const SEVERIDAD_ORDEN: Record<SeveridadAnalisis, number> = {
     alerta_legal: 0,

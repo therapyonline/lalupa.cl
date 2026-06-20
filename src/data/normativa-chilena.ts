@@ -105,6 +105,14 @@ export const NORMATIVA_ELECTRICIDAD = {
     url: 'https://www.bcn.cl/leychile/navegar?idNorma=1198976',
     servicio: 'electricidad' as const,
   },
+  'electricidad-recargo-invierno-temporada': {
+    id: 'electricidad-recargo-invierno-temporada',
+    norma: 'DS 327/1997 Reglamento; pliegos tarifarios SEC (límite de invierno)',
+    resumen:
+      'El recargo de invierno o cargo por sobreconsumo estacional se calcula sobre el promedio del período invernal y solo se factura entre abril y septiembre. Si aparece un recargo de invierno en una boleta emitida fuera de esos meses, es un error de facturación.',
+    url: 'https://www.bcn.cl/leychile/navegar?idNorma=258171',
+    servicio: 'electricidad' as const,
+  },
   'electricidad-cargo-unico-bt1': {
     id: 'electricidad-cargo-unico-bt1',
     norma: 'Pliego Tarifario SEC, componentes regulares BT-1',

@@ -11,12 +11,15 @@ import { COMUNAS } from '@/data/comunas'
 import {
   type PlanScored,
   type ServicioIncluido,
+  type Tecnologia,
   compararPlanes,
+  costoVerdaderoPromedioMensual,
 } from '@/data/internet-planes'
 import { cn } from '@/lib/utils'
 
 type Servicios = 'solo' | 'tv' | 'completo'
-type Orden = 'score' | 'precio' | 'velocidad'
+type FiltroTecnologia = 'cualquiera' | 'fibra' | 'cable'
+type Orden = 'score' | 'precio' | 'velocidad' | 'costo24m'
 
 const SERVICIOS_MAP: Record<Servicios, ServicioIncluido[]> = {
   solo: ['internet'],
@@ -83,6 +86,8 @@ export function Comparador() {
   const [velocidad, setVelocidad] = useState(600)
   const [presupuesto, setPresupuesto] = useState(20000)
   const [tipoServicio, setTipoServicio] = useState<Servicios>('solo')
+  const [tecnologia, setTecnologia] = useState<FiltroTecnologia>('cualquiera')
+  const [sinPermanencia, setSinPermanencia] = useState(false)
   const [orden, setOrden] = useState<Orden>('score')
 
   function applyPreset(p: Preset) {
@@ -96,8 +101,11 @@ export function Comparador() {
       velocidadMin: velocidad,
       presupuestoMaxPromo: presupuesto,
       servicios: SERVICIOS_MAP[tipoServicio],
+      tecnologia:
+        tecnologia === 'cualquiera' ? undefined : (tecnologia as Tecnologia),
+      sinPermanencia: sinPermanencia || undefined,
     })
-  }, [velocidad, presupuesto, tipoServicio])
+  }, [velocidad, presupuesto, tipoServicio, tecnologia, sinPermanencia])
 
   const planesOrdenados = useMemo<PlanScored[]>(() => {
     const arr = [...planesScored]
@@ -105,6 +113,11 @@ export function Comparador() {
       arr.sort((a, b) => a.precio.mes1a12 - b.precio.mes1a12)
     } else if (orden === 'velocidad') {
       arr.sort((a, b) => b.velocidad.bajada - a.velocidad.bajada)
+    } else if (orden === 'costo24m') {
+      arr.sort(
+        (a, b) =>
+          costoVerdaderoPromedioMensual(a) - costoVerdaderoPromedioMensual(b),
+      )
     } else {
       arr.sort((a, b) => b.score - a.score)
     }
@@ -175,6 +188,10 @@ export function Comparador() {
               setPresupuesto={setPresupuesto}
               tipoServicio={tipoServicio}
               setTipoServicio={setTipoServicio}
+              tecnologia={tecnologia}
+              setTecnologia={setTecnologia}
+              sinPermanencia={sinPermanencia}
+              setSinPermanencia={setSinPermanencia}
             />
 
             <div>
@@ -235,6 +252,10 @@ function FiltersPanel({
   setPresupuesto,
   tipoServicio,
   setTipoServicio,
+  tecnologia,
+  setTecnologia,
+  sinPermanencia,
+  setSinPermanencia,
 }: {
   comuna: string
   setComuna: (s: string) => void
@@ -244,6 +265,10 @@ function FiltersPanel({
   setPresupuesto: (n: number) => void
   tipoServicio: Servicios
   setTipoServicio: (s: Servicios) => void
+  tecnologia: FiltroTecnologia
+  setTecnologia: (t: FiltroTecnologia) => void
+  sinPermanencia: boolean
+  setSinPermanencia: (b: boolean) => void
 }) {
   return (
     <aside className="rounded-[20px] border border-border bg-white p-6 md:p-8 lg:sticky lg:top-24 lg:self-start">
@@ -335,6 +360,70 @@ function FiltersPanel({
             </label>
           ))}
         </fieldset>
+
+        <fieldset className="flex flex-col gap-2">
+          <legend className="text-[13px] font-bold text-ink">
+            Tecnología
+          </legend>
+          {(
+            [
+              {
+                value: 'cualquiera',
+                label: 'Cualquiera',
+                description: 'Fibra o cable, lo que mejor calce.',
+              },
+              {
+                value: 'fibra',
+                label: 'Solo fibra (FTTH)',
+                description: 'Simétrica, latencia baja, sin compartir ancho de banda con vecinos.',
+              },
+              {
+                value: 'cable',
+                label: 'Solo cable (HFC)',
+                description: 'Más barato en plan de entrada en zonas legacy.',
+              },
+            ] as const
+          ).map((opt) => (
+            <label
+              key={opt.value}
+              className={cn(
+                'flex cursor-pointer items-start gap-3 rounded-md border-[1.5px] border-border bg-white px-4 py-3 transition-colors hover:border-ink',
+                tecnologia === opt.value && 'border-primary bg-primary-soft',
+              )}
+            >
+              <input
+                type="radio"
+                name="tecnologia"
+                value={opt.value}
+                checked={tecnologia === opt.value}
+                onChange={() => setTecnologia(opt.value)}
+                className="mt-1 h-4 w-4 accent-primary"
+              />
+              <span className="flex flex-col">
+                <span className="text-[14px] text-ink">{opt.label}</span>
+                <span className="text-[11px] text-soft">{opt.description}</span>
+              </span>
+            </label>
+          ))}
+        </fieldset>
+
+        <label className="flex cursor-pointer items-start gap-3 rounded-md border-[1.5px] border-border bg-white px-4 py-3 transition-colors hover:border-ink">
+          <input
+            type="checkbox"
+            checked={sinPermanencia}
+            onChange={(e) => setSinPermanencia(e.target.checked)}
+            className="mt-1 h-4 w-4 accent-primary"
+          />
+          <span className="flex flex-col">
+            <span className="text-[14px] font-bold text-ink">
+              Solo sin permanencia
+            </span>
+            <span className="text-[11px] text-soft">
+              Filtrar planes cancelables en cualquier momento sin multa.
+              VTR es el único con esta política explícita en 2026.
+            </span>
+          </span>
+        </label>
       </div>
     </aside>
   )
@@ -373,7 +462,8 @@ function Toolbar({
           className="rounded-md border-[1.5px] border-border bg-white px-3 py-2 text-sm font-medium text-ink focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/15"
         >
           <option value="score">Score (recomendado)</option>
-          <option value="precio">Precio (más bajo primero)</option>
+          <option value="precio">Precio promo (más bajo primero)</option>
+          <option value="costo24m">Costo real 24 meses (más bajo primero)</option>
           <option value="velocidad">Velocidad (más alta primero)</option>
         </select>
       </div>
@@ -427,6 +517,23 @@ function PlanCard({ plan, comuna }: { plan: PlanScored; comuna: string }) {
             label={`Mes ${plan.promoDuraMeses + 1}+`}
             value={formatCLP(plan.precio.mes13plus)}
           />
+        </div>
+
+        <div className="mt-4 rounded-md bg-cream-warm/40 px-4 py-3">
+          <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-soft">
+            Costo real promedio 24 meses
+          </p>
+          <p className="mt-1 text-lg font-medium tabular-nums text-ink">
+            {formatCLP(costoVerdaderoPromedioMensual(plan))}
+            <span className="ml-1 text-xs font-normal text-soft">
+              por mes
+            </span>
+          </p>
+          <p className="mt-1 text-[11px] text-soft">
+            Promedio honesto incluyendo {plan.promoDuraMeses} meses de promo +{' '}
+            {24 - plan.promoDuraMeses} meses a precio normal. Útil para
+            comparar planes con duración de promo distinta.
+          </p>
         </div>
 
         <div className="mt-5 flex flex-wrap gap-2">

@@ -273,6 +273,66 @@ export const PLANES_INTERNET_2026: PlanInternet[] = [
     ],
     fuente: 'https://www.vtr.com/personas/triple-pack',
   },
+
+  // ───────── PLANES AGREGADOS RESEARCH JUNIO 2026 ─────────
+  // Verificados contra sitios oficiales en 2026-06-04. Datos
+  // consolidados en src/data/internet-fibra-2026.ts.
+
+  {
+    // VTR ahora ofrece fibra simétrica nueva además del HFC legacy.
+    // Diferencial único: sin permanencia explícito.
+    id: 'vtr-fibra-600-sin-permanencia',
+    empresa: 'VTR',
+    plan: 'VTR Fibra Hogar 600 (sin permanencia)',
+    velocidad: { bajada: 600, subida: 600 },
+    tecnologia: 'fibra',
+    precio: { mes1a12: 26990, mes13plus: 33990 },
+    promoDuraMeses: 12,
+    compromisoMeses: 0,
+    servicios: ['internet'],
+    coberturaRegiones: ['nacional'],
+    alertas: [
+      'Único operador con plan sin permanencia explícito.',
+      'Migración activa de clientes HFC a FTTH simétrica.',
+    ],
+    fuente: 'https://vtr.com/productos/hogar-packs/internet-hogar/',
+  },
+  {
+    // Mundo es el único con 10 Gbps masivo en Chile 2026.
+    id: 'mundo-fibra-800',
+    empresa: 'Mundo',
+    plan: 'Fibra 800',
+    velocidad: { bajada: 800, subida: 800 },
+    tecnologia: 'fibra',
+    precio: { mes1a12: 15990, mes13plus: 21990 },
+    promoDuraMeses: 12,
+    compromisoMeses: 12,
+    servicios: ['internet'],
+    coberturaRegiones: ['nacional'],
+    alertas: [
+      'Sin multa por terminación tras los 12 meses.',
+      'Llega a zonas rurales que Movistar y Entel no cubren.',
+    ],
+    fuente: 'https://mundointernet.cl/p/td/mundo-internet-planes.html',
+  },
+  {
+    id: 'gtd-fibra-600',
+    empresa: 'GTD',
+    plan: 'Fibra Hogar 600',
+    velocidad: { bajada: 600, subida: 600 },
+    tecnologia: 'fibra',
+    precio: { mes1a12: 17990, mes13plus: 26000 },
+    promoDuraMeses: 12,
+    compromisoMeses: 12,
+    servicios: ['internet'],
+    coberturaRegiones: ['nacional'],
+    alertas: [
+      'Instalación $ 29.990 con cargo aparte.',
+      'Precio sube 30-45% al terminar promoción.',
+      'Cobertura limitada vs Movistar/Entel.',
+    ],
+    fuente: 'https://www.gtd.cl/hogar/productos-hogar-internet-fibra',
+  },
 ];
 
 // ============================================================================
@@ -283,9 +343,21 @@ export interface CriteriosBusqueda {
   velocidadMin?: number; // Mbps mínimos requeridos
   presupuestoMaxPromo?: number; // CLP máximos precio promo
   presupuestoMaxPostPromo?: number; // CLP máximos precio post-promo
+  /**
+   * Presupuesto máximo en CLP del COSTO PROMEDIO MENSUAL a 24 meses
+   * (incluye promo + post-promo). Cifra honesta para comparar planes
+   * con duración de promo distinta (Movistar 6 meses vs Entel/Mundo 12).
+   */
+  presupuestoMaxCostoVerdadero?: number
   region?: string; // 'nacional' o nombre de región
   servicios?: ServicioIncluido[]; // requerimientos
   evitarCompromisoLargo?: boolean; // si true, excluir planes con compromiso >12 meses
+  /** Si true, solo planes con compromiso 0 meses (cancelable en cualquier momento). */
+  sinPermanencia?: boolean
+  /** Filtro por tecnología (fibra incluye 'fibra'; cable incluye HFC). */
+  tecnologia?: Tecnologia
+  /** Empresa específica si el usuario tiene preferencia. */
+  empresa?: string
 }
 
 export interface PlanScored extends PlanInternet {
@@ -304,7 +376,16 @@ export function compararPlanes(criterios: CriteriosBusqueda): PlanScored[] {
       if (criterios.velocidadMin && plan.velocidad.bajada < criterios.velocidadMin) return false;
       if (criterios.presupuestoMaxPromo && plan.precio.mes1a12 > criterios.presupuestoMaxPromo) return false;
       if (criterios.presupuestoMaxPostPromo && plan.precio.mes13plus > criterios.presupuestoMaxPostPromo) return false;
+      if (criterios.presupuestoMaxCostoVerdadero) {
+        const costoVerdadero = costoVerdaderoPromedioMensual(plan)
+        if (costoVerdadero > criterios.presupuestoMaxCostoVerdadero) return false
+      }
       if (criterios.evitarCompromisoLargo && plan.compromisoMeses > 12) return false;
+      if (criterios.sinPermanencia && plan.compromisoMeses > 0) return false
+      if (criterios.tecnologia && plan.tecnologia !== criterios.tecnologia) return false
+      if (criterios.empresa && plan.empresa.toLowerCase() !== criterios.empresa.toLowerCase()) {
+        return false
+      }
       if (criterios.servicios?.length) {
         for (const s of criterios.servicios) {
           if (!plan.servicios.includes(s)) return false;

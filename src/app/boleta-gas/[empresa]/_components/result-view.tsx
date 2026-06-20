@@ -7,6 +7,7 @@ import { Container } from '@/components/layout/Container'
 import { Button } from '@/components/ui/Button'
 import { BoletaErrorView } from '@/components/parsers/BoletaErrorView'
 import { ComparativaSection } from '@/components/parsers/ComparativaSection'
+import { AnalisisLegalSection } from '@/components/parsers/AnalisisLegalSection'
 import { PartialExtractionAlert } from '@/components/parsers/PartialExtractionAlert'
 import { PrivacyExportImport } from '@/components/parsers/PrivacyExportImport'
 import {
@@ -309,6 +310,8 @@ export function ResultViewGas({ empresaSlug }: { empresaSlug: string }) {
           </div>
         </Container>
       </section>
+
+      <AnalisisLegalSection boleta={boleta} />
 
       <section className="bg-cream pb-16">
         <Container>

@@ -64,6 +64,15 @@ export {
 
 export type { ParserElectricidad, TipoTarifa } from './electricidad'
 
+// Análisis legal ortogonal: aplica sobre cualquier ParsedBoleta y
+// detecta alertas con fundamento en normativa chilena (DS 327, DS
+// 1199, DS 67, leyes 21.667, 21.012, 19.496, etc.).
+export {
+  analizarLegalmente,
+  type AnalisisLegal,
+  type SeveridadAnalisis,
+} from './_analisis-legales'
+
 export {
   AGUA_PARSERS,
   aguasDelValleParser,

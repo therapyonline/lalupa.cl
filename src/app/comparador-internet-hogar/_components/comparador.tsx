@@ -124,6 +124,19 @@ export function Comparador() {
     return arr
   }, [planesScored, orden])
 
+  // El plan con menor costo real a 24 meses entre los resultados: lo
+  // destacamos como "mejor costo real" sin importar el orden elegido.
+  const mejorCostoRealId = useMemo<string | null>(() => {
+    if (planesScored.length === 0) return null
+    let mejor = planesScored[0]
+    for (const p of planesScored) {
+      if (costoVerdaderoPromedioMensual(p) < costoVerdaderoPromedioMensual(mejor)) {
+        mejor = p
+      }
+    }
+    return mejor.id
+  }, [planesScored])
+
   return (
     <>
       <section className="bg-cream py-12 md:py-16">
@@ -213,7 +226,12 @@ export function Comparador() {
               ) : (
                 <ul className="mt-6 flex flex-col gap-4">
                   {planesOrdenados.map((plan) => (
-                    <PlanCard key={plan.id} plan={plan} comuna={comuna} />
+                    <PlanCard
+                      key={plan.id}
+                      plan={plan}
+                      comuna={comuna}
+                      esMejorCostoReal={plan.id === mejorCostoRealId}
+                    />
                   ))}
                 </ul>
               )}
@@ -227,7 +245,7 @@ export function Comparador() {
                   vigente en el sitio oficial antes de contratar.{' '}
                   {comuna && (
                     <>
-                      Para tu comuna <strong>{comuna}</strong>, confirmá
+                      Para tu comuna <strong>{comuna}</strong>, confirma
                       cobertura en cada empresa.
                     </>
                   )}
@@ -471,10 +489,23 @@ function Toolbar({
   )
 }
 
-function PlanCard({ plan, comuna }: { plan: PlanScored; comuna: string }) {
+function PlanCard({
+  plan,
+  comuna,
+  esMejorCostoReal,
+}: {
+  plan: PlanScored
+  comuna: string
+  esMejorCostoReal?: boolean
+}) {
   const subePct = deltaPct(plan.precio.mes1a12, plan.precio.mes13plus)
+  // Umbral 30% (no 50%) para no esconder alzas de 30-49% que igual duelen,
+  // y el mes real del alza se deriva de promoDuraMeses (Movistar 600 sube
+  // al mes 7, no al 13). Es lo honesto y consistente con el Stat de la tarjeta.
   const subeFlag =
-    subePct >= 50 ? `Sube ${subePct}% al mes 13` : null
+    subePct >= 30
+      ? `Sube ${subePct}% al mes ${plan.promoDuraMeses + 1}`
+      : null
 
   const compromisoFlag =
     plan.compromisoMeses > 12
@@ -483,7 +514,17 @@ function PlanCard({ plan, comuna }: { plan: PlanScored; comuna: string }) {
 
   return (
     <li>
-      <article className="rounded-[20px] border border-border bg-white p-6 md:p-7">
+      <article
+        className={cn(
+          'rounded-[20px] border bg-white p-6 md:p-7',
+          esMejorCostoReal ? 'border-success ring-1 ring-success/30' : 'border-border',
+        )}
+      >
+        {esMejorCostoReal && (
+          <p className="mb-3 inline-flex items-center gap-2 rounded-full bg-success-soft px-3 py-1 font-mono text-[10px] font-medium uppercase tracking-wide text-success">
+            Mejor costo real a 24 meses
+          </p>
+        )}
         <header className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <p className="font-mono text-xs uppercase tracking-[0.1em] text-soft">
@@ -545,9 +586,18 @@ function PlanCard({ plan, comuna }: { plan: PlanScored; comuna: string }) {
           )}
           {subeFlag && <Pill variant="warning">{subeFlag}</Pill>}
           {plan.alertas.map((a) => {
-            const variant = /requiere|limitad|asim[eé]trica|disponibilidad/i.test(a)
+            // Alertas de alto riesgo (multa, alza fuerte, compromiso largo,
+            // costo oculto) van en warning; las de cobertura/asimetría
+            // también warning; las puramente informativas (referencial,
+            // estimado, incluye X) en info.
+            const altoRiesgo =
+              /multa|t[ée]rmino anticipado|sube\s+\+?\d|compromiso|asim[eé]trica|requiere|limitad|disponibilidad|no incluido|costo adicional/i.test(
+                a,
+              )
+            const informativa = /referencia|estimad|incluye|club/i.test(a)
+            const variant = altoRiesgo
               ? 'warning'
-              : /referencia/i.test(a)
+              : informativa
                 ? 'info'
                 : 'accent'
             return (

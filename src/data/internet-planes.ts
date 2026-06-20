@@ -113,22 +113,24 @@ export const PLANES_INTERNET_2026: PlanInternet[] = [
   },
 
   // ───────── MOVISTAR HOGAR ─────────
+  // Precios reconciliados con internet-fibra-2026.ts (verificado contra
+  // sitio oficial 2026-06-04), que es la fuente de verdad.
   {
     id: 'movistar-fibra-600',
     empresa: 'Movistar',
     plan: 'Fibra 600',
     velocidad: { bajada: 600, subida: 600 },
     tecnologia: 'fibra',
-    precio: { mes1a12: 14990, mes13plus: 22990 },
-    promoDuraMeses: 6, // ⚠️ Movistar tiene la promo más corta
+    precio: { mes1a12: 13990, mes13plus: 18990 },
+    promoDuraMeses: 6, // ⚠️ Movistar 600 tiene la promo más corta
     compromisoMeses: 0,
     servicios: ['internet'],
     coberturaRegiones: ['nacional'],
     alertas: [
-      'Promoción solo dura 6 meses (la más corta del mercado).',
+      'Promoción dura solo 6 meses (la más corta del mercado).',
       'Repetidor WiFi NO incluido, costo adicional $2.990/mes.',
     ],
-    fuente: 'https://ww2.movistar.cl/hogar/',
+    fuente: 'https://ww2.movistar.cl/hogar/internet-fibra-optica/',
   },
   {
     id: 'movistar-fibra-800',
@@ -136,35 +138,30 @@ export const PLANES_INTERNET_2026: PlanInternet[] = [
     plan: 'Fibra 800',
     velocidad: { bajada: 800, subida: 800 },
     tecnologia: 'fibra',
-    precio: { mes1a12: 15990, mes13plus: 27990 },
-    promoDuraMeses: 6,
+    precio: { mes1a12: 18990, mes13plus: 27990 },
+    promoDuraMeses: 12,
     compromisoMeses: 0,
     servicios: ['internet'],
     coberturaRegiones: ['nacional'],
     alertas: [
-      'Promoción solo 6 meses.',
-      'Precio sube +75% al terminar la promoción.',
+      'Precio post-promo estimado (no publicado en sitio oficial).',
       'Repetidor WiFi NO incluido.',
     ],
-    fuente: 'https://ww2.movistar.cl/hogar/',
+    fuente: 'https://ww2.movistar.cl/hogar/internet-fibra-optica/',
   },
   {
     id: 'movistar-fibra-940',
     empresa: 'Movistar',
-    plan: 'Fibra 940',
+    plan: 'Fibra Giga (940)',
     velocidad: { bajada: 940, subida: 940 },
     tecnologia: 'fibra',
-    precio: { mes1a12: 16990, mes13plus: 30000 },
-    promoDuraMeses: 6,
+    precio: { mes1a12: 28990, mes13plus: 36990 },
+    promoDuraMeses: 12,
     compromisoMeses: 0,
     servicios: ['internet'],
     coberturaRegiones: ['nacional'],
-    alertas: [
-      'Promoción solo 6 meses.',
-      'Precio post-promo estimado.',
-      'Repetidor WiFi NO incluido.',
-    ],
-    fuente: 'https://ww2.movistar.cl/hogar/',
+    alertas: ['Repetidor WiFi NO incluido.'],
+    fuente: 'https://ww2.movistar.cl/hogar/internet-fibra-optica/',
   },
 
   // ───────── MUNDO ─────────
@@ -174,7 +171,10 @@ export const PLANES_INTERNET_2026: PlanInternet[] = [
     plan: 'Fibra 1 Giga',
     velocidad: { bajada: 1000, subida: 1000 },
     tecnologia: 'fibra',
-    precio: { mes1a12: 14990, mes13plus: 21990 },
+    // mes13plus refleja el precio EFECTIVO del tramo mes 13-24 ($15.990),
+    // no el del mes 25+ ($21.990), para que el costo real a 24 meses sea
+    // honesto. El tercer escalón queda documentado en la alerta.
+    precio: { mes1a12: 14990, mes13plus: 15990 },
     promoDuraMeses: 12,
     compromisoMeses: 24, // ⚠️ Mundo tiene 24 meses de compromiso
     servicios: ['internet'],
@@ -402,15 +402,20 @@ export function compararPlanes(criterios: CriteriosBusqueda): PlanScored[] {
       const motivos: string[] = [];
       let score = 0;
 
-      // 30%, precio dentro del presupuesto (más bajo = mejor)
-      if (criterios.presupuestoMaxPromo) {
-        const ratio = plan.precio.mes1a12 / criterios.presupuestoMaxPromo;
-        const subscore = Math.round((1 - Math.min(ratio, 1)) * 30);
-        score += subscore;
-        if (subscore >= 20) motivos.push(`Precio promo ${plan.precio.mes1a12} CLP, ${Math.round(ratio * 100)}% de tu presupuesto.`);
-      } else {
-        score += 15; // neutral
-      }
+      // 30%, COSTO REAL a 24 meses dentro del presupuesto (más bajo = mejor).
+      // Usamos el costo verdadero promedio (promo + post-promo), no solo el
+      // precio promo, para que el orden "Score (recomendado)" sea coherente
+      // con la métrica honesta que el sitio muestra. Así un plan con promo
+      // corta que luego sube fuerte NO premia por encima de uno estable.
+      const costoReal = costoVerdaderoPromedioMensual(plan);
+      const techo = criterios.presupuestoMaxPromo ?? 26000; // techo de mercado si no hay presupuesto
+      const ratioCosto = costoReal / techo;
+      const subscorePrecio = Math.round((1 - Math.min(ratioCosto, 1)) * 30);
+      score += subscorePrecio;
+      if (subscorePrecio >= 20)
+        motivos.push(
+          `Costo real promedio a 24 meses $${costoReal.toLocaleString('es-CL')}/mes, conveniente.`,
+        );
 
       // 30%, velocidad cumple/supera mínimo
       if (criterios.velocidadMin) {
@@ -466,15 +471,16 @@ export function costoVerdaderoPromedioMensual(plan: PlanInternet): number {
 // ============================================================================
 
 export const INTERNET_PLANES_METADATA = {
-  version: '0.1.0',
-  ultimaActualizacion: '2026-05-06',
-  proximaRevision: '2026-07-06', // bimestral
+  version: '0.2.0',
+  ultimaActualizacion: '2026-06-20',
+  proximaRevision: '2026-08-20', // bimestral
   totalPlanes: PLANES_INTERNET_2026.length,
-  empresasCubiertas: ['WOM', 'Entel', 'Movistar', 'Mundo', 'GTD', 'Claro'],
-  empresasPendientes: ['VTR', 'Pacífico Cable', 'DirecTV'],
+  empresasCubiertas: ['WOM', 'Entel', 'Movistar', 'Mundo', 'GTD', 'Claro', 'VTR'],
+  empresasPendientes: ['Pacífico Cable', 'DirecTV'],
   notasActualizacion: [
     'Verificar precios en sitios oficiales antes de cada release.',
     'Promociones cambian en cyber/cyberday. Considerar dataset estacional.',
-    'VTR/Pacífico requieren ingresar dirección, complejo de scrapear.',
+    'Precios Movistar reconciliados con internet-fibra-2026.ts (verificado 2026-06-04).',
+    'Mundo 1G: mes13plus refleja el tramo mes 13-24 ($15.990), no el mes 25+.',
   ],
 } as const;

@@ -11,6 +11,7 @@ import { JsonLd } from '@/components/JsonLd'
 import { Button } from '@/components/ui/Button'
 import { mdxComponents } from '@/components/mdx'
 import { Toc } from '@/components/guias/Toc'
+import { FaqAccordion } from '@/components/guias/FaqAccordion'
 import {
   TOOL_LABELS,
   getAllGuiaSlugs,
@@ -175,7 +176,13 @@ export default async function GuiaPage({
       <section className="bg-cream pb-20">
         <Container>
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_280px]">
-            <article className="prose-guia">{content}</article>
+            <article className="prose-guia">
+              {content}
+              {Array.isArray(guia.frontmatter.faqs) &&
+                guia.frontmatter.faqs.length > 0 && (
+                  <FaqAccordion faqs={guia.frontmatter.faqs} />
+                )}
+            </article>
 
             <aside className="hidden lg:block">
               <div className="lg:sticky lg:top-24 lg:flex lg:flex-col lg:gap-6">

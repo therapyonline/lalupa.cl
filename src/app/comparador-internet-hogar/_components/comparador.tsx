@@ -295,18 +295,6 @@ function FiltersPanel({
       </p>
 
       <div className="mt-6 flex flex-col gap-6">
-        <div>
-          <Input
-            label="Comuna"
-            type="text"
-            value={comuna}
-            onChange={(e) => setComuna(e.target.value)}
-            placeholder="Ej: Ñuñoa"
-            list="comunas-list"
-            hint="Para verificar cobertura. No filtra el ranking aún (factibilidad técnica varía por dirección)."
-          />
-        </div>
-
         <div className="flex flex-col gap-2">
           <label
             htmlFor="comparador-velocidad"
@@ -442,6 +430,21 @@ function FiltersPanel({
             </span>
           </span>
         </label>
+
+        {/* La comuna NO filtra el ranking (no tenemos data de cobertura
+            por dirección). Va separada de los criterios, como recordatorio
+            informativo, para no prometer un filtro que no existe. */}
+        <div className="border-t border-border pt-6">
+          <Input
+            label="Tu comuna (solo informativo)"
+            type="text"
+            value={comuna}
+            onChange={(e) => setComuna(e.target.value)}
+            placeholder="Ej: Ñuñoa"
+            list="comunas-list"
+            hint="No filtra los resultados. Te lo recordamos al final para que confirmes cobertura en cada empresa, depende de tu dirección exacta."
+          />
+        </div>
       </div>
     </aside>
   )

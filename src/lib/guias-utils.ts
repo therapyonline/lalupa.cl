@@ -48,12 +48,18 @@ export function formatReadingTime(text: string): string {
   return `${minutes} min de lectura`
 }
 
+const FAQ_HEADING_REGEX = /preguntas\s+frecuentes|^faq\b/i
+
 export function extractToc(source: string): TocEntry[] {
   const slugger = new GithubSlugger()
   const lines = source.split('\n')
   const toc: TocEntry[] = []
   let inFrontmatter = false
   let inFence = false
+  // Dentro de la sección "Preguntas frecuentes" los ### son preguntas
+  // (a veces 8 o más) que saturan el TOC y le quitan su función de mapa.
+  // Mantenemos el H2 de la sección como ancla pero omitimos sus H3.
+  let inFaq = false
 
   for (const line of lines) {
     if (line.trim() === '---') {
@@ -72,6 +78,12 @@ export function extractToc(source: string): TocEntry[] {
     if (match) {
       const level = match[1].length as 2 | 3
       const text = match[2].replace(/[*_`]/g, '').trim()
+      if (level === 2) {
+        inFaq = FAQ_HEADING_REGEX.test(text)
+      } else if (inFaq) {
+        // H3 dentro de la sección FAQ: omitir del TOC.
+        continue
+      }
       toc.push({ level, text, slug: slugger.slug(text) })
     }
   }

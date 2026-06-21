@@ -9,6 +9,10 @@ import { Pill } from '@/components/ui/Pill'
 import { Input } from '@/components/ui/Input'
 import { COMUNAS } from '@/data/comunas'
 import {
+  MARKET_SHARE_INTERNET_FIJO_Q1_2026,
+  PENETRACION_FIBRA_CHILE,
+} from '@/data/internet-fibra-2026'
+import {
   type PlanScored,
   type ServicioIncluido,
   type Tecnologia,
@@ -256,8 +260,101 @@ export function Comparador() {
         </Container>
       </section>
 
+      <MercadoContexto />
+
       <ComunasDatalist />
     </>
+  )
+}
+
+/**
+ * Panorama del mercado de internet fijo chileno con data verificada de
+ * Subtel (penetración de fibra, market share). Da contexto al usuario
+ * sobre dónde está parado el mercado al elegir un plan.
+ */
+function MercadoContexto() {
+  const pen = PENETRACION_FIBRA_CHILE
+  const share = MARKET_SHARE_INTERNET_FIJO_Q1_2026
+  const players: Array<{ nombre: string; pct: number }> = [
+    { nombre: 'Movistar', pct: share.movistar },
+    { nombre: 'ClaroVTR', pct: share.claroVtr },
+    { nombre: 'Mundo / Pacífico', pct: share.mundoPacifico },
+    { nombre: 'Entel', pct: share.entel },
+    { nombre: 'Otros', pct: share.otros },
+  ]
+  return (
+    <section className="bg-white py-16">
+      <Container>
+        <p className="font-mono text-xs uppercase tracking-[0.1em] text-soft">
+          Panorama del mercado
+        </p>
+        <h2 className="mt-3 max-w-2xl text-2xl font-medium tracking-tight text-ink md:text-3xl">
+          Cómo está el internet fijo en Chile
+        </h2>
+
+        <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="rounded-[20px] border border-border bg-cream p-6">
+            <p className="text-4xl font-medium tabular-nums text-ink">
+              {pen.porcentajeConexionesFibra}%
+            </p>
+            <p className="mt-2 text-sm text-body">
+              de las conexiones fijas ya son fibra óptica (FTTH). Creció{' '}
+              {pen.variacionInteranualFibra}% en un año, mientras el cable
+              (HFC) cayó {Math.abs(pen.variacionInteranualHFC)}%.
+            </p>
+          </div>
+          <div className="rounded-[20px] border border-border bg-cream p-6">
+            <p className="text-4xl font-medium tabular-nums text-ink">
+              {pen.porcentajeHogaresConInternetFijo}%
+            </p>
+            <p className="mt-2 text-sm text-body">
+              de los hogares chilenos tiene internet fijo. El tráfico
+              promedio es de {Math.round(pen.traficoFijoPorConexionGB)} GB por
+              conexión al mes.
+            </p>
+          </div>
+          <div className="rounded-[20px] border border-border bg-cream p-6">
+            <p className="font-mono text-[11px] uppercase tracking-wide text-soft">
+              Market share (T1 2026)
+            </p>
+            <ul className="mt-3 flex flex-col gap-1.5">
+              {players.map((p) => (
+                <li
+                  key={p.nombre}
+                  className="flex items-center justify-between text-sm text-ink"
+                >
+                  <span>{p.nombre}</span>
+                  <span className="font-medium tabular-nums">{p.pct}%</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <p className="mt-6 text-xs text-soft">
+          Fuentes:{' '}
+          <a
+            href={pen.urlInforme}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 hover:no-underline"
+          >
+            {pen.fuente}
+          </a>{' '}
+          ·{' '}
+          <a
+            href={share.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 hover:no-underline"
+          >
+            {share.fuente}
+          </a>
+          . La fibra es simétrica y de baja latencia; el cable comparte
+          ancho de banda con tus vecinos y tiene subida más lenta.
+        </p>
+      </Container>
+    </section>
   )
 }
 

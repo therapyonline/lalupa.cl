@@ -470,6 +470,46 @@ describe('analizarLegalmente: otros cargos sin desglose', () => {
   })
 })
 
+describe('analizarLegalmente: reconexión oportuna', () => {
+  it('informa el derecho cuando la boleta menciona deuda', () => {
+    const boleta = makeBoletaElectricidad({
+      raw: 'Tiene un saldo vencido de períodos anteriores',
+    })
+    const r = analizarLegalmente(boleta)
+    expect(r.find((a) => a.id === 'reconexion-oportuna')).toBeDefined()
+  })
+
+  it('no aparece en boleta sin deuda ni corte', () => {
+    const boleta = makeBoletaElectricidad()
+    const r = analizarLegalmente(boleta)
+    expect(r.find((a) => a.id === 'reconexion-oportuna')).toBeUndefined()
+  })
+})
+
+describe('analizarLegalmente: plazos de reclamo con sospechosos', () => {
+  it('recuerda los plazos cuando hay un cargo sospechoso', () => {
+    const boleta = makeBoletaElectricidad({
+      cargos: [
+        { concepto: 'Cargo fijo', monto: 1048 },
+        {
+          concepto: 'Reposición de servicio',
+          monto: 5000,
+          sospechoso: true,
+          razonSospecha: 'Sin corte registrado',
+        },
+      ],
+    })
+    const r = analizarLegalmente(boleta)
+    expect(r.find((a) => a.id === 'plazos-reclamo-sospechosos')).toBeDefined()
+  })
+
+  it('no aparece cuando ningún cargo es sospechoso', () => {
+    const boleta = makeBoletaElectricidad()
+    const r = analizarLegalmente(boleta)
+    expect(r.find((a) => a.id === 'plazos-reclamo-sospechosos')).toBeUndefined()
+  })
+})
+
 describe('analizarLegalmente: boleta limpia', () => {
   it('no devuelve hallazgos para una boleta normal sin anomalías', () => {
     const boleta = makeBoletaElectricidad()

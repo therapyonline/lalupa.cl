@@ -621,6 +621,45 @@ function analizarOtrosCargosSinDesglose(
   )
 }
 
+/**
+ * Si la boleta menciona corte/deuda, recuerda el derecho a reconexión
+ * oportuna tras pagar (la empresa no puede demorar arbitrariamente).
+ */
+function analizarReconexionOportuna(boleta: ParsedBoleta): AnalisisLegal | null {
+  const mencionaDeudaOCorte =
+    /deuda|saldo\s+(?:vencido|anterior|pendiente)|aviso\s+de\s+corte|corte\s+por\s+(?:no\s+pago|mora)|suspensi[óo]n\s+(?:del?\s+)?(?:suministro|servicio)/i.test(
+      boleta.raw,
+    )
+  if (!mencionaDeudaOCorte) return null
+  return buildAnalisis(
+    'reconexion-oportuna',
+    'informativo',
+    'Si pagas, la reposición debe ser rápida',
+    'Tu boleta menciona deuda o un posible corte. Si pagas o regularizas, la empresa está obligada a reponer el suministro de forma oportuna (en general dentro de 24 horas desde que acreditas el pago). No pueden hacerte esperar días.',
+    'Guarda el comprobante de pago con fecha y hora. Si la reposición demora más de lo razonable, reclama: además de reponer, si el corte fue improcedente no pueden cobrarte la reposición.',
+    'comun-reconexion-oportuna',
+  )
+}
+
+/**
+ * Cuando hay cargos marcados como sospechosos, recuerda los plazos de
+ * reclamo para que el usuario actúe a tiempo.
+ */
+function analizarPlazosReclamoConSospechosos(
+  boleta: ParsedBoleta,
+): AnalisisLegal | null {
+  const haySospechosos = boleta.cargos.some((c) => c.sospechoso === true)
+  if (!haySospechosos) return null
+  return buildAnalisis(
+    'plazos-reclamo-sospechosos',
+    'informativo',
+    'Tienes plazos para reclamar los cargos marcados',
+    'Marcamos uno o más cargos que vale la pena revisar. Si reclamas formalmente a la empresa, tienen 5 días hábiles para responder en casos simples y 15 días hábiles cuando hay un monto en disputa. Pide siempre un número de folio o ticket del reclamo.',
+    'Reclama por escrito (correo o formulario web) para dejar registro. Guarda el folio: lo necesitarás si escalas a SEC, SISS o SERNAC. Puedes generar una carta lista en la herramienta de reclamo SERNAC.',
+    'comun-reclamo-5-dias',
+  )
+}
+
 // =============================================================================
 // ENTRY POINT
 // =============================================================================
@@ -656,6 +695,8 @@ export function analizarLegalmente(boleta: ParsedBoleta): AnalisisLegal[] {
     analizarRatioAlcantarillado,
     analizarAvisoCorteLuzAgua,
     analizarOtrosCargosSinDesglose,
+    analizarReconexionOportuna,
+    analizarPlazosReclamoConSospechosos,
   ]
   const SEVERIDAD_ORDEN: Record<SeveridadAnalisis, number> = {
     alerta_legal: 0,

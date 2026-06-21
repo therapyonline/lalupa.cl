@@ -283,6 +283,14 @@ export const NORMATIVA_COMUNES = {
     url: 'https://www.bcn.cl/leychile/navegar?idNorma=61438',
     servicio: 'todos' as const,
   },
+  'comun-reconexion-oportuna': {
+    id: 'comun-reconexion-oportuna',
+    norma: 'DS 327/1997 (luz), DS 1199/2004 (agua), DS 67/2004 (gas)',
+    resumen:
+      'Una vez que pagas la deuda o regularizas tu situación, la empresa está obligada a reponer el suministro de forma oportuna (en general dentro de 24 horas desde que acreditas el pago). No pueden demorarlo arbitrariamente ni cobrarte por la reposición si el corte fue improcedente.',
+    url: 'https://www.bcn.cl/leychile/navegar?idNorma=258171',
+    servicio: 'todos' as const,
+  },
   'comun-electrodependientes-no-corte': {
     id: 'comun-electrodependientes-no-corte',
     norma: 'Ley 21.012 Resguardo de personas electrodependientes',

@@ -55,11 +55,16 @@ export function PrivacyExportImport({
       if (!file) return
       setFeedback(null)
       try {
-        const count = await importarHistorial(file)
-        setFeedback({
-          kind: 'success',
-          message: `Importadas ${count} ${count === 1 ? 'boleta' : 'boletas'} a tu histórico local.`,
-        })
+        const { agregadas, omitidas } = await importarHistorial(file)
+        const partes = [
+          `${agregadas} ${agregadas === 1 ? 'boleta agregada' : 'boletas agregadas'} a tu histórico local`,
+        ]
+        if (omitidas > 0) {
+          partes.push(
+            `${omitidas} ${omitidas === 1 ? 'ya existía' : 'ya existían'} (no se sobrescribieron)`,
+          )
+        }
+        setFeedback({ kind: 'success', message: `${partes.join(', ')}.` })
         onImported?.()
       } catch (err) {
         setFeedback({

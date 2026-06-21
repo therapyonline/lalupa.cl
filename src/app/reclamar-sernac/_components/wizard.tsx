@@ -434,23 +434,19 @@ export function Wizard() {
                 </Button>
               )}
               {step < 5 && (
+                // No deshabilitamos el botón: al hacer click, handleNext
+                // valida y muestra el error específico del campo que falta
+                // (ej. "Mínimo 100 caracteres") en vez de un genérico. Es
+                // mejor feedback que un botón muerto. aria-disabled mantiene
+                // la pista para lectores de pantalla sin bloquear el click.
                 <Button
                   variant="dark"
                   size="md"
                   onClick={handleNext}
-                  disabled={!isCurrentStepValid()}
+                  aria-disabled={!isCurrentStepValid()}
                 >
                   Siguiente
                 </Button>
-              )}
-              {step < 5 && !isCurrentStepValid() && (
-                <p
-                  className="basis-full text-[13px] text-soft sm:basis-auto"
-                  role="status"
-                  aria-live="polite"
-                >
-                  Completa los campos requeridos para continuar.
-                </p>
               )}
               {step === 5 && (
                 <>

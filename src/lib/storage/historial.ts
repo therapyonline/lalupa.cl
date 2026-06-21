@@ -249,22 +249,40 @@ export async function exportarHistorial(): Promise<Blob> {
   })
 }
 
+/**
+ * Convierte un valor (string ISO o Date) a un Date válido, o devuelve
+ * `fallback` si no es parseable. Evita persistir `Date(NaN)` en IndexedDB
+ * (que rompe el índice por fecha y el render con date-fns).
+ */
+function toValidDate(value: unknown, fallback: Date | null): Date | null {
+  if (value == null) return fallback
+  const d = value instanceof Date ? value : new Date(value as string)
+  return Number.isFinite(d.getTime()) ? d : fallback
+}
+
 function reviveBoleta(raw: BoletaGuardada): BoletaGuardada {
+  // guardadoEn cae a "ahora" si viene corrupto; las fechas de período
+  // caen en cascada a algo válido para no romper el índice por fecha.
+  const guardadoEn = toValidDate(raw.guardadoEn, new Date()) as Date
+  const desde = toValidDate(raw.periodo?.desde, guardadoEn) as Date
+  const hasta = toValidDate(raw.periodo?.hasta, desde) as Date
   return {
     ...raw,
-    guardadoEn: new Date(raw.guardadoEn),
-    periodo: {
-      desde: new Date(raw.periodo.desde),
-      hasta: new Date(raw.periodo.hasta),
-    },
-    fechaEmision: raw.fechaEmision ? new Date(raw.fechaEmision) : undefined,
-    fechaVencimiento: raw.fechaVencimiento
-      ? new Date(raw.fechaVencimiento)
-      : undefined,
+    guardadoEn,
+    periodo: { desde, hasta },
+    fechaEmision: toValidDate(raw.fechaEmision, null) ?? undefined,
+    fechaVencimiento: toValidDate(raw.fechaVencimiento, null) ?? undefined,
   }
 }
 
-export async function importarHistorial(file: File): Promise<number> {
+export interface ResultadoImport {
+  /** Boletas nuevas efectivamente agregadas. */
+  agregadas: number
+  /** Boletas omitidas porque su id ya existía en el histórico local. */
+  omitidas: number
+}
+
+export async function importarHistorial(file: File): Promise<ResultadoImport> {
   const text = await file.text()
   let raw: unknown
   try {
@@ -287,11 +305,22 @@ export async function importarHistorial(file: File): Promise<number> {
 
   const db = await getDb()
   const tx = db.transaction(STORE, 'readwrite')
-  let count = 0
+  let agregadas = 0
+  let omitidas = 0
+  // No sobrescribimos boletas existentes: si el id ya está, lo omitimos.
+  // Así re-importar tu propio export no clobberea datos locales y avisamos
+  // cuántas quedaron fuera. (Las lecturas dentro de la tx ven los add
+  // previos, así que duplicados dentro del mismo archivo también se omiten.)
   for (const validated of parsed.data.boletas) {
-    await tx.store.put(reviveBoleta(validated as unknown as BoletaGuardada))
-    count++
+    const boleta = reviveBoleta(validated as unknown as BoletaGuardada)
+    const existente = await tx.store.get(boleta.id)
+    if (existente) {
+      omitidas++
+      continue
+    }
+    await tx.store.add(boleta)
+    agregadas++
   }
   await tx.done
-  return count
+  return { agregadas, omitidas }
 }

@@ -92,17 +92,12 @@ export function SubsidioWizard() {
     }
     setDirection('forward')
 
-    // Short-circuit: si la respuesta a Q1 (esMayorDeEdad) es false,
-    // el resto del wizard no aplica (bloqueador absoluto). Saltamos
-    // directo al resultado para no hacer perder tiempo al usuario.
-    if (
-      pregunta.id === 'esMayorDeEdad' &&
-      answers.esMayorDeEdad === false
-    ) {
-      setShowResult(true)
-      return
-    }
-
+    // Nota: antes había un short-circuit que saltaba al resultado si la
+    // persona declaraba ser menor de edad. Lo quitamos porque dejaba el
+    // wizard en un estado inconsistente al volver atrás (step quedaba en
+    // 0 y "Volver" no tenía a dónde ir). El motor de elegibilidad ya
+    // produce la minoría de edad como bloqueador terminal por la ruta
+    // normal, así que la navegación queda consistente.
     if (step < TOTAL - 1) {
       setStep((s) => s + 1)
     } else {
@@ -247,7 +242,12 @@ export function SubsidioWizard() {
 }
 
 function Stepper({ current, total }: { current: number; total: number }) {
-  const pct = Math.round(((current - 1) / total) * 100)
+  // Una sola fórmula para texto y barra: preguntas completadas / total
+  // (en la pregunta 1 aún no completaste ninguna, así que 0%). Antes el
+  // texto usaba (current-1)/total y la barra current/total, mostrando dos
+  // porcentajes distintos para el mismo progreso.
+  const pctNum = ((current - 1) / total) * 100
+  const pct = Math.round(pctNum)
   return (
     <div className="mt-10 max-w-3xl">
       <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wide text-soft">
@@ -260,13 +260,13 @@ function Stepper({ current, total }: { current: number; total: number }) {
         className="mt-2 h-2 overflow-hidden rounded-full bg-ink/5"
         role="progressbar"
         aria-label={`Progreso: pregunta ${current} de ${total}`}
-        aria-valuenow={current}
-        aria-valuemin={1}
-        aria-valuemax={total}
+        aria-valuenow={pct}
+        aria-valuemin={0}
+        aria-valuemax={100}
       >
         <div
           className="h-full bg-primary transition-all duration-300"
-          style={{ width: `${(current / total) * 100}%` }}
+          style={{ width: `${pctNum}%` }}
         />
       </div>
     </div>

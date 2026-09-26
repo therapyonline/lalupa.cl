@@ -101,6 +101,12 @@ Cada parser implementa reglas sobre conceptos y datos extraídos: p. ej. reposic
 
 `src/data/tarifas.ts` conserva cifras originales para simulaciones, marcadas `historico_no_verificado`. Los componentes ausentes son `number | null`; los helpers rechazan referencias incompletas y consumos inválidos. Antes de reintroducir comparaciones monetarias se necesita un catálogo con documento/página verificables, intervalo de vigencia completo, ámbito geográfico, opción, temporada, unidad y base tributaria coincidentes. Referencia ausente, ambigua o período que atraviesa un cambio deben devolver un resultado no verificable, nunca una selección por defecto.
 
+### Orientaciones sobre el documento
+
+`_analisis-legales.ts` conserva su nombre histórico, pero devuelve puntos `revision` o `informativo`, nunca un dictamen de infracción. Cada resultado declara `alcance: orientativo` y `versionAnalisis`. Los criterios no usan un techo fijo de interés, plazos universales ni el mes de emisión como sustituto del período de consumo. Las compras de cilindros no pasan por las reglas de suministros por medidor.
+
+`normativa-chilena.ts` diferencia `norma`, `contexto` y `canal`. `AnalisisLegalSection` muestra esa distinción junto a cada referencia. Los sufijos históricos de IDs no representan condiciones ejecutables. No se persisten estos resultados en IndexedDB; las marcas antiguas de cargos guardados no se recalculan ni se migran en este lote.
+
 ### Historial y borradores
 
 - `boleta-identity.ts`: SHA-256 del contenido extraído y datos de suministro, sin confiar en IDs importados. Las claves antiguas se conservan; no hay migración destructiva de IndexedDB.

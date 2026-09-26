@@ -36,7 +36,7 @@ for (const entry of cases) {
     await expect(page.getByText(/referencia histórica.*%|sobre.*lo esperado en/)).toHaveCount(0)
     // En luz/agua el cargo alto debe sobrevivir a la extracción sin marcarse.
     if (entry.servicio !== 'gas') {
-      await expect(page.getByText(/No detectamos alertas en los datos/)).toBeVisible()
+      await expect(page.getByText(/No hay cargos marcados en el desglose/)).toBeVisible()
       await expect(page.getByText(/1\.500/).first()).toBeVisible()
     }
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)

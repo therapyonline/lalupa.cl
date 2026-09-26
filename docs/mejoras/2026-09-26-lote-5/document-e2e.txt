@@ -1,0 +1,23 @@
+[WebServer] (node:7104) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:7116) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 6 tests using 2 workers
+
+(node:7122) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:7123) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:7123) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:7122) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [chromium] › tests/e2e/document-review.spec.ts:21:7 › electricidad: señales documentales sin dictamen legal (446ms)
+  ✓  2 [chromium] › tests/e2e/document-review.spec.ts:21:7 › agua: señales documentales sin dictamen legal (448ms)
+  ✓  3 [chromium] › tests/e2e/document-review.spec.ts:90:7 › te-cortaron-servicio-sin-aviso-que-hacer: contenido completo y FAQ visibles coherentes con el esquema (196ms)
+  ✓  4 [chromium] › tests/e2e/document-review.spec.ts:90:7 › reclamar-cobro-indebido-paso-a-paso: contenido completo y FAQ visibles coherentes con el esquema (217ms)
+  ✓  5 [chromium] › tests/e2e/document-review.spec.ts:90:7 › derechos-consumidor-chile-servicios-basicos: contenido completo y FAQ visibles coherentes con el esquema (196ms)
+  ✓  6 [chromium] › tests/e2e/document-review.spec.ts:90:7 › subsidio-agua-potable-sap-chile: contenido completo y FAQ visibles coherentes con el esquema (200ms)
+
+  6 passed (1.9s)

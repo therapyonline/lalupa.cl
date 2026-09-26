@@ -6,6 +6,14 @@ Registro de actualizaciones de los datasets en `src/data/`. Cada fila refleja el
 
 ---
 
+## 2026-09-26: Referencias documentales y alcance de las orientaciones (quinto lote)
+
+- `normativa-chilena.ts`: 27 referencias clasificadas como norma, contexto o canal. Se retiran artículos, plazos y fórmulas no sustentados para las conclusiones que antes emitía el lector. Los IDs históricos conservados no representan reglas de cuatro meses, dos meses o quince días.
+- `REVISION_REFERENCIAS`: versión editorial `2026-09-26.1`, con alcance orientativo explícito. La fecha no acredita que toda regulación sectorial haya sido validada exhaustivamente.
+- Electricidad estimada se vincula al artículo 129 del Decreto 327 correcto (`idNorma=124102`); ajustes tarifarios se distinguen de consumo omitido; interés se remite a la metodología CMF sin umbral universal. Las referencias a canales de SISS/SEC/SERNAC no se presentan como normas completas.
+- El subsidio SAP ya no atribuye beneficios por una publicidad ni asocia porcentajes a tramos RSH inventados. La guía fue contrastada con la ficha ChileAtiende; sin adjudicación automática ni renovación anual prometida.
+- Evidencias, fuentes y límites: `docs/MEJORAS_LOTE_5_2026-09-26.md`. No se actualizaron precios del catálogo de internet ni tarifas monetarias.
+
 ## 2026-09-26: Subsidio eléctrico, quinta convocatoria cerrada
 
 - `elegibilidad-subsidio.ts`: corrección de la referencia para 4 o más integrantes a $31.224 por semestre / $5.204 por cuota. Calendario histórico de la quinta convocatoria, estado de postulación cerrada y fuentes oficiales en metadatos. El anuncio del Ministerio de Energía del 11 de agosto actualiza el inicio de aplicación a agosto según facturación; no se extrapolan fechas de próximas convocatorias.

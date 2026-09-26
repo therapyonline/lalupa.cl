@@ -155,7 +155,8 @@ describe('Caso 3: boleta con tramo cambiado', () => {
     const r = parseCGE(conCargoUnico)
     const cu = r.cargos.find((c) => c.concepto === 'Cargo único')
     expect(cu?.sospechoso).toBe(true)
-    expect(cu?.razonSospecha).toMatch(/no es un componente estándar/i)
+    expect(cu?.razonSospecha).toMatch(/denominación completa/i)
+    expect(cu?.razonSospecha).not.toMatch(/no es un componente estándar/i)
   })
 })
 

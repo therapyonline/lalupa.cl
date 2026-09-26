@@ -75,9 +75,7 @@ export const BT2_CARGO_PATTERNS: ReadonlyArray<{
   },
 
   // === POTENCIA CONTRATADA / INVIERNO ===
-  // Cargos estacionales o por compromiso fijo. "Potencia adicional de
-  // invierno" aplica en zonas frías (sur de Chile, abril-septiembre) y
-  // se cobra sobre el exceso vs la potencia base.
+  // Etiquetas de potencia: no validan temporada, fórmula ni tarifa aplicable.
   {
     concepto: 'Cargo por potencia adicional de invierno',
     pattern: buildCargoPattern(

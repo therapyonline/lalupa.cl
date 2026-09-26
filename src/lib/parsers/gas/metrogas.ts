@@ -114,7 +114,7 @@ function detectarSospecha(cargo: Cargo, text: string): string | null {
     return 'Reposición sin que la boleta mencione un corte. Pide desglose.'
   }
   if (cargo.concepto === 'Ajuste por no registro de lectura') {
-    return 'Metrogas no registró tu medidor (consumo estimado). Tienes derecho a pedir relectura sin costo.'
+    return 'El cargo menciona consumo estimado. Pide las lecturas, el motivo de la estimación y su cálculo; contrástalos con la boleta original.'
   }
   if (cargo.concepto === 'Reliquidación de consumo' && cargo.monto > 0) {
     return 'Cuota de reliquidación de un período anterior. Pide a Metrogas el detalle del período reliquidado y por qué (lectura corregida, ajuste tarifario, etc.).'

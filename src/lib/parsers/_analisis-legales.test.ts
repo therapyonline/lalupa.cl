@@ -1,540 +1,479 @@
-/**
- * Tests para el módulo de análisis legales sobre boletas parseadas.
- * Cada test construye una `ParsedBoleta` mínima sintética y verifica
- * que la función `analizarLegalmente` devuelva los hallazgos esperados.
- */
-
 import { describe, expect, it } from 'vitest'
-import type { ParsedBoleta } from './types'
+import { REVISION_REFERENCIAS, TODA_NORMATIVA } from '@/data/normativa-chilena'
 import { analizarLegalmente } from './_analisis-legales'
+import type { ParsedBoleta } from './types'
 
-function makeBoletaElectricidad(
-  overrides: Partial<ParsedBoleta> = {},
-): ParsedBoleta {
+function boleta(overrides: Partial<ParsedBoleta> = {}): ParsedBoleta {
   return {
     empresa: 'CGE',
     servicio: 'electricidad',
     periodo: { desde: new Date('2026-05-01'), hasta: new Date('2026-05-31') },
-    cliente: { numeroCliente: '12345678-9' },
+    cliente: { numeroCliente: 'sintetico' },
     consumo: { unidad: 'kWh', valor: 250, tarifa: 'BT-1' },
-    cargos: [{ concepto: 'Cargo fijo', monto: 1048 }],
-    totales: { subtotal: 41985, iva: 7977, total: 49962 },
-    raw: 'Boleta normal sin nada raro',
+    cargos: [{ concepto: 'Cargo fijo', monto: 1000 }],
+    totales: { subtotal: 1000, iva: 190, total: 1190 },
+    raw: 'Boleta de ejemplo',
     ...overrides,
   }
 }
-
-function makeBoletaAgua(overrides: Partial<ParsedBoleta> = {}): ParsedBoleta {
-  return {
-    empresa: 'Aguas Andinas',
-    servicio: 'agua',
-    periodo: { desde: new Date('2026-05-01'), hasta: new Date('2026-05-31') },
-    cliente: { numeroCliente: '111111-1' },
-    consumo: { unidad: 'm3', valor: 12 },
-    cargos: [{ concepto: 'Cargo fijo', monto: 914 }],
-    totales: { subtotal: 14400, iva: 2736, total: 17144 },
-    raw: 'Boleta normal',
-    fechaEmision: new Date('2026-05-15'),
+function suministro(
+  servicio: ParsedBoleta['servicio'],
+  overrides: Partial<ParsedBoleta> = {},
+) {
+  return boleta({
+    servicio,
+    consumo: {
+      unidad: servicio === 'electricidad' ? 'kWh' : 'm3',
+      valor: 20,
+      tarifa: 'BT-1',
+    },
     ...overrides,
-  }
+  })
 }
+const buscar = (b: ParsedBoleta, id: string) =>
+  analizarLegalmente(b).find((h) => h.id === id)
 
-describe('analizarLegalmente: refacturación', () => {
-  it('detecta reliquidación en el texto y emite derecho a verificar plazo', () => {
-    const boleta = makeBoletaElectricidad({
-      raw: 'Cuota 01 de 06 Cuota Reliquidación consumo $ 5.940',
-    })
-    const r = analizarLegalmente(boleta)
-    const ref = r.find((a) => a.id.startsWith('refacturacion-'))
-    expect(ref).toBeDefined()
-    expect(ref?.severidad).toBe('derecho_disponible')
-    expect(ref?.fundamentoLegal.norma).toMatch(/Reglamento|DS 327/i)
-  })
-
-  it('detecta refacturación retroactiva en boleta de agua', () => {
-    const boleta = makeBoletaAgua({
-      raw: 'Reliquidación consumo período anterior $ 8.000',
-    })
-    const r = analizarLegalmente(boleta)
-    const ref = r.find((a) => a.id === 'refacturacion-agua')
-    expect(ref).toBeDefined()
-  })
-
-  it('no falsa positiva en boleta sin reliquidación', () => {
-    const boleta = makeBoletaElectricidad()
-    const r = analizarLegalmente(boleta)
-    expect(r.find((a) => a.id.startsWith('refacturacion-'))).toBeUndefined()
-  })
-})
-
-describe('analizarLegalmente: reposición sin corte', () => {
-  it('alerta cuando hay cargo de reposición y no hay corte mencionado', () => {
-    const boleta = makeBoletaElectricidad({
-      cargos: [
-        { concepto: 'Cargo fijo', monto: 1048 },
-        { concepto: 'Reposición de servicio', monto: 5000 },
-      ],
-      raw: 'Boleta sin mención de corte previo',
-    })
-    const r = analizarLegalmente(boleta)
-    const alerta = r.find((a) => a.id.startsWith('reposicion-sin-corte-'))
-    expect(alerta).toBeDefined()
-    expect(alerta?.severidad).toBe('alerta_legal')
-  })
-
-  it('no alerta cuando la boleta menciona el corte previo', () => {
-    const boleta = makeBoletaElectricidad({
-      cargos: [
-        { concepto: 'Cargo fijo', monto: 1048 },
-        { concepto: 'Reposición de servicio', monto: 5000 },
-      ],
-      raw: 'Nota: corte de suministro registrado el 10/05/2026 por no pago. Reposición $ 5.000',
-    })
-    const r = analizarLegalmente(boleta)
+describe('ajustes y lecturas: hechos incompletos', () => {
+  it.each(['electricidad', 'agua', 'gas'] as const)(
+    'no impone cuatro meses a una reliquidación de %s',
+    (servicio) => {
+      const h = buscar(
+        suministro(servicio, {
+          raw: 'Reliquidación tarifaria períodos 2020-2024',
+        }),
+        `refacturacion-${servicio}`,
+      )!
+      expect(h.severidad).toBe('revision')
+      expect(h.descripcion).toContain('no identifica por sí sola su causa')
+      expect(h.accionSugerida).not.toMatch(/negarte|no pag|fuera de plazo/)
+    },
+  )
+  it.each(['electricidad', 'agua', 'gas'] as const)(
+    'una lectura estimada de %s no prueba una secuencia ni gratuidad',
+    (servicio) => {
+      const h = buscar(
+        suministro(servicio, {
+          raw: 'Información: lectura estimada período anterior',
+        }),
+        `lectura-estimada-${servicio}`,
+      )!
+      expect(h.descripcion).toContain(
+        'no basta para contar estimaciones consecutivas',
+      )
+      expect(h.accionSugerida).not.toMatch(/sin costo|5 días/)
+      expect(h.fundamentoLegal.servicio).toBe(servicio)
+      if (servicio !== 'electricidad')
+        expect(h.fundamentoLegal.norma).not.toContain('Decreto 327')
+    },
+  )
+  it('reconoce facturación provisoria sin afirmar que no hubo lectura física', () => {
     expect(
-      r.find((a) => a.id.startsWith('reposicion-sin-corte-')),
-    ).toBeUndefined()
-  })
-})
-
-describe('analizarLegalmente: lectura estimada', () => {
-  it('marca derecho a relectura sin costo', () => {
-    const boleta = makeBoletaElectricidad({
-      raw: 'Lectura estimada del consumo del período',
-    })
-    const r = analizarLegalmente(boleta)
-    const ref = r.find((a) => a.id === 'lectura-estimada-electricidad')
-    expect(ref).toBeDefined()
-    expect(ref?.severidad).toBe('derecho_disponible')
-  })
-
-  it('aplica también a agua', () => {
-    const boleta = makeBoletaAgua({
-      raw: 'Consumo estimado debido a imposibilidad de lectura',
-    })
-    const r = analizarLegalmente(boleta)
-    expect(r.find((a) => a.id === 'lectura-estimada-agua')).toBeDefined()
-  })
-})
-
-describe('analizarLegalmente: cargo de potencia en BT-1', () => {
-  it('alerta cuando aparece cargo de demanda máxima en boleta BT-1', () => {
-    const boleta = makeBoletaElectricidad({
-      consumo: { unidad: 'kWh', valor: 250, tarifa: 'BT-1' },
-      cargos: [
-        { concepto: 'Cargo fijo', monto: 1048 },
-        {
-          concepto: 'Cargo por demanda máxima de potencia suministrada',
-          monto: 15000,
-        },
-      ],
-    })
-    const r = analizarLegalmente(boleta)
-    const alerta = r.find((a) => a.id === 'cargo-potencia-bt1')
-    expect(alerta).toBeDefined()
-    expect(alerta?.severidad).toBe('alerta_legal')
-  })
-
-  it('no alerta en BT-2 (donde sí corresponde el cargo de potencia)', () => {
-    const boleta = makeBoletaElectricidad({
-      consumo: { unidad: 'kWh', valor: 850, tarifa: 'BT-2' },
-      cargos: [
-        { concepto: 'Cargo fijo', monto: 1048 },
-        {
-          concepto: 'Cargo por demanda máxima de potencia suministrada',
-          monto: 28500,
-        },
-      ],
-    })
-    const r = analizarLegalmente(boleta)
-    expect(r.find((a) => a.id === 'cargo-potencia-bt1')).toBeUndefined()
-  })
-})
-
-describe('analizarLegalmente: multa por consumo reactivo en BT-1', () => {
-  it('alerta cuando aparece la multa en boleta residencial BT-1', () => {
-    const boleta = makeBoletaElectricidad({
-      consumo: { unidad: 'kWh', valor: 250, tarifa: 'BT-1' },
-      cargos: [
-        { concepto: 'Cargo fijo', monto: 1048 },
-        { concepto: 'Multa por Consumo Reactivo', monto: 5000 },
-      ],
-    })
-    const r = analizarLegalmente(boleta)
-    expect(r.find((a) => a.id === 'multa-reactivo-bt1')).toBeDefined()
-  })
-})
-
-describe('analizarLegalmente: período punta agua fuera de verano', () => {
-  it('alerta cuando aparece sobreconsumo en boleta de mayo (fuera de dic-mar)', () => {
-    const boleta = makeBoletaAgua({
-      fechaEmision: new Date('2026-05-15'),
-      cargos: [
-        { concepto: 'Cargo fijo', monto: 914 },
-        { concepto: 'Sobreconsumo agua potable punta', monto: 5000 },
-      ],
-    })
-    const r = analizarLegalmente(boleta)
-    expect(
-      r.find((a) => a.id === 'agua-sobreconsumo-fuera-verano'),
+      buscar(
+        boleta({ raw: 'Facturación provisoria' }),
+        'lectura-estimada-electricidad',
+      ),
     ).toBeDefined()
   })
-
-  it('no alerta cuando es enero (dentro del período punta)', () => {
-    const boleta = makeBoletaAgua({
-      fechaEmision: new Date('2026-01-15'),
-      cargos: [
-        { concepto: 'Cargo fijo', monto: 914 },
-        { concepto: 'Sobreconsumo agua potable punta', monto: 5000 },
-      ],
-    })
-    const r = analizarLegalmente(boleta)
-    expect(
-      r.find((a) => a.id === 'agua-sobreconsumo-fuera-verano'),
-    ).toBeUndefined()
-  })
+  it.each(['Corte de suministro realizado', 'Boleta sin historial de cortes'])(
+    'una reposición requiere antecedentes incluso con texto: %s',
+    (raw) => {
+      const h = buscar(
+        boleta({ raw, cargos: [{ concepto: 'Reposición', monto: 4000 }] }),
+        'reposicion-sin-corte-electricidad',
+      )!
+      expect(h.severidad).toBe('revision')
+      expect(h.descripcion).toContain('no acredita por sí sola si hubo corte')
+      expect(h.accionSugerida).not.toMatch(/retiro|devolver|indebido/)
+    },
+  )
+  it.each([0, -5000, NaN, Infinity])(
+    'no interpreta %s como un cargo positivo de reposición',
+    (monto) => {
+      expect(
+        buscar(
+          boleta({ cargos: [{ concepto: 'Reposición', monto }] }),
+          'reposicion-sin-corte-electricidad',
+        ),
+      ).toBeUndefined()
+    },
+  )
 })
 
-describe('analizarLegalmente: subsidio Ley 21.667 ausente', () => {
-  it('un aviso de postulación solo invita a verificar, sin afirmar incumplimiento', () => {
-    const boleta = makeBoletaElectricidad({
-      raw: 'Mensaje: Recuerda postular al Subsidio Eléctrico Ley 21.667 en subsidioelectrico.cl',
-    })
-    const r = analizarLegalmente(boleta)
-    const aviso = r.find((a) => a.id === 'subsidio-21667-ausente')
-    expect(aviso?.severidad).toBe('informativo')
-    expect(aviso?.descripcion).toContain(
-      'no acredita que seas beneficiario ni un incumplimiento',
-    )
-    expect(aviso?.accionSugerida).not.toContain('retroactivo')
-  })
-
-  it('no alerta cuando el subsidio sí aparece como cargo negativo', () => {
-    const boleta = makeBoletaElectricidad({
-      raw: 'Subsidio Eléctrico Ley N°21.667 ........ -$ 2.891',
-      cargos: [
-        { concepto: 'Cargo fijo', monto: 1048 },
-        { concepto: 'Subsidio Eléctrico Ley 21.667', monto: -2891 },
-      ],
-    })
-    const r = analizarLegalmente(boleta)
-    expect(r.find((a) => a.id === 'subsidio-21667-ausente')).toBeUndefined()
-  })
-})
-
-describe('analizarLegalmente: orden por severidad', () => {
-  it('alertas legales aparecen antes que derechos disponibles', () => {
-    const boleta = makeBoletaElectricidad({
-      cargos: [
-        { concepto: 'Cargo fijo', monto: 1048 },
-        { concepto: 'Reposición de servicio', monto: 5000 }, // alerta_legal
-      ],
-      raw: 'Lectura estimada del período', // derecho_disponible
-    })
-    const r = analizarLegalmente(boleta)
-    const idxAlerta = r.findIndex(
-      (a) => a.id === 'reposicion-sin-corte-electricidad',
-    )
-    const idxDerecho = r.findIndex(
-      (a) => a.id === 'lectura-estimada-electricidad',
-    )
-    expect(idxAlerta).toBeGreaterThanOrEqual(0)
-    expect(idxDerecho).toBeGreaterThanOrEqual(0)
-    expect(idxAlerta).toBeLessThan(idxDerecho)
-  })
-})
-
-describe('analizarLegalmente: subsidio SAP agua ausente', () => {
-  it('marca derecho cuando menciona SAP pero no hay descuento', () => {
-    const boleta = makeBoletaAgua({
-      raw: 'Recuerde postular al Subsidio al Pago del Consumo de Agua Potable (Ley 18.778)',
-    })
-    const r = analizarLegalmente(boleta)
-    expect(r.find((a) => a.id === 'agua-subsidio-sap-ausente')).toBeDefined()
-  })
-
-  it('no alerta cuando el subsidio agua sí aparece como cargo negativo', () => {
-    const boleta = makeBoletaAgua({
-      raw: 'Subsidio agua potable aplicado',
-      cargos: [
-        { concepto: 'Cargo fijo', monto: 914 },
-        { concepto: 'Subsidio agua potable', monto: -5000 },
-      ],
-    })
-    const r = analizarLegalmente(boleta)
-    expect(r.find((a) => a.id === 'agua-subsidio-sap-ausente')).toBeUndefined()
-  })
-})
-
-describe('analizarLegalmente: cilindro GLP', () => {
-  function makeCilindro(kg: number, overrides: Partial<ParsedBoleta> = {}) {
-    return {
-      empresa: 'Gasco GLP' as const,
-      servicio: 'gas' as const,
-      tipoVenta: 'producto' as const,
-      periodo: { desde: new Date('2026-05-01'), hasta: new Date('2026-05-01') },
-      cliente: {},
-      consumo: { unidad: 'kg' as const, valor: kg },
-      cargos: [{ concepto: 'Vale de carga GLP', monto: 19990 }],
-      totales: { subtotal: 16798, iva: 3192, total: 19990 },
-      raw: 'Boleta cilindro',
-      ...overrides,
-    } as ParsedBoleta
-  }
-
-  it('marca formato no estándar para cilindro de 13 kg', () => {
-    const r = analizarLegalmente(makeCilindro(13))
-    expect(
-      r.find((a) => a.id === 'gas-cilindro-formato-no-estandar'),
-    ).toBeDefined()
-  })
-
-  it('no alerta para cilindro estándar de 15 kg', () => {
-    const r = analizarLegalmente(makeCilindro(15))
-    expect(
-      r.find((a) => a.id === 'gas-cilindro-formato-no-estandar'),
-    ).toBeUndefined()
-  })
-
-  it('detecta recargo de delivery como derecho', () => {
-    const r = analizarLegalmente(
-      makeCilindro(15, {
-        cargos: [
-          { concepto: 'Vale de carga GLP', monto: 19990 },
-          { concepto: 'Recargo de delivery', monto: 2000 },
-        ],
+describe('tarifas, temporadas y extracción parcial', () => {
+  it.each(['BT-1', 'BT1'])('pide comprobar demanda y tarifa %s', (tarifa) => {
+    const h = buscar(
+      boleta({
+        consumo: { unidad: 'kWh', valor: 20, tarifa },
+        cargos: [{ concepto: 'Cargo por demanda máxima', monto: 2000 }],
       }),
-    )
+      'cargo-potencia-bt1',
+    )!
+    expect(h.severidad).toBe('revision')
+    expect(h.descripcion).toContain('no demuestra un cambio de contrato')
+  })
+  it.each(['BT-2', undefined])('no asume BT-1 para tarifa %s', (tarifa) => {
     expect(
-      r.find((a) => a.id === 'gas-recargo-delivery-no-publicado'),
-    ).toBeDefined()
-  })
-})
-
-describe('analizarLegalmente: aviso corte gas red', () => {
-  it('informa plazo 10 días cuando menciona corte', () => {
-    const boleta: ParsedBoleta = {
-      empresa: 'Metrogas',
-      servicio: 'gas',
-      periodo: { desde: new Date('2026-05-01'), hasta: new Date('2026-05-31') },
-      cliente: {},
-      consumo: { unidad: 'm3', valor: 40 },
-      cargos: [{ concepto: 'Gas consumido', monto: 50000 }],
-      totales: { subtotal: 42017, iva: 7983, total: 50000 },
-      raw: 'Aviso de corte por no pago a partir del 20/06/2026',
-    }
-    const r = analizarLegalmente(boleta)
-    const hallazgo = r.find((a) => a.id === 'gas-aviso-corte-10dias')
-    expect(hallazgo).toBeDefined()
-    expect(hallazgo?.descripcion).toMatch(/10 d[íi]as/)
-  })
-})
-
-describe('analizarLegalmente: interés mora sobre TMC', () => {
-  it('alerta cuando la tasa mensual explícita supera 2.5%', () => {
-    const boleta = makeBoletaElectricidad({
-      raw: 'Interés por mora de 4% mensual sobre saldos vencidos',
-    })
-    const r = analizarLegalmente(boleta)
-    const hallazgo = r.find((a) => a.id === 'interes-mora-sobre-tmc')
-    expect(hallazgo).toBeDefined()
-    expect(hallazgo?.severidad).toBe('alerta_legal')
-  })
-
-  it('no alerta con tasa baja (1.5% mensual)', () => {
-    const boleta = makeBoletaElectricidad({
-      raw: 'Interés 1,5% mensual',
-    })
-    const r = analizarLegalmente(boleta)
-    expect(r.find((a) => a.id === 'interes-mora-sobre-tmc')).toBeUndefined()
-  })
-
-  it('informa derecho cuando hay cargo de mora sin tasa explícita', () => {
-    const boleta = makeBoletaElectricidad({
-      cargos: [
-        { concepto: 'Cargo fijo', monto: 1048 },
-        { concepto: 'Recargo por mora', monto: 3000 },
-      ],
-      raw: 'Boleta con recargo por mora sin tasa indicada',
-    })
-    const r = analizarLegalmente(boleta)
-    expect(r.find((a) => a.id === 'interes-mora-verificar-tmc')).toBeDefined()
-  })
-})
-
-describe('analizarLegalmente: compensación corte no aplicada', () => {
-  it('marca derecho cuando menciona interrupción sin compensación', () => {
-    const boleta = makeBoletaElectricidad({
-      raw: 'Evento de interrupción de suministro registrado: 30 horas sin servicio',
-    })
-    const r = analizarLegalmente(boleta)
-    expect(
-      r.find((a) => a.id === 'compensacion-corte-no-aplicada'),
-    ).toBeDefined()
-  })
-
-  it('no alerta cuando la compensación sí está en el texto', () => {
-    const boleta = makeBoletaElectricidad({
-      raw: 'Interrupción de suministro. Compensación aplicada en esta boleta.',
-    })
-    const r = analizarLegalmente(boleta)
-    expect(
-      r.find((a) => a.id === 'compensacion-corte-no-aplicada'),
+      buscar(
+        boleta({
+          consumo: { unidad: 'kWh', valor: 20, tarifa },
+          cargos: [{ concepto: 'Potencia contratada', monto: 2000 }],
+        }),
+        'cargo-potencia-bt1',
+      ),
     ).toBeUndefined()
   })
-})
-
-describe('analizarLegalmente: recargo invierno fuera de temporada', () => {
-  it('alerta cuando hay recargo invierno en boleta de diciembre', () => {
-    const boleta = makeBoletaElectricidad({
-      empresa: 'SAESA',
-      fechaEmision: new Date('2026-12-15'),
-      consumo: { unidad: 'kWh', valor: 300, tarifa: 'BT-1' },
-      cargos: [
-        { concepto: 'Cargo fijo', monto: 1201 },
-        { concepto: 'Recargo por consumo invierno', monto: 8000 },
-      ],
-    })
-    const r = analizarLegalmente(boleta)
+  it('distingue potencia base de demanda máxima', () => {
     expect(
-      r.find((a) => a.id === 'recargo-invierno-fuera-temporada'),
-    ).toBeDefined()
-  })
-
-  it('no alerta cuando es julio (dentro del período invernal)', () => {
-    const boleta = makeBoletaElectricidad({
-      empresa: 'SAESA',
-      fechaEmision: new Date('2026-07-15'),
-      cargos: [
-        { concepto: 'Cargo fijo', monto: 1201 },
-        { concepto: 'Recargo por consumo invierno', monto: 8000 },
-      ],
-    })
-    const r = analizarLegalmente(boleta)
-    expect(
-      r.find((a) => a.id === 'recargo-invierno-fuera-temporada'),
+      buscar(
+        boleta({
+          cargos: [{ concepto: 'Cargo por potencia base', monto: 3000 }],
+        }),
+        'cargo-potencia-bt1',
+      ),
     ).toBeUndefined()
   })
-})
-
-describe('analizarLegalmente: alcantarillado sin agua potable', () => {
-  it('alerta cuando cobran alcantarillado sin agua potable y hay consumo', () => {
-    const boleta = makeBoletaAgua({
-      consumo: { unidad: 'm3', valor: 12 },
-      cargos: [
-        { concepto: 'Cargo fijo', monto: 914 },
-        { concepto: 'Servicio de alcantarillado', monto: 9000 },
-      ],
-    })
-    const r = analizarLegalmente(boleta)
-    expect(
-      r.find((a) => a.id === 'agua-alcantarillado-sin-agua-potable'),
-    ).toBeDefined()
+  it('pide mediciones para un recargo reactivo sin usar un umbral supuesto', () => {
+    const h = buscar(
+      boleta({
+        cargos: [{ concepto: 'Multa por consumo reactivo', monto: 4000 }],
+      }),
+      'multa-reactivo-bt1',
+    )!
+    expect(h.accionSugerida).toContain('mediciones')
+    expect(JSON.stringify(h)).not.toMatch(/0,93|retiro del cargo/)
   })
-
-  it('no alerta cuando sí hay cargo de agua potable', () => {
-    const boleta = makeBoletaAgua({
-      cargos: [
-        { concepto: 'Cargo fijo', monto: 914 },
-        { concepto: 'Consumo agua potable', monto: 7000 },
-        { concepto: 'Servicio de alcantarillado', monto: 9000 },
-      ],
-    })
-    const r = analizarLegalmente(boleta)
-    expect(
-      r.find((a) => a.id === 'agua-alcantarillado-sin-agua-potable'),
-    ).toBeUndefined()
+  it.each([
+    undefined,
+    new Date('2026-01-15'),
+    new Date('2026-05-15'),
+    new Date('invalid'),
+  ])('no decide temporada punta por emisión %s', (fechaEmision) => {
+    const h = buscar(
+      suministro('agua', {
+        fechaEmision,
+        cargos: [{ concepto: 'Sobreconsumo punta', monto: 5000 }],
+      }),
+      'agua-periodo-punta-revisar',
+    )!
+    expect(h.severidad).toBe('revision')
+    expect(h.descripcion).toContain('fecha de emisión no determina')
   })
-})
-
-describe('analizarLegalmente: aviso corte luz/agua 15 días', () => {
-  it('informa plazo 15 días en electricidad', () => {
-    const boleta = makeBoletaElectricidad({
-      raw: 'Aviso de corte por no pago programado para el 05/07/2026',
-    })
-    const r = analizarLegalmente(boleta)
-    const h = r.find((a) => a.id === 'aviso-corte-15dias-electricidad')
-    expect(h).toBeDefined()
-    expect(h?.descripcion).toMatch(/15 d[íi]as/)
-  })
-
-  it('informa plazo 15 días en agua', () => {
-    const boleta = makeBoletaAgua({
-      raw: 'Suspensión del servicio por mora',
-    })
-    const r = analizarLegalmente(boleta)
-    expect(r.find((a) => a.id === 'aviso-corte-15dias-agua')).toBeDefined()
-  })
-})
-
-describe('analizarLegalmente: otros cargos sin desglose', () => {
-  it('marca derecho cuando hay un cargo "Otros"', () => {
-    const boleta = makeBoletaElectricidad({
-      cargos: [
-        { concepto: 'Cargo fijo', monto: 1048 },
-        { concepto: 'Otros', monto: 3500 },
-      ],
-    })
-    const r = analizarLegalmente(boleta)
-    expect(r.find((a) => a.id === 'otros-cargos-sin-desglose')).toBeDefined()
-  })
-
-  it('no marca cuando el cargo tiene concepto específico', () => {
-    const boleta = makeBoletaElectricidad({
-      cargos: [
-        { concepto: 'Cargo fijo', monto: 1048 },
-        { concepto: 'Cargo por uso del sistema de transmisión', monto: 3500 },
-      ],
-    })
-    const r = analizarLegalmente(boleta)
-    expect(r.find((a) => a.id === 'otros-cargos-sin-desglose')).toBeUndefined()
-  })
-})
-
-describe('analizarLegalmente: reconexión oportuna', () => {
-  it('informa el derecho cuando la boleta menciona deuda', () => {
-    const boleta = makeBoletaElectricidad({
-      raw: 'Tiene un saldo vencido de períodos anteriores',
-    })
-    const r = analizarLegalmente(boleta)
-    expect(r.find((a) => a.id === 'reconexion-oportuna')).toBeDefined()
-  })
-
-  it('no aparece en boleta sin deuda ni corte', () => {
-    const boleta = makeBoletaElectricidad()
-    const r = analizarLegalmente(boleta)
-    expect(r.find((a) => a.id === 'reconexion-oportuna')).toBeUndefined()
-  })
-})
-
-describe('analizarLegalmente: plazos de reclamo con sospechosos', () => {
-  it('recuerda los plazos cuando hay un cargo sospechoso', () => {
-    const boleta = makeBoletaElectricidad({
-      cargos: [
-        { concepto: 'Cargo fijo', monto: 1048 },
-        {
-          concepto: 'Reposición de servicio',
-          monto: 5000,
-          sospechoso: true,
-          razonSospecha: 'Sin corte registrado',
+  it.each([undefined, new Date('2026-07-15'), new Date('2026-12-15')])(
+    'no aprueba ni rechaza invierno por emisión %s',
+    (fechaEmision) => {
+      const h = buscar(
+        boleta({
+          fechaEmision,
+          cargos: [{ concepto: 'Recargo por consumo invierno', monto: 8000 }],
+        }),
+        'recargo-invierno-revisar',
+      )!
+      expect(h.accionSugerida).toContain('No lo des por válido')
+    },
+  )
+  it('una boleta emitida en abril puede incluir consumo de marzo sin declararse ilegal', () => {
+    const h = buscar(
+      suministro('agua', {
+        fechaEmision: new Date('2026-04-10'),
+        periodo: {
+          desde: new Date('2026-03-01'),
+          hasta: new Date('2026-03-31'),
         },
-      ],
-    })
-    const r = analizarLegalmente(boleta)
-    expect(r.find((a) => a.id === 'plazos-reclamo-sospechosos')).toBeDefined()
+        cargos: [{ concepto: 'Sobreconsumo', monto: 10 }],
+      }),
+      'agua-periodo-punta-revisar',
+    )!
+    expect(h.descripcion).not.toMatch(
+      /error de facturación|fuera del período legal/,
+    )
   })
+  it('un nombre incompleto de cargo no prueba inexistencia del componente', () => {
+    const h = buscar(
+      boleta({ cargos: [{ concepto: 'Cargo único', monto: 500 }] }),
+      'cargo-unico-bt1',
+    )!
+    expect(h.accionSugerida).toContain('denominación completa')
+    expect(
+      buscar(
+        boleta({
+          cargos: [{ concepto: 'Cargo único sistema transmisión', monto: 500 }],
+        }),
+        'cargo-unico-bt1',
+      ),
+    ).toBeUndefined()
+  })
+  it('alcantarillado sin línea de agua se trata como posible extracción incompleta', () => {
+    const h = buscar(
+      suministro('agua', {
+        cargos: [{ concepto: 'Recolección', monto: 3000 }],
+      }),
+      'agua-alcantarillado-sin-agua-potable',
+    )!
+    expect(h.descripcion).toContain('faltar en la extracción')
+    expect(h.descripcion).not.toContain('no tiene base')
+  })
+  it.each(['Consumo agua potable', 'Consumo de agua', 'Agua potable'])(
+    'reconoce el cargo de agua con etiqueta %s',
+    (concepto) => {
+      expect(
+        buscar(
+          suministro('agua', {
+            cargos: [
+              { concepto: 'Recolección', monto: 3000 },
+              { concepto, monto: 4000 },
+            ],
+          }),
+          'agua-alcantarillado-sin-agua-potable',
+        ),
+      ).toBeUndefined()
+    },
+  )
+})
 
-  it('no aparece cuando ningún cargo es sospechoso', () => {
-    const boleta = makeBoletaElectricidad()
-    const r = analizarLegalmente(boleta)
-    expect(r.find((a) => a.id === 'plazos-reclamo-sospechosos')).toBeUndefined()
+describe('mora: sin umbral universal ni conversión anual supuesta', () => {
+  it.each(['1,5', '2.5', '4', '12.75'])(
+    'tasa %s mensual requiere base y referencia aplicable',
+    (tasa) => {
+      const h = buscar(
+        boleta({
+          raw: `Interés por mora ${tasa}% mensual sobre saldos vencidos`,
+        }),
+        'interes-mora-verificar-tmc',
+      )!
+      expect(h.severidad).toBe('revision')
+      expect(h.descripcion).toContain(`${tasa}% mensual`)
+      expect(h.descripcion).not.toMatch(/usura|supera|anual/)
+      expect(h.accionSugerida).toContain('fecha aplicable')
+    },
+  )
+  it('una tasa de publicidad en otra línea no se atribuye al cargo por mora', () => {
+    const h = buscar(
+      boleta({
+        raw: 'Oferta de crédito: tasa 4% mensual\nMora de tu servicio',
+        cargos: [{ concepto: 'Interés por mora', monto: 200 }],
+      }),
+      'interes-mora-verificar-tmc',
+    )!
+    expect(h.descripcion).not.toContain('4%')
+    expect(h.descripcion).toContain('no una tasa mensual vinculada')
+  })
+  it.each([
+    'Tasa promocional 4% mensual',
+    'Sin demora: tasa promocional 4% mensual',
+  ])('no transforma publicidad en mora: %s', (raw) => {
+    expect(
+      buscar(boleta({ raw }), 'interes-mora-verificar-tmc'),
+    ).toBeUndefined()
+  })
+  it('un cargo de mora sin tasa pide cálculo, sin certificar legalidad', () => {
+    expect(
+      buscar(
+        boleta({ cargos: [{ concepto: 'Recargo por mora', monto: 200 }] }),
+        'interes-mora-verificar-tmc',
+      )?.descripcion,
+    ).toContain('importe por sí solo')
+  })
+  it.each([0, -200, Infinity])(
+    'no trata un abono o importe %s como cobro de mora',
+    (monto) => {
+      expect(
+        buscar(
+          boleta({ cargos: [{ concepto: 'Recargo por mora', monto }] }),
+          'interes-mora-verificar-tmc',
+        ),
+      ).toBeUndefined()
+    },
+  )
+})
+
+describe('beneficios, cortes y plazos', () => {
+  it.each([
+    [
+      'electricidad',
+      'Publicidad Subsidio Eléctrico Ley 21.667',
+      'subsidio-21667-ausente',
+    ],
+    [
+      'agua',
+      'Postula al Subsidio al Pago del Consumo de Agua Potable',
+      'agua-subsidio-sap-ausente',
+    ],
+  ] as const)(
+    'no atribuye un beneficio por una publicidad de %s',
+    (servicio, raw, id) => {
+      const h = buscar(suministro(servicio, { raw }), id)!
+      expect(h.severidad).toBe('informativo')
+      expect(h.descripcion).toMatch(/aviso general|publicidad/)
+      expect(h.accionSugerida).not.toMatch(/exígelo|retroactivo/)
+    },
+  )
+  it.each([
+    ['electricidad', 'Subsidio eléctrico', 'subsidio-21667-ausente'],
+    ['agua', 'Subsidio agua potable', 'agua-subsidio-sap-ausente'],
+  ] as const)(
+    'un descuento leído evita el aviso de ausencia en %s',
+    (servicio, concepto, id) => {
+      expect(
+        buscar(
+          suministro(servicio, {
+            raw: concepto,
+            cargos: [{ concepto, monto: -500 }],
+          }),
+          id,
+        ),
+      ).toBeUndefined()
+    },
+  )
+  it('no confunde publicidad eléctrica con subsidio de agua', () => {
+    expect(
+      buscar(
+        suministro('agua', { raw: 'Postula al Subsidio Eléctrico' }),
+        'agua-subsidio-sap-ausente',
+      ),
+    ).toBeUndefined()
+  })
+  it('electrodependencia no promete suministro infalible ni inscripción confirmada', () => {
+    const h = buscar(
+      boleta({ raw: 'Registro de electrodependientes' }),
+      'electrodependiente-no-corte',
+    )!
+    expect(h.descripcion).toContain(
+      'No significa que el suministro no pueda fallar',
+    )
+    expect(h.descripcion).toContain('no verifica una inscripción')
+    expect(
+      buscar(
+        suministro('agua', { raw: 'Electrodependientes' }),
+        'electrodependiente-no-corte',
+      ),
+    ).toBeUndefined()
+  })
+  it.each(['electricidad', 'agua', 'gas'] as const)(
+    'no traslada plazos ni protecciones entre servicios: %s',
+    (servicio) => {
+      const b = suministro(servicio, {
+        raw: 'Aviso de corte por mora. Saldo vencido.',
+      })
+      const aviso = buscar(b, `aviso-corte-${servicio}`)!
+      expect(aviso.fundamentoLegal.servicio).toBe(servicio)
+      expect(JSON.stringify(analizarLegalmente(b))).not.toMatch(
+        /15 días|10 días|24 horas|fines de semana|electrodependiente/,
+      )
+    },
+  )
+  it('no deduce compensación de una duración aislada', () => {
+    const h = buscar(
+      boleta({ raw: 'Interrupción de suministro: 30 horas sin luz' }),
+      'compensacion-corte-no-aplicada',
+    )!
+    expect(h.descripcion).toContain('No basta para confirmar')
+    expect(h.descripcion + h.accionSugerida).not.toMatch(
+      /22 horas|cargo fijo|compensación automática/,
+    )
+  })
+  it('una palabra sobre compensación no equivale a un abono extraído', () => {
+    expect(
+      buscar(
+        boleta({ raw: 'Interrupción de suministro; compensación pendiente' }),
+        'compensacion-corte-no-aplicada',
+      ),
+    ).toBeDefined()
+    expect(
+      buscar(
+        boleta({
+          raw: 'Interrupción de suministro',
+          cargos: [{ concepto: 'Compensación corte', monto: -500 }],
+        }),
+        'compensacion-corte-no-aplicada',
+      ),
+    ).toBeUndefined()
+  })
+  it('separar un despacho no prueba un recargo oculto', () => {
+    const h = buscar(
+      suministro('gas', {
+        tipoVenta: 'producto',
+        cargos: [{ concepto: 'Recargo despacho', monto: 1000 }],
+      }),
+      'gas-recargo-delivery-revisar',
+    )!
+    expect(h.descripcion).toContain(
+      'no demuestra que el precio no haya sido informado',
+    )
+  })
+  it.each([13, 30, 45])(
+    'el total de %s kg no se interpreta como formato de un cilindro',
+    (valor) => {
+      expect(
+        analizarLegalmente(
+          suministro('gas', {
+            tipoVenta: 'producto',
+            consumo: { valor, unidad: 'kg' },
+          }),
+        ),
+      ).toEqual([])
+    },
+  )
+  it('no aplica reglas de suministro por red a la compra de cilindros', () => {
+    const b = suministro('gas', {
+      tipoVenta: 'producto',
+      consumo: { unidad: 'kg', valor: 30 },
+      raw: 'Saldo anterior. Aviso de corte. Lectura estimada. Reliquidación.',
+      cargos: [{ concepto: 'Reposición', monto: 5000 }],
+    })
+    expect(analizarLegalmente(b)).toEqual([])
+  })
+  it('un formato de gas desconocido no prueba suministro por red', () => {
+    expect(
+      analizarLegalmente(
+        suministro('gas', {
+          consumo: { unidad: 'kg', valor: 30 },
+          raw: 'Aviso de corte',
+        }),
+      ),
+    ).toEqual([])
+  })
+  it('pedir desglose o reclamar no inventa cinco días universales', () => {
+    const b = boleta({
+      cargos: [{ concepto: 'Otros', monto: 2000, sospechoso: true }],
+    })
+    expect(buscar(b, 'otros-cargos-sin-desglose')).toBeDefined()
+    expect(buscar(b, 'plazos-reclamo-sospechosos')).toBeDefined()
+    expect(JSON.stringify(analizarLegalmente(b))).not.toMatch(
+      /tienen 5|15 días|lista para enviar/i,
+    )
   })
 })
 
-describe('analizarLegalmente: boleta limpia', () => {
-  it('no devuelve hallazgos para una boleta normal sin anomalías', () => {
-    const boleta = makeBoletaElectricidad()
-    const r = analizarLegalmente(boleta)
-    expect(r).toHaveLength(0)
+describe('contrato del análisis', () => {
+  it('es puro, ordena revisiones primero y no certifica ausencia de errores', () => {
+    const b = boleta({
+      raw: 'Lectura estimada. Aviso de corte.',
+      cargos: [{ concepto: 'Otros', monto: 10, sospechoso: true }],
+    })
+    const snapshot = structuredClone(b)
+    const result = analizarLegalmente(b)
+    expect(b).toEqual(snapshot)
+    expect(analizarLegalmente(b)).toEqual(result)
+    expect(result.map((h) => h.severidad)).toEqual([
+      'revision',
+      'revision',
+      'informativo',
+      'informativo',
+      'informativo',
+    ])
+    for (const h of result) {
+      expect(h.alcance).toBe('orientativo')
+      expect(h.versionAnalisis).toBe(REVISION_REFERENCIAS.version)
+      expect(h.fundamentoLegal.tipo).toMatch(/norma|contexto|canal/)
+    }
+    expect(analizarLegalmente(boleta())).toEqual([])
+  })
+  it('no presenta directorios de atención como texto de una norma', () => {
+    const normas = Object.values(TODA_NORMATIVA).filter(
+      (r) => r.tipo === 'norma',
+    )
+    expect(normas.length).toBeGreaterThan(0)
+    for (const r of normas)
+      expect(r.url).toMatch(/^https:\/\/www\.bcn\.cl\/leychile\//)
   })
 })

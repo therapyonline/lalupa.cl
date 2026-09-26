@@ -9,7 +9,13 @@ const guides = [
   'deuda-electrica-convenios-pago-chile',
   'lectura-estimada-medidor-luz-cuando-es-legal',
   'subsidio-electrico-2026-requisitos',
+  'te-cortaron-servicio-sin-aviso-que-hacer',
+  'reclamar-cobro-indebido-paso-a-paso',
+  'derechos-consumidor-chile-servicios-basicos',
+  'subsidio-agua-potable-sap-chile',
 ]
+
+const revisadasEl26 = new Set(guides.slice(7))
 
 for (const slug of guides) {
   test(`${slug}: navegación móvil, enlaces y autor editorial`, async ({
@@ -45,9 +51,7 @@ for (const slug of guides) {
       page.locator('meta[property="article:modified_time"]'),
     ).toHaveAttribute(
       'content',
-      slug === 'subsidio-electrico-2026-requisitos'
-        ? '2026-09-26'
-        : '2026-09-25',
+      revisadasEl26.has(slug) ? '2026-09-26' : '2026-09-25',
     )
     const paths = await page
       .locator('article a[href^="/"]')
@@ -99,9 +103,7 @@ test('robots permite descubrir noindex; resultados quedan fuera del sitemap', as
       .split('<url>')
       .find((part) => part.includes(`/guias/${slug}</loc>`))
     expect(entry).toContain(
-      slug === 'subsidio-electrico-2026-requisitos'
-        ? '2026-09-26'
-        : '2026-09-25',
+      revisadasEl26.has(slug) ? '2026-09-26' : '2026-09-25',
     )
   }
 })

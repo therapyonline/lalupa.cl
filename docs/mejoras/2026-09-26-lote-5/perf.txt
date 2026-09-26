@@ -1,0 +1,30 @@
+
+> lalupa@0.1.0 perf:audit:ci /Users/estebanlorca/Projects/lalupa.cl
+> node scripts/perf-audit.mjs --start-server --assert
+
+Iniciando `pnpm start` en background...
+Server listo.
+
+
+🔍 Auditando http://localhost:3000
+
+✓ /
+✓ /boleta-luz
+✓ /guias
+✓ /comparador-internet-hogar
+
+📊 Core Web Vitals (ms / count / kB):
+
+route                              FCP    LCP    CLS     TTFB   JS     CSS   img
+-----------------------------------------------------------------------------
+/                                     68     68   0.0000      7   991.7kB   0.0kB   0.0kB
+/boleta-luz                           68     68   0.0000      5   991.7kB   0.0kB   0.0kB
+/guias                                80     80   0.0002      5   994.2kB   0.0kB   0.0kB
+/comparador-internet-hogar            76     76   0.0006      7   994.2kB   0.0kB   0.0kB
+
+Umbrales (Web.dev / Lighthouse mobile):
+  LCP < 2500ms (good)  < 1500ms (excellent)
+  CLS < 0.1   (good)  < 0.05   (excellent)
+  FCP < 1800ms (good)  < 1000ms (excellent)
+
+✓ Within all perf budgets

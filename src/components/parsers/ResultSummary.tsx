@@ -11,7 +11,7 @@ export function ResultSummary({ boleta }: { boleta: ParsedBoleta }) {
           ? 'La lectura está incompleta. Revisa los datos faltantes antes de evaluar tu cuenta. '
           : flags
             ? `Hay ${flags} ${flags === 1 ? 'cargo para revisar' : 'cargos para revisar'} en los datos leídos. `
-            : 'No detectamos alertas en los datos que logramos leer. '}
+            : 'No hay cargos marcados en el desglose. '}
         Esto no confirma que la facturación sea correcta. Contrasta el documento
         original y la tarifa de tu período, zona y contrato antes de reclamar.
       </p>

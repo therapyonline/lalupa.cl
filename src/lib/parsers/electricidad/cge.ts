@@ -103,7 +103,7 @@ function detectarSospecha(
   }
 
   if (cargo.concepto === 'Cargo único') {
-    return 'Cargo único no es un componente estándar de la tarifa BT-1. Pedir detalle del concepto.'
+    return 'La etiqueta Cargo único no identifica el componente. Pide su denominación completa, unidad y detalle tarifario.'
   }
 
   // La extracción no acredita sector tarifario, IVA por línea ni vigencia

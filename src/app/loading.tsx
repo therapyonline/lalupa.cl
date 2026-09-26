@@ -7,7 +7,10 @@ import { LogoSpinner } from '@/components/ui/Skeleton'
 // queda en page.tsx; aquí basta con role="status".
 export default function Loading() {
   return (
-    <div className="flex flex-1 items-center justify-center bg-cream py-20">
+    // Reserva el viewport bajo el header mientras llega el contenido en streaming.
+    // Sin esta altura, el footer aparece dentro del primer pantallazo y salta
+    // fuera de él al resolver Suspense, generando un CLS alto en conexiones lentas.
+    <div className="flex min-h-[calc(100svh-4rem)] flex-1 items-center justify-center bg-cream py-20">
       <Container>
         <div
           role="status"

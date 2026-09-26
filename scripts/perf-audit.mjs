@@ -79,6 +79,7 @@ async function auditRoute(browser, route) {
   await page.addInitScript(() => {
     window.__lcp = 0
     window.__cls = 0
+    window.__layoutShifts = []
     new PerformanceObserver((list) => {
       for (const entry of list.getEntries()) {
         window.__lcp = Math.max(window.__lcp, entry.startTime)
@@ -86,7 +87,19 @@ async function auditRoute(browser, route) {
     }).observe({ type: 'largest-contentful-paint', buffered: true })
     new PerformanceObserver((list) => {
       for (const entry of list.getEntries()) {
-        if (!entry.hadRecentInput) window.__cls += entry.value
+        if (!entry.hadRecentInput) {
+          window.__cls += entry.value
+          window.__layoutShifts.push({
+            time: entry.startTime,
+            value: entry.value,
+            sources: entry.sources.map((source) => ({
+              node: source.node?.nodeName,
+              className: String(source.node?.className ?? ''),
+              previous: source.previousRect.toJSON(),
+              current: source.currentRect.toJSON(),
+            })),
+          })
+        }
       }
     }).observe({ type: 'layout-shift', buffered: true })
   })
@@ -114,6 +127,7 @@ async function auditRoute(browser, route) {
       firstContentfulPaint: fcp,
       largestContentfulPaint: window.__lcp || undefined,
       cls: window.__cls || 0,
+      layoutShifts: window.__layoutShifts,
     }
   })
 
@@ -133,6 +147,7 @@ async function auditRoute(browser, route) {
     jsKB: (totalJsBytes / 1024).toFixed(1),
     cssKB: (totalCssBytes / 1024).toFixed(1),
     imgKB: (totalImageBytes / 1024).toFixed(1),
+    layoutShifts: metrics.layoutShifts,
   }
 }
 
@@ -209,6 +224,7 @@ async function main() {
       }
       if (Number(r.cls) > BUDGET_CLS) {
         failures.push(`${r.route}: CLS ${r.cls} > ${BUDGET_CLS}`)
+        console.error('Layout shift attribution:', JSON.stringify({ route: r.route, shifts: r.layoutShifts }))
       }
       if (Number(r.jsKB) > BUDGET_JS_KB) {
         failures.push(`${r.route}: JS ${r.jsKB}kB > ${BUDGET_JS_KB}kB`)

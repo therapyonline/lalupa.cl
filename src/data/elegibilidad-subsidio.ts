@@ -1,20 +1,8 @@
 /**
- * Elegibilidad y monto del Subsidio Eléctrico Ley 21.667, 5ta convocatoria 2026
- *
- * Fuente: https://www.subsidioelectrico.cl/ (extraído 2026-05-06)
- * Marco legal: Ley 21.667, Decreto Exento Nº136/2024 Ministerio de Energía
- *
- * Esta lógica replica las condiciones del formulario oficial para que la
- * calculadora de lalupa.cl pueda pre-evaluar elegibilidad antes de redirigir
- * al usuario al sitio del Ministerio.
- *
- * IMPORTANTE: actualizar fechas y montos cuando inicie la 6ta convocatoria
- * (probablemente noviembre 2026).
+ * Orientación sobre requisitos de la quinta convocatoria, ya cerrada.
+ * Revisión: 2026-09-26. No consulta registros oficiales ni acredita adjudicación.
+ * Fuentes y alcance en ELEGIBILIDAD_METADATA. No extrapolar a futuras convocatorias.
  */
-
-// ============================================================================
-// TIPOS
-// ============================================================================
 
 export type TramoCSE =
   | '0-40'
@@ -22,57 +10,58 @@ export type TramoCSE =
   | '61-80'
   | '81-90'
   | '91-100'
-  | 'no_registrado';
+  | 'no_registrado'
 
-export type IntegrantesHogar = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | number;
+export type IntegrantesHogar = number
 
 export interface RespuestasUsuario {
   /** Q1: ¿Tiene 18 años o más? */
-  esMayorDeEdad: boolean;
+  esMayorDeEdad: boolean
   /** Q2: ¿Está inscrito en el Registro Social de Hogares? */
-  estaEnRSH: boolean;
+  estaEnRSH: boolean
   /** Q3: Tramo de Calificación Socioeconómica del RSH */
-  tramoCSE: TramoCSE;
+  tramoCSE: TramoCSE
   /** Q4: ¿En el hogar vive una persona electrodependiente inscrita en el Registro? */
-  hayElectrodependiente: boolean;
+  hayElectrodependiente: boolean
   /** Q5: ¿Es cliente residencial (vivienda, no comercio)? */
-  esClienteResidencial: boolean;
-  /** Q6: ¿Está conectado a una empresa o cooperativa eléctrica regulada (NO sistema aislado)? */
-  estaEnSistemaRegulado: boolean;
-  /** Q7: ¿Está al día en el pago de la cuenta de luz (o tiene convenio de pago vigente)? */
-  estaAlDia: boolean;
+  esClienteResidencial: boolean
+  /** Q6: ¿Era cliente de una empresa o cooperativa concesionaria de distribución? */
+  estaEnSistemaRegulado: boolean
+  /** Q7: ¿Cumplía la condición de pago al 22 de junio de 2026? */
+  estaAlDia: boolean
   /** Q8: ¿Tiene ClaveÚnica? */
-  tieneClaveUnica: boolean;
+  tieneClaveUnica: boolean
   /** Q9: Cantidad de integrantes del hogar según RSH */
-  cantidadIntegrantes: IntegrantesHogar;
+  cantidadIntegrantes: IntegrantesHogar
   /** Q10 (opcional): ¿Otra persona del hogar ya postuló a esta convocatoria? */
-  otroIntegranteYaPostulo?: boolean;
+  otroIntegranteYaPostulo?: boolean
   /** Q11 (opcional): ¿Vive en una agrupación de viviendas (varias casas comparten empalme)? */
-  esAgrupacionDeViviendas?: boolean;
+  esAgrupacionDeViviendas?: boolean
   /** Q12 (opcional para priorización): ¿Hay personas con discapacidad / dependencia / invalidez en el hogar? */
-  hayPersonaConDiscapacidad?: boolean;
+  hayPersonaConDiscapacidad?: boolean
   /** Q13 (opcional): ¿Hay niños o adolescentes (<18 años) en el hogar? */
-  hayNinos?: boolean;
+  hayNinos?: boolean
   /** Q14 (opcional): ¿Hay adultos mayores en el hogar? */
-  hayAdultoMayor?: boolean;
+  hayAdultoMayor?: boolean
   /** Q15 (opcional): ¿Hay alguien que ejerce cuidado de otra persona en el hogar? */
-  hayPersonaCuidadora?: boolean;
+  hayPersonaCuidadora?: boolean
 }
 
 export interface ResultadoElegibilidad {
-  califica: boolean;
-  motivo: string;
-  /** Monto semestral estimado en CLP (null si no califica) */
-  montoSemestralCLP: number | null;
+  /** Coincidencia orientativa de respuestas; NO adjudicación ni plazo abierto. */
+  califica: boolean
+  motivo: string
+  /** Referencia semestral por integrantes; no es una asignación oficial. */
+  montoSemestralCLP: number | null
   /** Monto mensual estimado en CLP (1 cuota = monto / 6) */
-  montoMensualCLP: number | null;
-  /** Probabilidad de priorización (alta / media / baja) */
-  prioridad: 'alta' | 'media' | 'baja' | 'na';
-  pasosSiguientes: string[];
+  montoMensualCLP: number | null
+  /** Factores declarados; no son un puntaje ni una probabilidad de asignación. */
+  factoresPrioridad: string[]
+  pasosSiguientes: string[]
   /** Alertas o consideraciones especiales */
-  alertas: string[];
-  /** Por qué no califica (si aplica), útil para guiar al usuario */
-  bloqueadores: string[];
+  alertas: string[]
+  /** Antecedentes por verificar; no equivalen a un rechazo oficial. */
+  bloqueadores: string[]
 }
 
 // ============================================================================
@@ -83,25 +72,35 @@ export interface ResultadoElegibilidad {
 export const MONTOS_SUBSIDIO_5TA_CONVOCATORIA_CLP = {
   hogar1Integrante: 17346,
   hogar2a3Integrantes: 22548,
-  hogar4OMasIntegrantes: 32224,
-} as const;
+  hogar4OMasIntegrantes: 31224,
+} as const
 
 /** Calendario 5ta convocatoria */
 export const CALENDARIO_5TA_CONVOCATORIA = {
   postulacionInicio: '2026-05-26',
   postulacionFin: '2026-06-05',
-  fechaCorteRSH: '2026-05-31', // segunda quincena mayo 2026
-  fechaCorteElectrodependientes: '2026-03-31', // marzo 2026
+  periodoRSH: 'segunda quincena de mayo de 2026',
+  periodoRegistroElectrodependientes: 'marzo de 2026',
   fechaAlDiaPago: '2026-06-22',
-  resultadosFecha: '2026-08-31',
-  primeraCuotaFecha: '2026-09-01',
-  ultimaCuotaFecha: '2026-12-31',
-} as const;
+  resultadosFecha: '2026-08-12',
+  primerDescuentoMes: '2026-08',
+  ultimoDescuentoMes: '2026-12',
+} as const
 
 const MESES_ES = [
-  'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
-  'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',
-] as const;
+  'enero',
+  'febrero',
+  'marzo',
+  'abril',
+  'mayo',
+  'junio',
+  'julio',
+  'agosto',
+  'septiembre',
+  'octubre',
+  'noviembre',
+  'diciembre',
+] as const
 
 /**
  * Formatea una fecha ISO 'YYYY-MM-DD' a "DD de mes de YYYY" en español.
@@ -114,14 +113,14 @@ const MESES_ES = [
  * manual los componentes y mapeamos el mes.
  */
 export function formatFechaCalendario(iso: string): string {
-  const m = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if (!m) return iso;
-  const year = m[1];
-  const monthIdx = parseInt(m[2], 10) - 1;
-  const day = parseInt(m[3], 10);
-  const mes = MESES_ES[monthIdx] ?? '';
-  if (!mes) return iso;
-  return `${day} de ${mes} de ${year}`;
+  const m = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/)
+  if (!m) return iso
+  const year = m[1]
+  const monthIdx = parseInt(m[2], 10) - 1
+  const day = parseInt(m[3], 10)
+  const mes = MESES_ES[monthIdx] ?? ''
+  if (!mes) return iso
+  return `${day} de ${mes} de ${year}`
 }
 
 // ============================================================================
@@ -130,38 +129,38 @@ export function formatFechaCalendario(iso: string): string {
 
 /** Q1, Edad mínima 18 años */
 function cumpleEdad(r: RespuestasUsuario): boolean {
-  return r.esMayorDeEdad === true;
+  return r.esMayorDeEdad === true
 }
 
 /** Q2, Estar en RSH */
 function cumpleRSH(r: RespuestasUsuario): boolean {
-  return r.estaEnRSH === true;
+  return r.estaEnRSH === true
 }
 
 /** Q3 + Q4, Cumple criterio principal (tramo 0-40% O electrodependiente) */
 function cumpleCriterioPrincipal(r: RespuestasUsuario): boolean {
-  if (r.hayElectrodependiente) return true;
-  return r.tramoCSE === '0-40';
+  if (r.hayElectrodependiente === true) return true
+  return r.tramoCSE === '0-40'
 }
 
 /** Q5, Cliente residencial */
 function cumpleClienteResidencial(r: RespuestasUsuario): boolean {
-  return r.esClienteResidencial === true;
+  return r.esClienteResidencial === true
 }
 
-/** Q6, Sistema regulado (no aislado) */
+/** Q6, Empresa o cooperativa concesionaria de distribución */
 function cumpleSistemaRegulado(r: RespuestasUsuario): boolean {
-  return r.estaEnSistemaRegulado === true;
+  return r.estaEnSistemaRegulado === true
 }
 
 /** Q7, Al día con la cuenta */
 function cumpleAlDia(r: RespuestasUsuario): boolean {
-  return r.estaAlDia === true;
+  return r.estaAlDia === true
 }
 
 /** Q8, Tiene ClaveÚnica (no bloqueador, hay vías presenciales) */
 function tieneClaveUnica(r: RespuestasUsuario): boolean {
-  return r.tieneClaveUnica === true;
+  return r.tieneClaveUnica === true
 }
 
 // ============================================================================
@@ -169,344 +168,176 @@ function tieneClaveUnica(r: RespuestasUsuario): boolean {
 // ============================================================================
 
 export function calcularMontoSemestral(integrantes: number): number {
-  if (integrantes <= 0) return 0;
-  if (integrantes === 1) return MONTOS_SUBSIDIO_5TA_CONVOCATORIA_CLP.hogar1Integrante;
-  if (integrantes >= 2 && integrantes <= 3) return MONTOS_SUBSIDIO_5TA_CONVOCATORIA_CLP.hogar2a3Integrantes;
-  return MONTOS_SUBSIDIO_5TA_CONVOCATORIA_CLP.hogar4OMasIntegrantes;
+  if (!Number.isSafeInteger(integrantes) || integrantes <= 0) return 0
+  if (integrantes === 1)
+    return MONTOS_SUBSIDIO_5TA_CONVOCATORIA_CLP.hogar1Integrante
+  if (integrantes >= 2 && integrantes <= 3)
+    return MONTOS_SUBSIDIO_5TA_CONVOCATORIA_CLP.hogar2a3Integrantes
+  return MONTOS_SUBSIDIO_5TA_CONVOCATORIA_CLP.hogar4OMasIntegrantes
 }
 
 export function calcularMontoMensual(integrantes: number): number {
-  return Math.round(calcularMontoSemestral(integrantes) / 6);
+  return Math.round(calcularMontoSemestral(integrantes) / 6)
 }
 
 // ============================================================================
 // PRIORIZACIÓN
 // ============================================================================
 
-function calcularPrioridad(r: RespuestasUsuario): 'alta' | 'media' | 'baja' {
-  // Alta: persona electrodependiente (postulación automática)
-  if (r.hayElectrodependiente) return 'alta';
-
-  // Media: tramo 0-40% + algún factor de vulnerabilidad adicional
-  if (
-    r.tramoCSE === '0-40' &&
-    (r.hayPersonaConDiscapacidad ||
-      r.hayNinos ||
-      r.hayAdultoMayor ||
-      r.hayPersonaCuidadora)
-  ) {
-    return 'media';
-  }
-
-  // Baja: tramo 0-40% sin vulnerabilidad adicional
-  return 'baja';
+function factoresDePrioridad(r: RespuestasUsuario): string[] {
+  const factores: string[] = []
+  if (r.hayElectrodependiente)
+    factores.push(
+      'Persona electrodependiente inscrita en el registro correspondiente.',
+    )
+  if (r.hayPersonaConDiscapacidad)
+    factores.push('Persona con discapacidad, dependencia o invalidez.')
+  if (r.hayNinos) factores.push('Niños, niñas o adolescentes en el hogar.')
+  if (r.hayAdultoMayor) factores.push('Persona adulta mayor en el hogar.')
+  if (r.hayPersonaCuidadora) factores.push('Persona cuidadora en el hogar.')
+  return factores
 }
 
 // ============================================================================
 // EVALUACIÓN PRINCIPAL
 // ============================================================================
 
-export function evaluarSubsidioElectrico(r: RespuestasUsuario): ResultadoElegibilidad {
-  const bloqueadores: string[] = [];
-  const alertas: string[] = [];
+export function evaluarSubsidioElectrico(
+  r: RespuestasUsuario,
+): ResultadoElegibilidad {
+  const bloqueadores: string[] = []
+  const alertas: string[] = [
+    'La postulación de la quinta convocatoria está cerrada. Esta revisión no consulta tu resultado oficial ni habilita una nueva solicitud.',
+    'El monto por integrantes es referencial: un suministro compartido por varios hogares puede requerir otro cálculo. Verifica el monto asignado en el portal oficial.',
+  ]
+  if (
+    !Number.isSafeInteger(r.cantidadIntegrantes) ||
+    r.cantidadIntegrantes < 1
+  ) {
+    bloqueadores.push(
+      'Indica una cantidad entera y válida de integrantes del hogar.',
+    )
+  }
 
   if (!cumpleEdad(r)) {
-    bloqueadores.push('Debes tener 18 años o más para postular en representación de tu hogar.');
+    bloqueadores.push(
+      'Revisa que cumplías la edad mínima de 18 años al postular en representación de tu hogar.',
+    )
   }
 
   if (!cumpleRSH(r)) {
     bloqueadores.push(
-      'Tu hogar debe estar inscrito en el Registro Social de Hogares (RSH). Regístrate en https://www.ventanillaunicasocial.gob.cl/.',
-    );
+      'Revisa la inscripción de tu hogar en el RSH vigente en la segunda quincena de mayo de 2026. Una inscripción posterior no acredita ese requisito histórico.',
+    )
   } else if (!cumpleCriterioPrincipal(r)) {
     bloqueadores.push(
-      'Para calificar debes pertenecer al tramo 0-40% del RSH O tener una persona electrodependiente en el hogar inscrita en el Registro de Personas Electrodependientes.',
-    );
+      'Revisa si tu hogar pertenecía al tramo 0-40% del RSH en la segunda quincena de mayo de 2026 o contaba con una persona electrodependiente inscrita a marzo de 2026.',
+    )
   }
 
   if (!cumpleClienteResidencial(r)) {
     bloqueadores.push(
       'El subsidio aplica solo a clientes residenciales. Las cuentas comerciales no califican.',
-    );
+    )
   }
 
   if (!cumpleSistemaRegulado(r)) {
     bloqueadores.push(
-      'El subsidio aplica solo a clientes regulados por la SEC. Los sistemas aislados (algunas zonas extremas) no califican.',
-    );
+      'Confirma que eres cliente de una empresa o cooperativa concesionaria de distribución eléctrica. El cuestionario no comprueba la condición de tu suministro.',
+    )
   }
 
   if (!cumpleAlDia(r)) {
     bloqueadores.push(
-      `Debes estar al día en el pago de tu cuenta de luz al ${formatFechaCalendario(CALENDARIO_5TA_CONVOCATORIA.fechaAlDiaPago)} (o tener convenio de pago vigente). Regulariza con tu empresa eléctrica antes de postular.`,
-    );
+      `Debías cumplir la condición de pago al ${formatFechaCalendario(CALENDARIO_5TA_CONVOCATORIA.fechaAlDiaPago)}. Regularizar hoy no acredita que cumplías el requisito en esa fecha.`,
+    )
   }
 
   if (r.otroIntegranteYaPostulo === true) {
     bloqueadores.push(
-      'Otro integrante de tu hogar ya postuló en esta convocatoria. Solo se permite una postulación por hogar.',
-    );
+      'Ya existe una solicitud de otro integrante del hogar. Consulta esa solicitud; esta respuesta no significa que el hogar haya sido rechazado.',
+    )
   }
 
   // Alertas (no bloquean pero son importantes)
   if (!tieneClaveUnica(r)) {
     alertas.push(
-      'No tienes ClaveÚnica. Puedes obtenerla en https://claveunica.gob.cl/ o postular presencialmente en Chile Atiende con tu cédula y boleta de luz.',
-    );
+      'No tener ClaveÚnica no determina la elegibilidad. Puedes consultar el resultado mediante los canales de atención de ChileAtiende.',
+    )
   }
 
   if (r.esAgrupacionDeViviendas === true) {
     alertas.push(
-      'Vives en una agrupación de viviendas. Asegúrate de declararlo en el formulario para que la SEC verifique y entregue el subsidio desagrupado (un descuento por hogar).',
-    );
+      'Si perteneces a una agrupación de viviendas, verifica cómo quedó registrada la asignación en tu solicitud oficial.',
+    )
   }
 
   if (r.hayElectrodependiente) {
     alertas.push(
-      'Hogar con persona electrodependiente: postulación automática garantizada (sin importar tramo CSE), siempre que estén inscritos en el Registro de Personas Electrodependientes.',
-    );
+      'La regla para electrodependencia exige los registros y fechas aplicables a esta convocatoria. Tu respuesta no comprueba una inscripción ni una adjudicación automática.',
+    )
   }
 
   // Determinar resultado
-  const califica = bloqueadores.length === 0;
+  const califica = bloqueadores.length === 0
 
   if (califica) {
-    const monto = calcularMontoSemestral(r.cantidadIntegrantes);
-    const prioridad = calcularPrioridad(r);
+    const monto = calcularMontoSemestral(r.cantidadIntegrantes)
+    const factoresPrioridad = factoresDePrioridad(r)
     return {
       califica: true,
-      motivo: descripcionMotivoCalifica(r, prioridad),
+      motivo:
+        'Tus respuestas coinciden con los requisitos consultados de la quinta convocatoria. Solo el resultado oficial confirma si tu hogar recibió el beneficio.',
       montoSemestralCLP: monto,
       montoMensualCLP: calcularMontoMensual(r.cantidadIntegrantes),
-      prioridad,
-      pasosSiguientes: pasosCalificas(r),
+      factoresPrioridad,
+      pasosSiguientes: pasosConsulta(),
       alertas,
       bloqueadores: [],
-    };
+    }
   }
 
   return {
     califica: false,
-    motivo: 'No califica para esta convocatoria por las razones detalladas en bloqueadores.',
+    motivo:
+      'Hay antecedentes que revisar. Esto no equivale a un rechazo oficial de tu hogar.',
     montoSemestralCLP: null,
     montoMensualCLP: null,
-    prioridad: 'na',
-    pasosSiguientes: pasosNoCalificas(r),
+    factoresPrioridad: factoresDePrioridad(r),
+    pasosSiguientes: pasosConsulta(),
     alertas,
     bloqueadores,
-  };
+  }
 }
 
-function descripcionMotivoCalifica(r: RespuestasUsuario, prioridad: 'alta' | 'media' | 'baja'): string {
-  if (r.hayElectrodependiente) {
-    return 'Tu hogar califica con prioridad alta por incluir una persona electrodependiente.';
-  }
-  if (prioridad === 'media') {
-    return 'Tu hogar califica con prioridad media por estar en tramo 0-40% RSH y tener integrantes vulnerables (discapacidad, niños, adulto mayor o cuidadora).';
-  }
-  return 'Tu hogar califica para postular al Subsidio Eléctrico de la 5ta convocatoria.';
+function pasosConsulta(): string[] {
+  return [
+    'Consulta el resultado y el monto asignado en subsidioelectrico.cl o en la sección Mis trámites / Apoyos recibidos de Ventanilla Única Social.',
+    'Contrasta el número de cliente asignado con tu boleta y revisa descuentos y períodos informados.',
+    'Si necesitas aclarar una diferencia, conserva la resolución, la boleta y el comprobante de atención; consulta los canales oficiales disponibles.',
+  ]
 }
-
-function pasosCalificas(r: RespuestasUsuario): string[] {
-  const pasos: string[] = [
-    `Postula entre el ${formatFechaCalendario(CALENDARIO_5TA_CONVOCATORIA.postulacionInicio)} y el ${formatFechaCalendario(CALENDARIO_5TA_CONVOCATORIA.postulacionFin)} en https://www.subsidioelectrico.cl/`,
-    'Inicia sesión con tu ClaveÚnica',
-    'Ten a mano tu boleta de luz para copiar el número de cliente exacto (con dígito verificador, puntos y guiones)',
-    'Completa: región, comuna, empresa eléctrica, número de cliente, correo y teléfono',
-    'Declara si vives en agrupación de viviendas (varias casas con un solo empalme)',
-  ];
-
-  if (r.hayElectrodependiente) {
-    pasos.unshift(
-      'Tu postulación es automática por persona electrodependiente. Verifica igual en el portal por seguridad.',
-    );
-  }
-
-  pasos.push(
-    `Resultados publicados en agosto 2026. Primera cuota se aplicará desde septiembre 2026 en tu boleta como "Subsidio Eléctrico Ley N°21.667".`,
-  );
-
-  return pasos;
-}
-
-function pasosNoCalificas(r: RespuestasUsuario): string[] {
-  const pasos: string[] = [];
-
-  if (!r.estaEnRSH) {
-    pasos.push(
-      'Inscríbete en el Registro Social de Hogares: https://www.ventanillaunicasocial.gob.cl/',
-    );
-  } else if (r.tramoCSE !== '0-40' && !r.hayElectrodependiente) {
-    pasos.push(
-      'Si tu situación socioeconómica cambió, actualiza tu RSH: https://www.ventanillaunicasocial.gob.cl/',
-    );
-    pasos.push(
-      'Si en tu hogar hay una persona electrodependiente, inscríbela en el Registro de Personas Electrodependientes con tu empresa eléctrica (necesitas certificado médico).',
-    );
-  }
-
-  if (!r.estaAlDia) {
-    pasos.push(
-      `Regulariza tu deuda con la empresa eléctrica antes del ${formatFechaCalendario(CALENDARIO_5TA_CONVOCATORIA.fechaAlDiaPago)} (puede ser convenio de pago).`,
-    );
-  }
-
-  if (!r.esClienteResidencial) {
-    pasos.push(
-      'Verifica con tu empresa eléctrica si tu cuenta puede pasar a cliente residencial.',
-    );
-  }
-
-  // Otros subsidios alternativos
-  pasos.push('Considera otros beneficios: SAP (agua), Bono Gas Licuado, Aporte Familiar Permanente.');
-
-  return pasos;
-}
-
-// ============================================================================
-// TESTS UNITARIOS BÁSICOS (Vitest / Jest compatible)
-// ============================================================================
-
-/**
- * Para correr: ts-node con un test runner.
- * Estos casos cubren los escenarios principales documentados en R3.1.
- */
-
-export const TEST_CASES = {
-  /** Caso 1: Califica claramente, prioridad baja (tramo 0-40 sin vulnerabilidades) */
-  calificaBaja: {
-    input: {
-      esMayorDeEdad: true,
-      estaEnRSH: true,
-      tramoCSE: '0-40',
-      hayElectrodependiente: false,
-      esClienteResidencial: true,
-      estaEnSistemaRegulado: true,
-      estaAlDia: true,
-      tieneClaveUnica: true,
-      cantidadIntegrantes: 2,
-    } as RespuestasUsuario,
-    expected: {
-      califica: true,
-      montoSemestralCLP: 22548,
-      montoMensualCLP: 3758,
-      prioridad: 'baja',
-    },
-  },
-
-  /** Caso 2: Califica con prioridad alta (electrodependiente) */
-  calificaElectrodependiente: {
-    input: {
-      esMayorDeEdad: true,
-      estaEnRSH: true,
-      tramoCSE: '61-80', // sin importar tramo
-      hayElectrodependiente: true,
-      esClienteResidencial: true,
-      estaEnSistemaRegulado: true,
-      estaAlDia: true,
-      tieneClaveUnica: true,
-      cantidadIntegrantes: 5,
-    } as RespuestasUsuario,
-    expected: {
-      califica: true,
-      montoSemestralCLP: 32224,
-      montoMensualCLP: 5371,
-      prioridad: 'alta',
-    },
-  },
-
-  /** Caso 3: Califica con prioridad media (0-40 + adulto mayor) */
-  calificaMedia: {
-    input: {
-      esMayorDeEdad: true,
-      estaEnRSH: true,
-      tramoCSE: '0-40',
-      hayElectrodependiente: false,
-      esClienteResidencial: true,
-      estaEnSistemaRegulado: true,
-      estaAlDia: true,
-      tieneClaveUnica: true,
-      cantidadIntegrantes: 1,
-      hayAdultoMayor: true,
-    } as RespuestasUsuario,
-    expected: {
-      califica: true,
-      montoSemestralCLP: 17346,
-      montoMensualCLP: 2891,
-      prioridad: 'media',
-    },
-  },
-
-  /** Caso 4: NO califica, tramo alto sin electrodependiente */
-  noCalificaTramoAlto: {
-    input: {
-      esMayorDeEdad: true,
-      estaEnRSH: true,
-      tramoCSE: '91-100',
-      hayElectrodependiente: false,
-      esClienteResidencial: true,
-      estaEnSistemaRegulado: true,
-      estaAlDia: true,
-      tieneClaveUnica: true,
-      cantidadIntegrantes: 3,
-    } as RespuestasUsuario,
-    expected: {
-      califica: false,
-      montoSemestralCLP: null,
-    },
-  },
-
-  /** Caso 5: NO califica, no está al día */
-  noCalificaDeuda: {
-    input: {
-      esMayorDeEdad: true,
-      estaEnRSH: true,
-      tramoCSE: '0-40',
-      hayElectrodependiente: false,
-      esClienteResidencial: true,
-      estaEnSistemaRegulado: true,
-      estaAlDia: false,
-      tieneClaveUnica: true,
-      cantidadIntegrantes: 4,
-    } as RespuestasUsuario,
-    expected: {
-      califica: false,
-      montoSemestralCLP: null,
-    },
-  },
-
-  /** Caso 6: Borderline, no tiene ClaveÚnica pero tiene todo lo demás (NO bloquea, alerta) */
-  borderlineSinClaveUnica: {
-    input: {
-      esMayorDeEdad: true,
-      estaEnRSH: true,
-      tramoCSE: '0-40',
-      hayElectrodependiente: false,
-      esClienteResidencial: true,
-      estaEnSistemaRegulado: true,
-      estaAlDia: true,
-      tieneClaveUnica: false, // sin clave
-      cantidadIntegrantes: 1,
-    } as RespuestasUsuario,
-    expected: {
-      califica: true, // sigue calificando, hay alternativas presenciales
-      montoSemestralCLP: 17346,
-    },
-  },
-} as const;
-
-// ============================================================================
-// METADATA
-// ============================================================================
 
 export const ELEGIBILIDAD_METADATA = {
-  version: '0.1.0',
-  ultimaActualizacion: '2026-05-06',
-  proximaRevision: '2026-08-31', // tras resultados 5ta convocatoria
-  convocatoriaVigente: 5,
+  version: '0.2.0',
+  ultimaActualizacion: '2026-09-26',
+  convocatoria: 5,
+  estado: 'postulacion_cerrada',
   fuente: 'https://www.subsidioelectrico.cl/',
+  fuentes: {
+    montosYAplicacion:
+      'https://energia.gob.cl/noticias/nacional/quinto-proceso-de-entrega-del-subsidio-electrico-llega-cifra-mas-alta-de-beneficiarios-desde-su-creacion',
+    requisitos:
+      'https://www.gob.cl/noticias/como-postular-al-quinto-proceso-subsidio-electrico/',
+    cierreYResultados:
+      'https://www.gob.cl/noticias/fin-plazo-subsidio-electrico-quinta-convocatoria/',
+    consulta:
+      'https://www.ventanillaunicasocial.gob.cl/ficha/381/subsidio-electrico',
+  },
   notasActualizacion: [
-    'Cuando se publique la 6ta convocatoria (probablemente nov 2026), actualizar MONTOS y CALENDARIO.',
-    'Si cambia la metodología (ej: incluir tramo 41-60), revisar cumpleCriterioPrincipal.',
+    'Estado editorial verificado: la quinta postulación cerró; no se infiere una sexta convocatoria.',
+    'El anuncio de resultados del 11 de agosto actualiza la aplicación a agosto, con cuotas de julio y agosto juntas, según ciclo de facturación.',
+    'Los criterios orientativos no consultan RSH, pagos, registro de electrodependencia ni asignación oficial.',
+    'Actualizar convocatoria, fuentes, preguntas y versión del borrador solo tras una nueva publicación oficial.',
   ],
-} as const;
+} as const

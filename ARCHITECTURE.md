@@ -36,7 +36,7 @@ src/
 │   │   └── rss.xml/
 │   ├── tracker/            # Histórico personal (IndexedDB)
 │   ├── reclamar-sernac/    # Wizard 5 pasos → PDF
-│   ├── subsidio-electrico/ # Calculadora elegibilidad
+│   ├── subsidio-electrico/ # Revisión orientativa de convocatoria cerrada
 │   ├── comparador-internet-hogar/
 │   ├── como-funciona/      # Trust page con FAQ + CSP verification
 │   ├── privacidad/, terminos/, contacto/, sobre/

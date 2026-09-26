@@ -24,9 +24,7 @@ function makeBoletaElectricidad(
   }
 }
 
-function makeBoletaAgua(
-  overrides: Partial<ParsedBoleta> = {},
-): ParsedBoleta {
+function makeBoletaAgua(overrides: Partial<ParsedBoleta> = {}): ParsedBoleta {
   return {
     empresa: 'Aguas Andinas',
     servicio: 'agua',
@@ -93,7 +91,9 @@ describe('analizarLegalmente: reposición sin corte', () => {
       raw: 'Nota: corte de suministro registrado el 10/05/2026 por no pago. Reposición $ 5.000',
     })
     const r = analizarLegalmente(boleta)
-    expect(r.find((a) => a.id.startsWith('reposicion-sin-corte-'))).toBeUndefined()
+    expect(
+      r.find((a) => a.id.startsWith('reposicion-sin-corte-')),
+    ).toBeUndefined()
   })
 })
 
@@ -123,7 +123,10 @@ describe('analizarLegalmente: cargo de potencia en BT-1', () => {
       consumo: { unidad: 'kWh', valor: 250, tarifa: 'BT-1' },
       cargos: [
         { concepto: 'Cargo fijo', monto: 1048 },
-        { concepto: 'Cargo por demanda máxima de potencia suministrada', monto: 15000 },
+        {
+          concepto: 'Cargo por demanda máxima de potencia suministrada',
+          monto: 15000,
+        },
       ],
     })
     const r = analizarLegalmente(boleta)
@@ -137,7 +140,10 @@ describe('analizarLegalmente: cargo de potencia en BT-1', () => {
       consumo: { unidad: 'kWh', valor: 850, tarifa: 'BT-2' },
       cargos: [
         { concepto: 'Cargo fijo', monto: 1048 },
-        { concepto: 'Cargo por demanda máxima de potencia suministrada', monto: 28500 },
+        {
+          concepto: 'Cargo por demanda máxima de potencia suministrada',
+          monto: 28500,
+        },
       ],
     })
     const r = analizarLegalmente(boleta)
@@ -169,7 +175,9 @@ describe('analizarLegalmente: período punta agua fuera de verano', () => {
       ],
     })
     const r = analizarLegalmente(boleta)
-    expect(r.find((a) => a.id === 'agua-sobreconsumo-fuera-verano')).toBeDefined()
+    expect(
+      r.find((a) => a.id === 'agua-sobreconsumo-fuera-verano'),
+    ).toBeDefined()
   })
 
   it('no alerta cuando es enero (dentro del período punta)', () => {
@@ -181,17 +189,24 @@ describe('analizarLegalmente: período punta agua fuera de verano', () => {
       ],
     })
     const r = analizarLegalmente(boleta)
-    expect(r.find((a) => a.id === 'agua-sobreconsumo-fuera-verano')).toBeUndefined()
+    expect(
+      r.find((a) => a.id === 'agua-sobreconsumo-fuera-verano'),
+    ).toBeUndefined()
   })
 })
 
 describe('analizarLegalmente: subsidio Ley 21.667 ausente', () => {
-  it('marca derecho cuando la boleta menciona el subsidio pero no aparece como descuento', () => {
+  it('un aviso de postulación solo invita a verificar, sin afirmar incumplimiento', () => {
     const boleta = makeBoletaElectricidad({
       raw: 'Mensaje: Recuerda postular al Subsidio Eléctrico Ley 21.667 en subsidioelectrico.cl',
     })
     const r = analizarLegalmente(boleta)
-    expect(r.find((a) => a.id === 'subsidio-21667-ausente')).toBeDefined()
+    const aviso = r.find((a) => a.id === 'subsidio-21667-ausente')
+    expect(aviso?.severidad).toBe('informativo')
+    expect(aviso?.descripcion).toContain(
+      'no acredita que seas beneficiario ni un incumplimiento',
+    )
+    expect(aviso?.accionSugerida).not.toContain('retroactivo')
   })
 
   it('no alerta cuando el subsidio sí aparece como cargo negativo', () => {
@@ -269,12 +284,16 @@ describe('analizarLegalmente: cilindro GLP', () => {
 
   it('marca formato no estándar para cilindro de 13 kg', () => {
     const r = analizarLegalmente(makeCilindro(13))
-    expect(r.find((a) => a.id === 'gas-cilindro-formato-no-estandar')).toBeDefined()
+    expect(
+      r.find((a) => a.id === 'gas-cilindro-formato-no-estandar'),
+    ).toBeDefined()
   })
 
   it('no alerta para cilindro estándar de 15 kg', () => {
     const r = analizarLegalmente(makeCilindro(15))
-    expect(r.find((a) => a.id === 'gas-cilindro-formato-no-estandar')).toBeUndefined()
+    expect(
+      r.find((a) => a.id === 'gas-cilindro-formato-no-estandar'),
+    ).toBeUndefined()
   })
 
   it('detecta recargo de delivery como derecho', () => {
@@ -286,7 +305,9 @@ describe('analizarLegalmente: cilindro GLP', () => {
         ],
       }),
     )
-    expect(r.find((a) => a.id === 'gas-recargo-delivery-no-publicado')).toBeDefined()
+    expect(
+      r.find((a) => a.id === 'gas-recargo-delivery-no-publicado'),
+    ).toBeDefined()
   })
 })
 

@@ -10,7 +10,7 @@ import { SubsidioWizard } from './_components/wizard'
 export const metadata = buildMetadata({
   title: 'Subsidio eléctrico 2026',
   description:
-    '13 preguntas → te decimos si calificas al subsidio Ley 21.667 y cómo postular. Quinta convocatoria vigente.',
+    'La quinta postulación de 2026 cerró. Revisa sus requisitos y montos de referencia, y consulta el resultado oficial del Subsidio Eléctrico.',
   path: '/subsidio-electrico',
   ogKind: 'tool',
   ogCategory: 'Subsidio',
@@ -30,7 +30,7 @@ export default function SubsidioElectricoPage() {
           webApplicationSchema({
             name: 'Calculadora subsidio eléctrico',
             description:
-              'Wizard de 13 preguntas que evalúa si tu hogar califica al Subsidio Eléctrico Ley 21.667 antes de postular en subsidioelectrico.cl.',
+              'Orientación sobre los requisitos de la quinta convocatoria cerrada, con montos de referencia y acceso a la consulta oficial. No acredita adjudicación.',
             path: '/subsidio-electrico',
           }),
           breadcrumbsSchema([

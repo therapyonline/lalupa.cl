@@ -8,7 +8,7 @@
  *  - re-exports del motor (`evaluarSubsidioElectrico`, etc.) que vive en
  *    [`elegibilidad-subsidio.ts`](./elegibilidad-subsidio.ts)
  *
- * **TODO**: cuando llegue la lista oficial actualizada de la SEC,
+ * **TODO**: cuando se publique una nueva convocatoria oficial,
  * reemplazar `PREGUNTAS_2026` y/o `buildRespuestasUsuario` para reflejar
  * los criterios vigentes. La normativa puede cambiar entre convocatorias.
  */
@@ -70,7 +70,7 @@ export interface PreguntaWizard {
 export const PREGUNTAS_2026: ReadonlyArray<PreguntaWizard> = [
   {
     id: 'esMayorDeEdad',
-    pregunta: '¿Tienes 18 años o más?',
+    pregunta: '¿Tenías 18 años o más al postular?',
     descripcion:
       'Solo personas mayores de edad pueden postular en representación de su hogar.',
     tipo: 'boolean',
@@ -80,7 +80,7 @@ export const PREGUNTAS_2026: ReadonlyArray<PreguntaWizard> = [
     pregunta:
       '¿Estás en el Registro Social de Hogares y en qué tramo de Calificación Socioeconómica?',
     descripcion:
-      'Puedes consultar tu tramo en ventanillaunicasocial.gob.cl con tu ClaveÚnica.',
+      'Responde según el RSH vigente en la segunda quincena de mayo de 2026. Puedes consultar tus antecedentes en Ventanilla Única Social.',
     tipo: 'select',
     opciones: [
       { value: 'no_registrado', label: 'No estoy registrado en el RSH' },
@@ -96,7 +96,7 @@ export const PREGUNTAS_2026: ReadonlyArray<PreguntaWizard> = [
     pregunta:
       '¿En tu hogar vive una persona electrodependiente inscrita en el Registro?',
     descripcion:
-      'Las personas electrodependientes postulan automáticamente, sin importar el tramo.',
+      'Para esta convocatoria importaba la inscripción vigente a marzo de 2026 y contar con RSH; esta respuesta no verifica esos registros.',
     tipo: 'boolean',
   },
   {
@@ -107,24 +107,24 @@ export const PREGUNTAS_2026: ReadonlyArray<PreguntaWizard> = [
   {
     id: 'estaEnSistemaRegulado',
     pregunta:
-      '¿Tu suministro eléctrico está regulado por la SEC (no es un sistema aislado)?',
+      '¿Eras cliente de una empresa o cooperativa concesionaria de distribución eléctrica?',
     descripcion:
-      'Algunas zonas extremas tienen sistemas aislados que no están regulados por la SEC y no aplican.',
+      'Consulta a tu empresa si desconoces la condición del suministro; estar en una zona aislada no permite concluir por sí solo que no cumples.',
     tipo: 'boolean',
   },
   {
     id: 'estaAlDia',
     pregunta:
-      '¿Estás al día en el pago de tu cuenta de luz, o tienes convenio de pago vigente?',
+      '¿Cumplías la condición de pago de la cuenta de luz al 22 de junio de 2026?',
     descripcion:
-      'Si tienes deuda, puedes regularizarla antes del 22 de junio de 2026 para postular.',
+      'Responde sobre esa fecha, no sobre tu deuda actual. Si hubo repactación, confirma con la empresa cómo quedó registrada.',
     tipo: 'boolean',
   },
   {
     id: 'tieneClaveUnica',
     pregunta: '¿Tienes ClaveÚnica activa?',
     descripcion:
-      'Si no tienes, puedes tramitar el subsidio presencialmente en Chile Atiende.',
+      'La falta de ClaveÚnica no bloquea esta orientación. ChileAtiende también informa resultados por sus canales de atención.',
     tipo: 'boolean',
   },
   {
@@ -134,7 +134,6 @@ export const PREGUNTAS_2026: ReadonlyArray<PreguntaWizard> = [
       'El monto del subsidio depende del número de integrantes (1 / 2-3 / 4 o más).',
     tipo: 'number',
     min: 1,
-    max: 12,
   },
   {
     id: 'otroIntegranteYaPostulo',
@@ -149,7 +148,7 @@ export const PREGUNTAS_2026: ReadonlyArray<PreguntaWizard> = [
     pregunta:
       '¿En tu hogar hay alguna persona con discapacidad, dependencia o invalidez?',
     descripcion:
-      'Mejora la prioridad al adjudicar cuando hay más postulantes que cupos.',
+      'Factor de priorización declarado; no permite estimar una probabilidad de adjudicación.',
     tipo: 'boolean',
     opcional: true,
   },
@@ -167,8 +166,7 @@ export const PREGUNTAS_2026: ReadonlyArray<PreguntaWizard> = [
   },
   {
     id: 'hayPersonaCuidadora',
-    pregunta:
-      '¿Hay alguien en el hogar que ejerce cuidados de otra persona?',
+    pregunta: '¿Hay alguien en el hogar que ejerce cuidados de otra persona?',
     tipo: 'boolean',
     opcional: true,
   },
@@ -187,46 +185,54 @@ export type RespuestasWizard = Record<string, unknown>
 export function buildRespuestasUsuario(
   answers: RespuestasWizard,
 ): RespuestasUsuario {
-  const rshYTramo = answers.rshYTramo as TramoCSE | 'no_registrado' | undefined
-  const estaEnRSH = rshYTramo !== undefined && rshYTramo !== 'no_registrado'
-  const tramoCSE: TramoCSE = (rshYTramo ?? 'no_registrado') as TramoCSE
+  const tramos: readonly TramoCSE[] = [
+    '0-40',
+    '41-60',
+    '61-80',
+    '81-90',
+    '91-100',
+  ]
+  const tramoCSE: TramoCSE = tramos.includes(answers.rshYTramo as TramoCSE)
+    ? (answers.rshYTramo as TramoCSE)
+    : 'no_registrado'
+  const estaEnRSH = tramoCSE !== 'no_registrado'
 
   const intRaw = answers.cantidadIntegrantes
   const cantidadIntegrantes =
     typeof intRaw === 'number'
       ? intRaw
       : typeof intRaw === 'string'
-        ? parseInt(intRaw, 10) || 1
-        : 1
+        ? Number(intRaw)
+        : NaN
 
   return {
-    esMayorDeEdad: Boolean(answers.esMayorDeEdad),
+    esMayorDeEdad: answers.esMayorDeEdad === true,
     estaEnRSH,
     tramoCSE,
-    hayElectrodependiente: Boolean(answers.hayElectrodependiente),
-    esClienteResidencial: Boolean(answers.esClienteResidencial),
-    estaEnSistemaRegulado: Boolean(answers.estaEnSistemaRegulado),
-    estaAlDia: Boolean(answers.estaAlDia),
-    tieneClaveUnica: Boolean(answers.tieneClaveUnica),
+    hayElectrodependiente: answers.hayElectrodependiente === true,
+    esClienteResidencial: answers.esClienteResidencial === true,
+    estaEnSistemaRegulado: answers.estaEnSistemaRegulado === true,
+    estaAlDia: answers.estaAlDia === true,
+    tieneClaveUnica: answers.tieneClaveUnica === true,
     cantidadIntegrantes,
     otroIntegranteYaPostulo:
       answers.otroIntegranteYaPostulo === undefined
         ? undefined
-        : Boolean(answers.otroIntegranteYaPostulo),
+        : answers.otroIntegranteYaPostulo === true,
     hayPersonaConDiscapacidad:
       answers.hayPersonaConDiscapacidad === undefined
         ? undefined
-        : Boolean(answers.hayPersonaConDiscapacidad),
+        : answers.hayPersonaConDiscapacidad === true,
     hayNinos:
-      answers.hayNinos === undefined ? undefined : Boolean(answers.hayNinos),
+      answers.hayNinos === undefined ? undefined : answers.hayNinos === true,
     hayAdultoMayor:
       answers.hayAdultoMayor === undefined
         ? undefined
-        : Boolean(answers.hayAdultoMayor),
+        : answers.hayAdultoMayor === true,
     hayPersonaCuidadora:
       answers.hayPersonaCuidadora === undefined
         ? undefined
-        : Boolean(answers.hayPersonaCuidadora),
+        : answers.hayPersonaCuidadora === true,
   }
 }
 

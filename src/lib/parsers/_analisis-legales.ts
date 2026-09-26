@@ -298,10 +298,10 @@ function analizarSubsidio21667Ausente(
 
   return buildAnalisis(
     'subsidio-21667-ausente',
-    'derecho_disponible',
-    'La boleta menciona el Subsidio Ley 21.667 pero no aparece como descuento',
-    'En el texto de tu boleta aparece referencia al Subsidio Eléctrico Ley 21.667, pero no detectamos la línea con monto negativo que corresponde al descuento aplicado. Si postulaste y fuiste seleccionado, la distribuidora está obligada a aplicar el descuento automáticamente.',
-    'Verifica tu estado de postulación en subsidioelectrico.cl con ClaveÚnica. Si efectivamente fuiste seleccionado, contacta a tu distribuidora para que aplique el descuento retroactivo y reporta el incumplimiento a la SEC.',
+    'informativo',
+    'Revisa la mención al Subsidio Eléctrico en tu boleta',
+    'El texto menciona el subsidio, pero no identificamos un descuento entre los cargos extraídos. Puede ser un aviso general o una lectura incompleta: no acredita que seas beneficiario ni un incumplimiento de la empresa.',
+    'Consulta el resultado oficial, el número de cliente y el período asignado. Si el descuento informado no coincide con el documento original, pide a tu distribuidora el detalle de su aplicación.',
     'electricidad-subsidio-21667',
   )
 }

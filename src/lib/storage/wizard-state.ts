@@ -55,8 +55,11 @@ export const reclamoPayloadSchema = z.object({
     .max(100),
 })
 
+// Las preguntas de la revisión 2026-09-26 se refieren a fechas históricas.
+// No reinterpretar un “sí” antiguo sobre la deuda actual como pago al corte.
+export const SUBSIDIO_DRAFT_VERSION = 3
 export const subsidioDraftSchema = z.object({
-  version: draftVersion,
+  version: z.literal(SUBSIDIO_DRAFT_VERSION),
   step: z
     .number()
     .int()
@@ -72,7 +75,7 @@ export const subsidioDraftSchema = z.object({
           : p.tipo === 'select'
             ? p.opciones?.some((o) => o.value === value)
             : typeof value === 'number' &&
-              Number.isInteger(value) &&
+              Number.isSafeInteger(value) &&
               value >= (p.min ?? -Infinity) &&
               value <= (p.max ?? Infinity))
       if (!valid)

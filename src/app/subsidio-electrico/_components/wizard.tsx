@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Container } from '@/components/layout/Container'
 import { Alert } from '@/components/ui/Alert'
 import { Button } from '@/components/ui/Button'
@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/Input'
 import { Pill } from '@/components/ui/Pill'
 import {
   CALENDARIO_5TA_CONVOCATORIA,
+  ELEGIBILIDAD_METADATA,
   formatFechaCalendario,
   PREGUNTAS_2026,
   type PreguntaWizard,
@@ -23,6 +24,7 @@ import {
   readSessionDraft,
   subsidioDraftSchema,
   STORAGE_NOTICE,
+  SUBSIDIO_DRAFT_VERSION,
 } from '@/lib/storage/wizard-state'
 
 const STORAGE_KEY = 'lalupa:subsidio:wizard'
@@ -53,7 +55,10 @@ export function SubsidioWizard() {
   useEffect(() => {
     if (!hydrated) return
     try {
-      safeSessionSet(STORAGE_KEY, JSON.stringify({ version: 2, step, answers }))
+      safeSessionSet(
+        STORAGE_KEY,
+        JSON.stringify({ version: SUBSIDIO_DRAFT_VERSION, step, answers }),
+      )
     } catch {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- El efecto informa un fallo de persistencia externo.
       setStorageNotice(STORAGE_NOTICE)
@@ -74,8 +79,9 @@ export function SubsidioWizard() {
       return 'Necesitamos tu respuesta para seguir.'
     }
     if (p.tipo === 'number') {
-      const n = typeof value === 'number' ? value : parseInt(String(value), 10)
-      if (Number.isNaN(n)) return 'Ingresa un número válido.'
+      const n = typeof value === 'number' ? value : Number(value)
+      if (!Number.isSafeInteger(n))
+        return 'Ingresa una cantidad entera de personas.'
       if (p.min !== undefined && n < p.min) return `Mínimo ${p.min}.`
       if (p.max !== undefined && n > p.max) return `Máximo ${p.max}.`
     }
@@ -160,12 +166,14 @@ export function SubsidioWizard() {
             Subsidio eléctrico Ley 21.667
           </p>
           <h1 className="mt-4 max-w-[20ch] text-[clamp(36px,5vw,64px)] font-medium leading-[1.05] tracking-tight text-ink">
-            ¿Calificas al subsidio eléctrico?
+            Revisa los requisitos del subsidio eléctrico.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-body">
-            13 preguntas. Te tomamos 2 minutos y te decimos si calificas + cómo
-            postular. Tus respuestas viven solo en este celular.
+            Responde sobre las condiciones de la quinta convocatoria de 2026.
+            Esta orientación no consulta registros oficiales ni confirma un
+            beneficio. Tus respuestas se guardan solo en este navegador.
           </p>
+          <ConvocatoriaNotice />
           <Stepper current={step + 1} total={TOTAL} />
           {storageNotice && (
             <p className="mt-6" role="status">
@@ -335,11 +343,13 @@ function PreguntaInput({
       <div className="max-w-xs">
         <Input
           type="number"
+          aria-label={pregunta.pregunta}
+          step={1}
           value={value === undefined ? '' : String(value)}
           onChange={(e) => {
             const raw = e.target.value
             if (raw === '') return onChange(undefined)
-            const n = parseInt(raw, 10)
+            const n = Number(raw)
             onChange(Number.isNaN(n) ? undefined : n)
           }}
           min={pregunta.min}
@@ -394,13 +404,12 @@ function ResultView({
   onRestart: () => void
 }) {
   const { califica, alertas } = resultado
-  const conAlertas = alertas.length > 0
-  const tone: 'califica' | 'parcial' | 'no-califica' = !califica
-    ? 'no-califica'
-    : conAlertas
-      ? 'parcial'
-      : 'califica'
-
+  const heading = useRef<HTMLHeadingElement>(null)
+  useEffect(() => {
+    // La última pregunta puede dejar el scroll lejos del inicio del resultado.
+    heading.current?.focus({ preventScroll: true })
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }, [])
   return (
     <>
       <section className="bg-cream py-12 md:py-16">
@@ -409,31 +418,24 @@ function ResultView({
             Resultado · Subsidio eléctrico
           </p>
           <Pill
-            variant={
-              tone === 'califica'
-                ? 'success'
-                : tone === 'parcial'
-                  ? 'warning'
-                  : 'danger'
-            }
+            variant={califica ? 'info' : 'warning'}
             className="mt-4 self-start"
           >
-            {tone === 'califica'
-              ? 'Calificas'
-              : tone === 'parcial'
-                ? 'Calificas, con condiciones'
-                : 'No calificas'}
+            Revisión orientativa
           </Pill>
-          <h1 className="mt-6 max-w-[24ch] text-[clamp(36px,5vw,64px)] font-medium leading-[1.05] tracking-tight text-ink">
-            {tone === 'califica'
-              ? 'Sí calificas al subsidio eléctrico.'
-              : tone === 'parcial'
-                ? 'Calificas, pero hay cosas a verificar.'
-                : 'Esta convocatoria no calificas.'}
+          <h1
+            ref={heading}
+            tabIndex={-1}
+            className="mt-6 max-w-[24ch] text-[clamp(36px,5vw,64px)] font-medium leading-[1.05] tracking-tight text-ink"
+          >
+            {califica
+              ? 'Tus respuestas coinciden con los requisitos consultados.'
+              : 'Hay antecedentes que revisar.'}
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-body">
             {resultado.motivo}
           </p>
+          <ConvocatoriaNotice />
         </Container>
       </section>
 
@@ -444,7 +446,6 @@ function ResultView({
               <MontoCard
                 semestral={resultado.montoSemestralCLP}
                 mensual={resultado.montoMensualCLP ?? 0}
-                prioridad={resultado.prioridad}
               />
             )}
 
@@ -455,7 +456,22 @@ function ResultView({
             {alertas.length > 0 && <AlertasCard alertas={alertas} />}
           </div>
 
-          <PasosCard califica={califica} pasos={resultado.pasosSiguientes} />
+          {resultado.factoresPrioridad.length > 0 && (
+            <div className="mt-6 rounded-[20px] border border-border bg-white p-6">
+              <h2 className="font-medium text-ink">
+                Factores de priorización declarados
+              </h2>
+              <ul className="mt-3 list-disc pl-5 text-sm text-body">
+                {resultado.factoresPrioridad.map((factor) => (
+                  <li key={factor}>{factor}</li>
+                ))}
+              </ul>
+              <p className="mt-3 text-sm text-body">
+                No representan un puntaje ni una probabilidad de adjudicación.
+              </p>
+            </div>
+          )}
+          <PasosCard pasos={resultado.pasosSiguientes} />
         </Container>
       </section>
 
@@ -464,24 +480,10 @@ function ResultView({
           <Alert variant="info">
             <Alert.Title>Esto es referencial</Alert.Title>
             <Alert.Body>
-              La elegibilidad oficial se confirma al postular en{' '}
-              <a
-                href="https://www.subsidioelectrico.cl"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-medium text-primary underline underline-offset-4 hover:no-underline"
-              >
-                subsidioelectrico.cl
-              </a>{' '}
-              con tu ClaveÚnica. Las fechas vigentes (postulación hasta el{' '}
-              {formatFechaCalendario(
-                CALENDARIO_5TA_CONVOCATORIA.postulacionFin,
-              )}
-              , estar al día hasta el{' '}
-              {formatFechaCalendario(
-                CALENDARIO_5TA_CONVOCATORIA.fechaAlDiaPago,
-              )}
-              ) las publica la SEC y pueden cambiar.
+              Solo el resultado del Ministerio de Energía confirma la
+              asignación. Contrasta tus antecedentes y el descuento de tu boleta
+              con la resolución oficial. Revisión de fuentes:{' '}
+              {ELEGIBILIDAD_METADATA.ultimaActualizacion}.
             </Alert.Body>
           </Alert>
 
@@ -505,43 +507,30 @@ function ResultView({
 function MontoCard({
   semestral,
   mensual,
-  prioridad,
 }: {
   semestral: number
   mensual: number
-  prioridad: ResultadoElegibilidad['prioridad']
 }) {
   return (
     <div className="rounded-[20px] border border-border bg-white p-6 md:p-8">
       <p className="font-mono text-xs uppercase tracking-[0.1em] text-soft">
-        Estimación
+        Referencia por integrantes · segundo semestre 2026
       </p>
       <p className="mt-3 text-4xl font-medium leading-none tabular-nums text-ink md:text-5xl">
         $ {Math.round(semestral).toLocaleString('es-CL')}
       </p>
       <p className="mt-2 text-sm text-body">
-        semestral · ${Math.round(mensual).toLocaleString('es-CL')} mensual en 6
-        cuotas.
+        semestral · ${Math.round(mensual).toLocaleString('es-CL')} por cuota, en
+        seis cuotas. No es un monto adjudicado a tu hogar.
       </p>
-      <Pill
-        variant={
-          prioridad === 'alta'
-            ? 'success'
-            : prioridad === 'media'
-              ? 'warning'
-              : 'info'
-        }
-        className="mt-5 self-start"
+      <a
+        href={ELEGIBILIDAD_METADATA.fuentes.montosYAplicacion}
+        className="mt-4 inline-block text-sm text-primary underline underline-offset-4"
+        target="_blank"
+        rel="noopener noreferrer"
       >
-        Prioridad{' '}
-        {prioridad === 'alta'
-          ? 'alta'
-          : prioridad === 'media'
-            ? 'media'
-            : prioridad === 'baja'
-              ? 'baja'
-              : '-'}
-      </Pill>
+        Ver montos publicados por el Ministerio
+      </a>
     </div>
   )
 }
@@ -550,7 +539,7 @@ function BloqueadoresCard({ bloqueadores }: { bloqueadores: string[] }) {
   return (
     <div className="rounded-[20px] border border-danger/30 bg-danger-soft p-6 md:p-8">
       <p className="font-mono text-xs uppercase tracking-[0.1em] text-danger">
-        Por qué no calificas
+        Antecedentes por verificar
       </p>
       <ul className="mt-4 flex flex-col gap-3 text-sm leading-relaxed text-ink">
         {bloqueadores.map((b) => (
@@ -586,17 +575,11 @@ function AlertasCard({ alertas }: { alertas: string[] }) {
   )
 }
 
-function PasosCard({
-  califica,
-  pasos,
-}: {
-  califica: boolean
-  pasos: string[]
-}) {
+function PasosCard({ pasos }: { pasos: string[] }) {
   return (
     <div className="mt-6 rounded-[20px] border border-border bg-white p-6 md:p-8">
       <p className="font-mono text-xs uppercase tracking-[0.1em] text-soft">
-        {califica ? 'Cómo postular' : 'Qué puedes hacer ahora'}
+        Consulta y revisión del resultado
       </p>
       <ol className="mt-5 flex flex-col gap-4">
         {pasos.map((paso, i) => (
@@ -620,19 +603,43 @@ function PasosCard({
             target="_blank"
             rel="noopener noreferrer"
           >
-            Postular en subsidioelectrico.cl
+            Consultar en subsidioelectrico.cl
           </a>
         </Button>
         <Button asChild variant="ghost" size="md">
           <a
-            href="https://www.sec.cl"
+            href={ELEGIBILIDAD_METADATA.fuentes.consulta}
             target="_blank"
             rel="noopener noreferrer"
           >
-            Ver SEC
+            Ver canales de atención
           </a>
         </Button>
       </div>
+    </div>
+  )
+}
+
+function ConvocatoriaNotice() {
+  return (
+    <div className="mt-6 rounded-xl border border-primary/20 bg-primary-soft p-5 text-body">
+      <h2 className="font-medium text-ink">
+        Postulación cerrada · quinta convocatoria
+      </h2>
+      <p className="mt-2 text-sm leading-relaxed">
+        El plazo cerró el{' '}
+        {formatFechaCalendario(CALENDARIO_5TA_CONVOCATORIA.postulacionFin)}.
+        Puedes consultar el resultado oficial y los descuentos asignados. Este
+        formulario no permite postular ni predice una próxima convocatoria.
+      </p>
+      <a
+        href={ELEGIBILIDAD_METADATA.fuentes.consulta}
+        className="mt-3 inline-block font-medium text-primary underline underline-offset-4"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Consultar resultado oficial
+      </a>
     </div>
   )
 }

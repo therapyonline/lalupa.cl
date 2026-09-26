@@ -21,7 +21,7 @@ const TOOLS = [
     badge: { label: 'Más usada', variant: 'accent' as const },
     title: 'Revisa tu boleta de luz',
     description:
-      'CGE, Enel, SAESA, Frontel, Chilquinta. Detecta tramos mal aplicados, cargos no habituales y subidas anómalas.',
+      'CGE, Enel, SAESA, Frontel, Chilquinta. Revisa consumo y cargos extraídos; contrástalos con el documento original.',
   },
   {
     href: '/boleta-agua',
@@ -47,9 +47,9 @@ const TOOLS = [
   {
     href: '/subsidio-electrico',
     badge: { label: 'Gratis', variant: 'success' as const },
-    title: '¿Calificas al subsidio eléctrico?',
+    title: 'Revisa el subsidio eléctrico',
     description:
-      '13 preguntas → te decimos si calificas y cómo postular. Subsidio vigente 2026.',
+      'La quinta postulación de 2026 cerró. Revisa sus requisitos y consulta el resultado oficial.',
   },
   {
     href: '/comparador-internet-hogar',
@@ -96,7 +96,9 @@ export default async function HomePage() {
     'como-leer-boleta-cge',
     'por-que-subio-mi-cuenta-de-luz',
   ]
-  const guias = destacados.flatMap((slug) => allGuias.filter((g) => g.slug === slug))
+  const guias = destacados.flatMap((slug) =>
+    allGuias.filter((g) => g.slug === slug),
+  )
   return (
     <main className="flex-1">
       <section className="relative bg-cream py-15 md:py-20">
@@ -121,8 +123,8 @@ export default async function HomePage() {
 
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-body md:text-xl">
             Sube el PDF o sácale una foto. La lupa la procesa en tu propio
-            celular (nunca sale de tu dispositivo) y te dice si te están
-            cobrando lo justo.
+            celular (nunca sale de tu dispositivo) y te ayuda a revisar los
+            cargos que logra leer.
           </p>
 
           <div className="mt-10 flex flex-col gap-4 sm:flex-row">
@@ -164,9 +166,7 @@ export default async function HomePage() {
                       {tool.badge.label}
                     </Pill>
                   )}
-                  <CardLight.Title
-                    className={tool.badge ? 'mt-4' : undefined}
-                  >
+                  <CardLight.Title className={tool.badge ? 'mt-4' : undefined}>
                     {tool.title}
                   </CardLight.Title>
                   <CardLight.Body>{tool.description}</CardLight.Body>
@@ -322,7 +322,7 @@ export default async function HomePage() {
                   href={ind.href}
                   className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary transition-colors hover:text-primary-deep"
                 >
-                  {ind.linkLabel}{' '}<span aria-hidden>→</span>
+                  {ind.linkLabel} <span aria-hidden>→</span>
                 </Link>
               </div>
             ))}

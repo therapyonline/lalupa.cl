@@ -99,10 +99,10 @@ export const NORMATIVA_ELECTRICIDAD = {
   },
   'electricidad-subsidio-21667': {
     id: 'electricidad-subsidio-21667',
-    norma: 'Ley 21.667 Art. 1-3; Decreto Exento N° 136/2024',
+    norma: 'Subsidio Eléctrico, quinta convocatoria 2026: resultados y aplicación',
     resumen:
-      'Si calificaste y fuiste seleccionado para el Subsidio Eléctrico Ley 21.667, la distribuidora está obligada a aplicar el descuento automáticamente como línea con monto negativo en tu boleta. El monto va entre $11.700 y $32.224 mensuales según tramo RSH y composición familiar. Si no aparece, contacta a la SEC.',
-    url: 'https://www.bcn.cl/leychile/navegar?idNorma=1198976',
+      'Consulta el resultado oficial, el número de cliente y el período asignado antes de contrastar el descuento con tu boleta. Una mención publicitaria al subsidio no acredita que tu hogar sea beneficiario; la lectura del documento también puede ser incompleta. Los montos dependen de la convocatoria y no deben extrapolarse a otros períodos.',
+    url: 'https://energia.gob.cl/noticias/nacional/quinto-proceso-de-entrega-del-subsidio-electrico-llega-cifra-mas-alta-de-beneficiarios-desde-su-creacion',
     servicio: 'electricidad' as const,
   },
   'electricidad-recargo-invierno-temporada': {

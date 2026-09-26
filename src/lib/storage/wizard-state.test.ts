@@ -5,6 +5,7 @@ import {
   reclamoPayloadSchema,
   reclamoSource,
   subsidioDraftSchema,
+  SUBSIDIO_DRAFT_VERSION,
   STORAGE_NOTICE,
   INVALID_DRAFT_NOTICE,
 } from './wizard-state'
@@ -12,14 +13,19 @@ import {
 afterEach(() => vi.unstubAllGlobals())
 describe('borradores recuperados', () => {
   it.each([-1, 1.5, 99, '2', null])('rechaza pasos inválidos: %s', (step) => {
-    expect(subsidioDraftSchema.safeParse({ step, answers: {} }).success).toBe(
-      false,
-    )
+    expect(
+      subsidioDraftSchema.safeParse({
+        version: SUBSIDIO_DRAFT_VERSION,
+        step,
+        answers: {},
+      }).success,
+    ).toBe(false)
     expect(reclamoDraftSchema.safeParse({ step, data: {} }).success).toBe(false)
   })
   it('valida tipos, opciones y límites reales de las preguntas', () => {
     expect(
       subsidioDraftSchema.safeParse({
+        version: SUBSIDIO_DRAFT_VERSION,
         step: 1,
         answers: { esMayorDeEdad: false, rshYTramo: '0-40' },
       }).success,
@@ -28,13 +34,31 @@ describe('borradores recuperados', () => {
       { esMayorDeEdad: 'false' },
       { rshYTramo: 'inventado' },
       { desconocida: 3 },
-      { integrantesHogar: -1 },
+      { cantidadIntegrantes: -1 },
+      { cantidadIntegrantes: 1.5 },
+      { cantidadIntegrantes: Infinity },
     ]) {
-      expect(subsidioDraftSchema.safeParse({ step: 1, answers }).success).toBe(
-        false,
-      )
+      expect(
+        subsidioDraftSchema.safeParse({
+          version: SUBSIDIO_DRAFT_VERSION,
+          step: 1,
+          answers,
+        }).success,
+      ).toBe(false)
     }
   })
+  it.each([undefined, 2])(
+    'descarta respuestas de la convocatoria anterior (versión %s)',
+    (version) => {
+      expect(
+        subsidioDraftSchema.safeParse({
+          version,
+          step: 5,
+          answers: { estaAlDia: true },
+        }).success,
+      ).toBe(false)
+    },
+  )
   it('recupera borradores antiguos parciales sin exigir campos completos', () => {
     const parsed = reclamoDraftSchema.parse({
       step: 2,
@@ -61,7 +85,9 @@ describe('borradores recuperados', () => {
     )
     getItem.mockReturnValueOnce(null)
     expect(readSessionDraft('key', subsidioDraftSchema)).toEqual({ data: null })
-    getItem.mockReturnValueOnce(JSON.stringify({ step: 0, answers: {} }))
+    getItem.mockReturnValueOnce(
+      JSON.stringify({ version: SUBSIDIO_DRAFT_VERSION, step: 0, answers: {} }),
+    )
     expect(readSessionDraft('key', subsidioDraftSchema).data?.step).toBe(0)
     getItem.mockReturnValueOnce('a'.repeat(250_001))
     expect(readSessionDraft('key', subsidioDraftSchema).notice).toBe(

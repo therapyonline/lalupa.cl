@@ -6,6 +6,14 @@ Registro de actualizaciones de los datasets en `src/data/`. Cada fila refleja el
 
 ---
 
+## 2026-09-26: Subsidio eléctrico, quinta convocatoria cerrada
+
+- `elegibilidad-subsidio.ts`: corrección de la referencia para 4 o más integrantes a $31.224 por semestre / $5.204 por cuota. Calendario histórico de la quinta convocatoria, estado de postulación cerrada y fuentes oficiales en metadatos. El anuncio del Ministerio de Energía del 11 de agosto actualiza el inicio de aplicación a agosto según facturación; no se extrapolan fechas de próximas convocatorias.
+- `subsidio-electrico.ts`: preguntas sobre las fechas de corte, entradas enteras sin truncamiento y booleanos estrictos. ClaveÚnica no bloquea la orientación; se retira el límite de 12 integrantes sin fundamento publicado.
+- El resultado informa coincidencia orientativa y factores declarados; se elimina el puntaje de prioridad alta/media/baja. No se consultan registros ni se acredita adjudicación. Los borradores de subsidio anteriores a la versión 3 se descartan para no reinterpretar respuestas históricas; SERNAC conserva su formato.
+- `normativa-chilena.ts`: la referencia de subsidio deja de publicar montos mensuales incorrectos. Una mención genérica en la boleta solo motiva una comprobación informativa.
+- Fuentes, límites y comprobaciones: `docs/MEJORAS_LOTE_4_2026-09-26.md`. Las notas de lanzamiento conservan su carácter histórico, incluidas las previsiones antiguas que no constituyen fechas oficiales.
+
 ## 2026-09-25: Alcance tarifario y portada (tercer lote)
 
 - `tarifas.ts`: los importes originales no se revalidaron ni se presentan como vigentes. Metadatos `historico_no_verificado`, uso de simulación y vigencia final desconocida. Se sustituyeron conversiones inseguras de `null` por tipos anulables y validación de entradas. El PDF CGE consultado respondió HTTP 403; no se infirieron nuevos precios.

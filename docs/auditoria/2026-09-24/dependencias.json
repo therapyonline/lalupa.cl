@@ -1,0 +1,1630 @@
+{
+  "date": "2026-09-24",
+  "all": {
+    "metadata": {
+      "vulnerabilities": {
+        "info": 0,
+        "low": 1,
+        "moderate": 16,
+        "high": 28,
+        "critical": 2
+      },
+      "dependencies": 675,
+      "devDependencies": 0,
+      "optionalDependencies": 0,
+      "totalDependencies": 675
+    },
+    "advisories": [
+      {
+        "module": "postcss",
+        "title": "PostCSS has XSS via Unescaped </style> in its CSS Stringify Output",
+        "severity": "moderate",
+        "url": "https://github.com/advisories/GHSA-qx2v-qp2m-jg93",
+        "vulnerable": "<8.5.10",
+        "patched": ">=8.5.10",
+        "findings": [
+          {
+            "version": "8.4.31",
+            "paths": [
+              ".>next>postcss"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "next",
+        "title": "Next.js has a Middleware / Proxy bypass in App Router applications via segment-prefetch routes - Incomplete Fix Follow-Up",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-26hh-7cqf-hhc6",
+        "vulnerable": ">=16.0.0 <16.2.6",
+        "patched": ">=16.2.6",
+        "findings": [
+          {
+            "version": "16.2.5",
+            "paths": [
+              ".>next"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "brace-expansion",
+        "title": "brace-expansion: Large numeric range defeats documented `max` DoS protection",
+        "severity": "moderate",
+        "url": "https://github.com/advisories/GHSA-jxxr-4gwj-5jf2",
+        "vulnerable": ">=5.0.0 <5.0.6",
+        "patched": ">=5.0.6",
+        "findings": [
+          {
+            "version": "5.0.5",
+            "paths": [
+              ".>eslint-config-next>eslint-plugin-import>@typescript-eslint/parser>@typescript-eslint/typescript-estree>minimatch>brace-expansion"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "vite",
+        "title": "launch-editor: NTLMv2 hash disclosure via UNC path handling on Windows",
+        "severity": "moderate",
+        "url": "https://github.com/advisories/GHSA-v6wh-96g9-6wx3",
+        "vulnerable": ">=8.0.0 <=8.0.15",
+        "patched": ">=8.0.16",
+        "findings": [
+          {
+            "version": "8.0.10",
+            "paths": [
+              ".>vitest>vite"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "js-yaml",
+        "title": "JS-YAML: Quadratic-complexity DoS in merge key handling via repeated aliases",
+        "severity": "moderate",
+        "url": "https://github.com/advisories/GHSA-h67p-54hq-rp68",
+        "vulnerable": "<3.15.0",
+        "patched": ">=3.15.0",
+        "findings": [
+          {
+            "version": "3.14.2",
+            "paths": [
+              ".>gray-matter>js-yaml"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "js-yaml",
+        "title": "JS-YAML: Quadratic-complexity DoS in merge key handling via repeated aliases",
+        "severity": "moderate",
+        "url": "https://github.com/advisories/GHSA-h67p-54hq-rp68",
+        "vulnerable": ">=4.0.0 <=4.1.1",
+        "patched": ">=4.2.0",
+        "findings": [
+          {
+            "version": "4.1.1",
+            "paths": [
+              ".>eslint>@eslint/eslintrc>js-yaml"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "vite",
+        "title": "vite: `server.fs.deny` bypass on Windows alternate paths",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-fx2h-pf6j-xcff",
+        "vulnerable": ">=8.0.0 <=8.0.15",
+        "patched": ">=8.0.16",
+        "findings": [
+          {
+            "version": "8.0.10",
+            "paths": [
+              ".>vitest>vite"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "@babel/core",
+        "title": "@babel/core: Arbitrary File Read via sourceMappingURL Comment",
+        "severity": "low",
+        "url": "https://github.com/advisories/GHSA-4x5r-pxfx-6jf8",
+        "vulnerable": "<=7.29.0",
+        "patched": ">=7.29.6",
+        "findings": [
+          {
+            "version": "7.29.0",
+            "paths": [
+              ".>eslint-config-next>eslint-plugin-react-hooks>@babel/core"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "brace-expansion",
+        "title": "brace-expansion: DoS via exponential-time expansion of consecutive non-expanding {} groups",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-3jxr-9vmj-r5cp",
+        "vulnerable": "<1.1.16",
+        "patched": ">=1.1.16",
+        "findings": [
+          {
+            "version": "1.1.14",
+            "paths": [
+              ".>eslint>minimatch>brace-expansion"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "brace-expansion",
+        "title": "brace-expansion: DoS via exponential-time expansion of consecutive non-expanding {} groups",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-3jxr-9vmj-r5cp",
+        "vulnerable": ">=3.0.0 <5.0.7",
+        "patched": ">=5.0.7",
+        "findings": [
+          {
+            "version": "5.0.5",
+            "paths": [
+              ".>eslint-config-next>eslint-plugin-import>@typescript-eslint/parser>@typescript-eslint/typescript-estree>minimatch>brace-expansion"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "js-yaml",
+        "title": "js-yaml: YAML merge-key chains can force quadratic CPU consumption",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-52cp-r559-cp3m",
+        "vulnerable": ">=4.0.0 <4.3.0",
+        "patched": ">=4.3.0",
+        "findings": [
+          {
+            "version": "4.1.1",
+            "paths": [
+              ".>eslint>@eslint/eslintrc>js-yaml"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "js-yaml",
+        "title": "js-yaml: YAML merge-key chains can force quadratic CPU consumption",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-52cp-r559-cp3m",
+        "vulnerable": ">=3.0.0 <3.15.0",
+        "patched": ">=3.15.0",
+        "findings": [
+          {
+            "version": "3.14.2",
+            "paths": [
+              ".>gray-matter>js-yaml"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "sharp",
+        "title": "sharp inherited vulnerabilities in libvips: CVE-2026-33327, CVE-2026-33328, CVE-2026-35590, CVE-2026-35591",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-f88m-g3jw-g9cj",
+        "vulnerable": "<0.35.0",
+        "patched": ">=0.35.0",
+        "findings": [
+          {
+            "version": "0.34.5",
+            "paths": [
+              ".>next>sharp"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "next",
+        "title": "Next.js: Middleware / Proxy bypass in App Router applications using Turbopack and single locale",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-6gpp-xcg3-4w24",
+        "vulnerable": ">=16.0.0 <16.2.11",
+        "patched": ">=16.2.11",
+        "findings": [
+          {
+            "version": "16.2.5",
+            "paths": [
+              ".>next"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "next",
+        "title": "Next.js: Denial of Service in App Router using Server Actions",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-m99w-x7hq-7vfj",
+        "vulnerable": ">=16.0.0 <16.2.11",
+        "patched": ">=16.2.11",
+        "findings": [
+          {
+            "version": "16.2.5",
+            "paths": [
+              ".>next"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "next",
+        "title": "Next.js: Server-Side Request Forgery in Server Actions on custom servers",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-89xv-2m56-2m9x",
+        "vulnerable": ">=16.0.0 <16.2.11",
+        "patched": ">=16.2.11",
+        "findings": [
+          {
+            "version": "16.2.5",
+            "paths": [
+              ".>next"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "next",
+        "title": "Next.js: Cache confusion of response bodies for requests with bodies",
+        "severity": "moderate",
+        "url": "https://github.com/advisories/GHSA-68g3-v927-f742",
+        "vulnerable": ">=16.0.0 <16.2.11",
+        "patched": ">=16.2.11",
+        "findings": [
+          {
+            "version": "16.2.5",
+            "paths": [
+              ".>next"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "next",
+        "title": "Next.js: Cache confusion of response bodies for requests with bodies containing invalid UTF-8 byte sequences",
+        "severity": "moderate",
+        "url": "https://github.com/advisories/GHSA-4633-3j49-mh5q",
+        "vulnerable": ">=16.0.0 <16.2.11",
+        "patched": ">=16.2.11",
+        "findings": [
+          {
+            "version": "16.2.5",
+            "paths": [
+              ".>next"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "next",
+        "title": "Next.js: Unbounded Server Action payload in Edge runtime",
+        "severity": "moderate",
+        "url": "https://github.com/advisories/GHSA-4c39-4ccg-62r3",
+        "vulnerable": ">=16.0.0 <16.2.11",
+        "patched": ">=16.2.11",
+        "findings": [
+          {
+            "version": "16.2.5",
+            "paths": [
+              ".>next"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "next",
+        "title": "Next.js: Server-Side Request Forgery in rewrites via attacker-controlled destination hostname",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-p9j2-gv94-2wf4",
+        "vulnerable": ">=16.0.0 <16.2.11",
+        "patched": ">=16.2.11",
+        "findings": [
+          {
+            "version": "16.2.5",
+            "paths": [
+              ".>next"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "next",
+        "title": "Next.js: Denial of Service in the Image Optimization API using SVGs",
+        "severity": "moderate",
+        "url": "https://github.com/advisories/GHSA-q8wf-6r8g-63ch",
+        "vulnerable": ">=16.0.0 <16.2.11",
+        "patched": ">=16.2.11",
+        "findings": [
+          {
+            "version": "16.2.5",
+            "paths": [
+              ".>next"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "next",
+        "title": "Next.js: Unauthenticated disclosure of internal Server Function endpoints",
+        "severity": "moderate",
+        "url": "https://github.com/advisories/GHSA-955p-x3mx-jcvp",
+        "vulnerable": ">=16.0.0 <16.2.11",
+        "patched": ">=16.2.11",
+        "findings": [
+          {
+            "version": "16.2.5",
+            "paths": [
+              ".>next"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "postcss",
+        "title": "PostCSS: Arbitrary file read and information disclosure via attacker-controlled sourceMappingURL in CSS comments",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-6g55-p6wh-862q",
+        "vulnerable": "<=8.5.11",
+        "patched": ">=8.5.12",
+        "findings": [
+          {
+            "version": "8.4.31",
+            "paths": [
+              ".>next>postcss"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "brace-expansion",
+        "title": "brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-mh99-v99m-4gvg",
+        "vulnerable": "<1.1.17",
+        "patched": ">=1.1.17",
+        "findings": [
+          {
+            "version": "1.1.14",
+            "paths": [
+              ".>eslint>minimatch>brace-expansion"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "brace-expansion",
+        "title": "brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-mh99-v99m-4gvg",
+        "vulnerable": ">=4.0.0 <5.0.8",
+        "patched": ">=5.0.8",
+        "findings": [
+          {
+            "version": "5.0.5",
+            "paths": [
+              ".>eslint-config-next>eslint-plugin-import>@typescript-eslint/parser>@typescript-eslint/typescript-estree>minimatch>brace-expansion"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "postcss",
+        "title": "PostCSS: incomplete fix of GHSA-6g55-p6wh-862q — attacker-controlled sourceMappingURL reads arbitrary .map files when `from` is unset",
+        "severity": "moderate",
+        "url": "https://github.com/advisories/GHSA-fxqj-rqcc-2cmp",
+        "vulnerable": "<=8.5.22",
+        "patched": ">=8.5.23",
+        "findings": [
+          {
+            "version": "8.5.14",
+            "paths": [
+              ".>@tailwindcss/postcss>postcss"
+            ]
+          },
+          {
+            "version": "8.4.31",
+            "paths": [
+              ".>next>postcss"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "brace-expansion",
+        "title": "brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-rgw5-rvv9-x895",
+        "vulnerable": ">=4.0.0 <5.0.9",
+        "patched": ">=5.0.9",
+        "findings": [
+          {
+            "version": "5.0.5",
+            "paths": [
+              ".>eslint-config-next>eslint-plugin-import>@typescript-eslint/parser>@typescript-eslint/typescript-estree>minimatch>brace-expansion"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "brace-expansion",
+        "title": "brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-rgw5-rvv9-x895",
+        "vulnerable": "<1.1.18",
+        "patched": ">=1.1.18",
+        "findings": [
+          {
+            "version": "1.1.14",
+            "paths": [
+              ".>eslint>minimatch>brace-expansion"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "js-yaml",
+        "title": "JS-YAML: Quadratic CPU consumption in !!omap resolution (3.x and 4.x) — CVE-2026-59870 fix not backported",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-5p4m-2wfm-xmqj",
+        "vulnerable": ">=3.0.0 <3.15.1",
+        "patched": ">=3.15.1",
+        "findings": [
+          {
+            "version": "3.14.2",
+            "paths": [
+              ".>gray-matter>js-yaml"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "js-yaml",
+        "title": "JS-YAML: Quadratic CPU consumption in !!omap resolution (3.x and 4.x) — CVE-2026-59870 fix not backported",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-5p4m-2wfm-xmqj",
+        "vulnerable": ">=4.0.0 <4.3.1",
+        "patched": ">=4.3.1",
+        "findings": [
+          {
+            "version": "4.1.1",
+            "paths": [
+              ".>eslint>@eslint/eslintrc>js-yaml"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "pdfjs-dist",
+        "title": "PDF.js: Arbitrary JavaScript execution upon opening a malicious PDF ",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-hq66-cqwq-w95j",
+        "vulnerable": ">=5.6.83 <6.2.108",
+        "patched": ">=6.2.108",
+        "findings": [
+          {
+            "version": "5.7.284",
+            "paths": [
+              ".>pdfjs-dist"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "nanoid",
+        "title": "nanoid: non-secure generators can loop indefinitely with negative size",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-28wg-ghj8-5hjv",
+        "vulnerable": "<3.3.16",
+        "patched": ">=3.3.16",
+        "findings": [
+          {
+            "version": "3.3.12",
+            "paths": [
+              ".>@tailwindcss/postcss>postcss>nanoid"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "nanoid",
+        "title": "nanoid: custom generators can loop indefinitely when size is zero",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-2v37-7h3g-55p8",
+        "vulnerable": "<3.3.18",
+        "patched": ">=3.3.18",
+        "findings": [
+          {
+            "version": "3.3.12",
+            "paths": [
+              ".>@tailwindcss/postcss>postcss>nanoid"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "postcss",
+        "title": "PostCSS: Path Traversal in Previous Source Map Auto-Loading (sourceMappingURL) leads to Arbitrary .map File Disclosure",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-r28c-9q8g-f849",
+        "vulnerable": "<=8.5.17",
+        "patched": ">=8.5.18",
+        "findings": [
+          {
+            "version": "8.5.14",
+            "paths": [
+              ".>@tailwindcss/postcss>postcss"
+            ]
+          },
+          {
+            "version": "8.4.31",
+            "paths": [
+              ".>next>postcss"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "browserslist",
+        "title": "Browserslist: Unbounded memory growth (no cache eviction) via distinct query results, leading to eventual OOM",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-c83g-rgw3-j3cx",
+        "vulnerable": "<=4.28.6",
+        "patched": ">=4.28.7",
+        "findings": [
+          {
+            "version": "4.28.2",
+            "paths": [
+              ".>eslint-config-next>eslint-plugin-react-hooks>@babel/core>@babel/helper-compilation-targets>browserslist"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "browserslist",
+        "title": "Browserslist: Uncaught crash / prototype write via untrusted browserslist-stats.json custom stats (normalizeStats)",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-73wf-gq98-2v4g",
+        "vulnerable": "<=4.28.6",
+        "patched": ">=4.28.7",
+        "findings": [
+          {
+            "version": "4.28.2",
+            "paths": [
+              ".>eslint-config-next>eslint-plugin-react-hooks>@babel/core>@babel/helper-compilation-targets>browserslist"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "fflate",
+        "title": "fflate unzipSync can enter an infinite loop when parsing malformed ZIP64 archives",
+        "severity": "moderate",
+        "url": "https://github.com/advisories/GHSA-px8p-9vwx-vf98",
+        "vulnerable": ">=0.8.0 <0.8.3",
+        "patched": ">=0.8.3",
+        "findings": [
+          {
+            "version": "0.8.2",
+            "paths": [
+              ".>@vitest/ui>fflate"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "next",
+        "title": "Next.js: Unauthenticated Remote Code Execution on windows-hosted servers",
+        "severity": "critical",
+        "url": "https://github.com/advisories/GHSA-p293-qw3h-jr36",
+        "vulnerable": ">=16.0.0 <16.3.3",
+        "patched": ">=16.3.3",
+        "findings": [
+          {
+            "version": "16.2.5",
+            "paths": [
+              ".>next"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "vitest",
+        "title": "Vitest: Path Traversal / Arbitrary File Read via @vitest/mocker Redirect Mock",
+        "severity": "moderate",
+        "url": "https://github.com/advisories/GHSA-82fw-gwwq-j7x9",
+        "vulnerable": ">=2.1.0 <4.1.11",
+        "patched": ">=4.1.11",
+        "findings": [
+          {
+            "version": "4.1.5",
+            "paths": [
+              ".>vitest"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "@vitest/mocker",
+        "title": "Vitest: Path Traversal / Arbitrary File Read via @vitest/mocker Redirect Mock",
+        "severity": "moderate",
+        "url": "https://github.com/advisories/GHSA-82fw-gwwq-j7x9",
+        "vulnerable": ">=2.1.0 <4.1.11",
+        "patched": ">=4.1.11",
+        "findings": [
+          {
+            "version": "4.1.5",
+            "paths": [
+              ".>vitest>@vitest/mocker"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "baseline-browser-mapping",
+        "title": "baseline-browser-mapping process termination on invalid input causes denial of service",
+        "severity": "moderate",
+        "url": "https://github.com/advisories/GHSA-w5vr-8v7q-w6rv",
+        "vulnerable": ">=2.0.0 <2.11.0",
+        "patched": ">=2.11.0",
+        "findings": [
+          {
+            "version": "2.10.27",
+            "paths": [
+              ".>eslint-config-next>eslint-plugin-react-hooks>@babel/core>@babel/helper-compilation-targets>browserslist>baseline-browser-mapping"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "sharp",
+        "title": "sharp: Vulnerabilities in libheif: GHSA-g89c-p67h-r497 and GHSA-2jg2-4ch7-h545",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-rgj7-g3m4-5g8c",
+        "vulnerable": "<0.35.4",
+        "patched": ">=0.35.4",
+        "findings": [
+          {
+            "version": "0.34.5",
+            "paths": [
+              ".>next>sharp"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "js-yaml",
+        "title": "js-yaml: maxTotalMergeKeys does not limit CPU use for empty merge sources",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-2883-xcg3-v3hh",
+        "vulnerable": ">=3.0.0 <3.15.2",
+        "patched": ">=3.15.2",
+        "findings": [
+          {
+            "version": "3.14.2",
+            "paths": [
+              ".>gray-matter>js-yaml"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "js-yaml",
+        "title": "js-yaml: maxTotalMergeKeys does not limit CPU use for empty merge sources",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-2883-xcg3-v3hh",
+        "vulnerable": ">=4.0.0 <4.3.2",
+        "patched": ">=4.3.2",
+        "findings": [
+          {
+            "version": "4.1.1",
+            "paths": [
+              ".>eslint>@eslint/eslintrc>js-yaml"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "next",
+        "title": "Next.js: Unauthenticated Remote Code Execution in Image Optimization API when AVIF files are used",
+        "severity": "critical",
+        "url": "https://github.com/advisories/GHSA-2xp9-vwfh-vxw4",
+        "vulnerable": ">=16.0.0 <16.3.3",
+        "patched": ">=16.3.3",
+        "findings": [
+          {
+            "version": "16.2.5",
+            "paths": [
+              ".>next"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "production": {
+    "metadata": {
+      "vulnerabilities": {
+        "info": 0,
+        "low": 1,
+        "moderate": 9,
+        "high": 17,
+        "critical": 2
+      },
+      "dependencies": 282,
+      "devDependencies": 0,
+      "optionalDependencies": 0,
+      "totalDependencies": 282
+    },
+    "advisories": [
+      {
+        "module": "postcss",
+        "title": "PostCSS has XSS via Unescaped </style> in its CSS Stringify Output",
+        "severity": "moderate",
+        "url": "https://github.com/advisories/GHSA-qx2v-qp2m-jg93",
+        "vulnerable": "<8.5.10",
+        "patched": ">=8.5.10",
+        "findings": [
+          {
+            "version": "8.4.31",
+            "paths": [
+              ".>next>postcss"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "next",
+        "title": "Next.js has a Middleware / Proxy bypass in App Router applications via segment-prefetch routes - Incomplete Fix Follow-Up",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-26hh-7cqf-hhc6",
+        "vulnerable": ">=16.0.0 <16.2.6",
+        "patched": ">=16.2.6",
+        "findings": [
+          {
+            "version": "16.2.5",
+            "paths": [
+              ".>next"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "js-yaml",
+        "title": "JS-YAML: Quadratic-complexity DoS in merge key handling via repeated aliases",
+        "severity": "moderate",
+        "url": "https://github.com/advisories/GHSA-h67p-54hq-rp68",
+        "vulnerable": "<3.15.0",
+        "patched": ">=3.15.0",
+        "findings": [
+          {
+            "version": "3.14.2",
+            "paths": [
+              ".>gray-matter>js-yaml"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "@babel/core",
+        "title": "@babel/core: Arbitrary File Read via sourceMappingURL Comment",
+        "severity": "low",
+        "url": "https://github.com/advisories/GHSA-4x5r-pxfx-6jf8",
+        "vulnerable": "<=7.29.0",
+        "patched": ">=7.29.6",
+        "findings": [
+          {
+            "version": "7.29.0",
+            "paths": [
+              ".>next>styled-jsx>@babel/core"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "js-yaml",
+        "title": "js-yaml: YAML merge-key chains can force quadratic CPU consumption",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-52cp-r559-cp3m",
+        "vulnerable": ">=3.0.0 <3.15.0",
+        "patched": ">=3.15.0",
+        "findings": [
+          {
+            "version": "3.14.2",
+            "paths": [
+              ".>gray-matter>js-yaml"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "sharp",
+        "title": "sharp inherited vulnerabilities in libvips: CVE-2026-33327, CVE-2026-33328, CVE-2026-35590, CVE-2026-35591",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-f88m-g3jw-g9cj",
+        "vulnerable": "<0.35.0",
+        "patched": ">=0.35.0",
+        "findings": [
+          {
+            "version": "0.34.5",
+            "paths": [
+              ".>next>sharp"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "next",
+        "title": "Next.js: Middleware / Proxy bypass in App Router applications using Turbopack and single locale",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-6gpp-xcg3-4w24",
+        "vulnerable": ">=16.0.0 <16.2.11",
+        "patched": ">=16.2.11",
+        "findings": [
+          {
+            "version": "16.2.5",
+            "paths": [
+              ".>next"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "next",
+        "title": "Next.js: Denial of Service in App Router using Server Actions",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-m99w-x7hq-7vfj",
+        "vulnerable": ">=16.0.0 <16.2.11",
+        "patched": ">=16.2.11",
+        "findings": [
+          {
+            "version": "16.2.5",
+            "paths": [
+              ".>next"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "next",
+        "title": "Next.js: Server-Side Request Forgery in Server Actions on custom servers",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-89xv-2m56-2m9x",
+        "vulnerable": ">=16.0.0 <16.2.11",
+        "patched": ">=16.2.11",
+        "findings": [
+          {
+            "version": "16.2.5",
+            "paths": [
+              ".>next"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "next",
+        "title": "Next.js: Cache confusion of response bodies for requests with bodies",
+        "severity": "moderate",
+        "url": "https://github.com/advisories/GHSA-68g3-v927-f742",
+        "vulnerable": ">=16.0.0 <16.2.11",
+        "patched": ">=16.2.11",
+        "findings": [
+          {
+            "version": "16.2.5",
+            "paths": [
+              ".>next"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "next",
+        "title": "Next.js: Cache confusion of response bodies for requests with bodies containing invalid UTF-8 byte sequences",
+        "severity": "moderate",
+        "url": "https://github.com/advisories/GHSA-4633-3j49-mh5q",
+        "vulnerable": ">=16.0.0 <16.2.11",
+        "patched": ">=16.2.11",
+        "findings": [
+          {
+            "version": "16.2.5",
+            "paths": [
+              ".>next"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "next",
+        "title": "Next.js: Unbounded Server Action payload in Edge runtime",
+        "severity": "moderate",
+        "url": "https://github.com/advisories/GHSA-4c39-4ccg-62r3",
+        "vulnerable": ">=16.0.0 <16.2.11",
+        "patched": ">=16.2.11",
+        "findings": [
+          {
+            "version": "16.2.5",
+            "paths": [
+              ".>next"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "next",
+        "title": "Next.js: Server-Side Request Forgery in rewrites via attacker-controlled destination hostname",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-p9j2-gv94-2wf4",
+        "vulnerable": ">=16.0.0 <16.2.11",
+        "patched": ">=16.2.11",
+        "findings": [
+          {
+            "version": "16.2.5",
+            "paths": [
+              ".>next"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "next",
+        "title": "Next.js: Denial of Service in the Image Optimization API using SVGs",
+        "severity": "moderate",
+        "url": "https://github.com/advisories/GHSA-q8wf-6r8g-63ch",
+        "vulnerable": ">=16.0.0 <16.2.11",
+        "patched": ">=16.2.11",
+        "findings": [
+          {
+            "version": "16.2.5",
+            "paths": [
+              ".>next"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "next",
+        "title": "Next.js: Unauthenticated disclosure of internal Server Function endpoints",
+        "severity": "moderate",
+        "url": "https://github.com/advisories/GHSA-955p-x3mx-jcvp",
+        "vulnerable": ">=16.0.0 <16.2.11",
+        "patched": ">=16.2.11",
+        "findings": [
+          {
+            "version": "16.2.5",
+            "paths": [
+              ".>next"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "postcss",
+        "title": "PostCSS: Arbitrary file read and information disclosure via attacker-controlled sourceMappingURL in CSS comments",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-6g55-p6wh-862q",
+        "vulnerable": "<=8.5.11",
+        "patched": ">=8.5.12",
+        "findings": [
+          {
+            "version": "8.4.31",
+            "paths": [
+              ".>next>postcss"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "postcss",
+        "title": "PostCSS: incomplete fix of GHSA-6g55-p6wh-862q — attacker-controlled sourceMappingURL reads arbitrary .map files when `from` is unset",
+        "severity": "moderate",
+        "url": "https://github.com/advisories/GHSA-fxqj-rqcc-2cmp",
+        "vulnerable": "<=8.5.22",
+        "patched": ">=8.5.23",
+        "findings": [
+          {
+            "version": "8.4.31",
+            "paths": [
+              ".>next>postcss"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "js-yaml",
+        "title": "JS-YAML: Quadratic CPU consumption in !!omap resolution (3.x and 4.x) — CVE-2026-59870 fix not backported",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-5p4m-2wfm-xmqj",
+        "vulnerable": ">=3.0.0 <3.15.1",
+        "patched": ">=3.15.1",
+        "findings": [
+          {
+            "version": "3.14.2",
+            "paths": [
+              ".>gray-matter>js-yaml"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "pdfjs-dist",
+        "title": "PDF.js: Arbitrary JavaScript execution upon opening a malicious PDF ",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-hq66-cqwq-w95j",
+        "vulnerable": ">=5.6.83 <6.2.108",
+        "patched": ">=6.2.108",
+        "findings": [
+          {
+            "version": "5.7.284",
+            "paths": [
+              ".>pdfjs-dist"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "nanoid",
+        "title": "nanoid: non-secure generators can loop indefinitely with negative size",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-28wg-ghj8-5hjv",
+        "vulnerable": "<3.3.16",
+        "patched": ">=3.3.16",
+        "findings": [
+          {
+            "version": "3.3.12",
+            "paths": [
+              ".>next>postcss>nanoid"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "nanoid",
+        "title": "nanoid: custom generators can loop indefinitely when size is zero",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-2v37-7h3g-55p8",
+        "vulnerable": "<3.3.18",
+        "patched": ">=3.3.18",
+        "findings": [
+          {
+            "version": "3.3.12",
+            "paths": [
+              ".>next>postcss>nanoid"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "postcss",
+        "title": "PostCSS: Path Traversal in Previous Source Map Auto-Loading (sourceMappingURL) leads to Arbitrary .map File Disclosure",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-r28c-9q8g-f849",
+        "vulnerable": "<=8.5.17",
+        "patched": ">=8.5.18",
+        "findings": [
+          {
+            "version": "8.4.31",
+            "paths": [
+              ".>next>postcss"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "browserslist",
+        "title": "Browserslist: Unbounded memory growth (no cache eviction) via distinct query results, leading to eventual OOM",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-c83g-rgw3-j3cx",
+        "vulnerable": "<=4.28.6",
+        "patched": ">=4.28.7",
+        "findings": [
+          {
+            "version": "4.28.2",
+            "paths": [
+              ".>next>styled-jsx>@babel/core>@babel/helper-compilation-targets>browserslist"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "browserslist",
+        "title": "Browserslist: Uncaught crash / prototype write via untrusted browserslist-stats.json custom stats (normalizeStats)",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-73wf-gq98-2v4g",
+        "vulnerable": "<=4.28.6",
+        "patched": ">=4.28.7",
+        "findings": [
+          {
+            "version": "4.28.2",
+            "paths": [
+              ".>next>styled-jsx>@babel/core>@babel/helper-compilation-targets>browserslist"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "next",
+        "title": "Next.js: Unauthenticated Remote Code Execution on windows-hosted servers",
+        "severity": "critical",
+        "url": "https://github.com/advisories/GHSA-p293-qw3h-jr36",
+        "vulnerable": ">=16.0.0 <16.3.3",
+        "patched": ">=16.3.3",
+        "findings": [
+          {
+            "version": "16.2.5",
+            "paths": [
+              ".>next"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "baseline-browser-mapping",
+        "title": "baseline-browser-mapping process termination on invalid input causes denial of service",
+        "severity": "moderate",
+        "url": "https://github.com/advisories/GHSA-w5vr-8v7q-w6rv",
+        "vulnerable": ">=2.0.0 <2.11.0",
+        "patched": ">=2.11.0",
+        "findings": [
+          {
+            "version": "2.10.27",
+            "paths": [
+              ".>next>baseline-browser-mapping"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "sharp",
+        "title": "sharp: Vulnerabilities in libheif: GHSA-g89c-p67h-r497 and GHSA-2jg2-4ch7-h545",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-rgj7-g3m4-5g8c",
+        "vulnerable": "<0.35.4",
+        "patched": ">=0.35.4",
+        "findings": [
+          {
+            "version": "0.34.5",
+            "paths": [
+              ".>next>sharp"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "js-yaml",
+        "title": "js-yaml: maxTotalMergeKeys does not limit CPU use for empty merge sources",
+        "severity": "high",
+        "url": "https://github.com/advisories/GHSA-2883-xcg3-v3hh",
+        "vulnerable": ">=3.0.0 <3.15.2",
+        "patched": ">=3.15.2",
+        "findings": [
+          {
+            "version": "3.14.2",
+            "paths": [
+              ".>gray-matter>js-yaml"
+            ]
+          }
+        ]
+      },
+      {
+        "module": "next",
+        "title": "Next.js: Unauthenticated Remote Code Execution in Image Optimization API when AVIF files are used",
+        "severity": "critical",
+        "url": "https://github.com/advisories/GHSA-2xp9-vwfh-vxw4",
+        "vulnerable": ">=16.0.0 <16.3.3",
+        "patched": ">=16.3.3",
+        "findings": [
+          {
+            "version": "16.2.5",
+            "paths": [
+              ".>next"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "outdated": {
+    "@axe-core/playwright": {
+      "current": "4.11.3",
+      "latest": "4.13.0",
+      "wanted": "4.11.3",
+      "isDeprecated": false,
+      "dependencyType": "devDependencies"
+    },
+    "@playwright/test": {
+      "current": "1.59.1",
+      "latest": "1.63.0",
+      "wanted": "1.59.1",
+      "isDeprecated": false,
+      "dependencyType": "devDependencies"
+    },
+    "@radix-ui/react-slot": {
+      "current": "1.2.4",
+      "latest": "1.3.3",
+      "wanted": "1.2.4",
+      "isDeprecated": false,
+      "dependencyType": "dependencies"
+    },
+    "@tailwindcss/postcss": {
+      "current": "4.2.4",
+      "latest": "4.3.3",
+      "wanted": "4.2.4",
+      "isDeprecated": false,
+      "dependencyType": "devDependencies"
+    },
+    "@types/react": {
+      "current": "19.2.14",
+      "latest": "19.3.0",
+      "wanted": "19.2.14",
+      "isDeprecated": false,
+      "dependencyType": "devDependencies"
+    },
+    "@types/react-dom": {
+      "current": "19.2.3",
+      "latest": "19.3.0",
+      "wanted": "19.2.3",
+      "isDeprecated": false,
+      "dependencyType": "devDependencies"
+    },
+    "date-fns": {
+      "current": "4.1.0",
+      "latest": "4.4.0",
+      "wanted": "4.1.0",
+      "isDeprecated": false,
+      "dependencyType": "dependencies"
+    },
+    "eslint-config-next": {
+      "current": "16.2.5",
+      "latest": "16.3.6",
+      "wanted": "16.2.5",
+      "isDeprecated": false,
+      "dependencyType": "devDependencies"
+    },
+    "lucide-react": {
+      "current": "1.14.0",
+      "latest": "1.48.0",
+      "wanted": "1.14.0",
+      "isDeprecated": false,
+      "dependencyType": "dependencies"
+    },
+    "next": {
+      "current": "16.2.5",
+      "latest": "16.3.6",
+      "wanted": "16.2.5",
+      "isDeprecated": false,
+      "dependencyType": "dependencies"
+    },
+    "prettier": {
+      "current": "3.8.3",
+      "latest": "3.9.9",
+      "wanted": "3.8.3",
+      "isDeprecated": false,
+      "dependencyType": "devDependencies"
+    },
+    "react": {
+      "current": "19.2.4",
+      "latest": "19.3.0",
+      "wanted": "19.2.4",
+      "isDeprecated": false,
+      "dependencyType": "dependencies"
+    },
+    "react-dom": {
+      "current": "19.2.4",
+      "latest": "19.3.0",
+      "wanted": "19.2.4",
+      "isDeprecated": false,
+      "dependencyType": "dependencies"
+    },
+    "tailwind-merge": {
+      "current": "3.5.0",
+      "latest": "3.7.0",
+      "wanted": "3.5.0",
+      "isDeprecated": false,
+      "dependencyType": "dependencies"
+    },
+    "tailwindcss": {
+      "current": "4.2.4",
+      "latest": "4.3.3",
+      "wanted": "4.2.4",
+      "isDeprecated": false,
+      "dependencyType": "devDependencies"
+    },
+    "zod": {
+      "current": "4.4.3",
+      "latest": "4.6.5",
+      "wanted": "4.4.3",
+      "isDeprecated": false,
+      "dependencyType": "dependencies"
+    },
+    "@types/node": {
+      "current": "20.19.39",
+      "latest": "26.6.2",
+      "wanted": "20.19.39",
+      "isDeprecated": false,
+      "dependencyType": "devDependencies"
+    },
+    "@vitest/coverage-v8": {
+      "current": "4.1.5",
+      "latest": "5.0.1",
+      "wanted": "4.1.5",
+      "isDeprecated": false,
+      "dependencyType": "devDependencies"
+    },
+    "@vitest/ui": {
+      "current": "4.1.5",
+      "latest": "5.0.1",
+      "wanted": "4.1.5",
+      "isDeprecated": false,
+      "dependencyType": "devDependencies"
+    },
+    "eslint": {
+      "current": "9.39.4",
+      "latest": "10.11.0",
+      "wanted": "9.39.4",
+      "isDeprecated": false,
+      "dependencyType": "devDependencies"
+    },
+    "pdfjs-dist": {
+      "current": "5.7.284",
+      "latest": "6.3.289",
+      "wanted": "5.7.284",
+      "isDeprecated": false,
+      "dependencyType": "dependencies"
+    },
+    "typescript": {
+      "current": "5.9.3",
+      "latest": "7.0.2",
+      "wanted": "5.9.3",
+      "isDeprecated": false,
+      "dependencyType": "devDependencies"
+    },
+    "vitest": {
+      "current": "4.1.5",
+      "latest": "5.0.1",
+      "wanted": "4.1.5",
+      "isDeprecated": false,
+      "dependencyType": "devDependencies"
+    }
+  },
+  "direct": [
+    {
+      "name": "@radix-ui/react-slot",
+      "declared": "^1.2.4",
+      "installed": "1.2.4",
+      "license": "MIT"
+    },
+    {
+      "name": "class-variance-authority",
+      "declared": "^0.7.1",
+      "installed": "0.7.1",
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "clsx",
+      "declared": "^2.1.1",
+      "installed": "2.1.1",
+      "license": "MIT",
+      "engines": {
+        "node": ">=6"
+      }
+    },
+    {
+      "name": "date-fns",
+      "declared": "^4.1.0",
+      "installed": "4.1.0",
+      "license": "MIT"
+    },
+    {
+      "name": "github-slugger",
+      "declared": "^2.0.0",
+      "installed": "2.0.0",
+      "license": "ISC"
+    },
+    {
+      "name": "gray-matter",
+      "declared": "^4.0.3",
+      "installed": "4.0.3",
+      "license": "MIT",
+      "engines": {
+        "node": ">=6.0"
+      }
+    },
+    {
+      "name": "idb",
+      "declared": "^8.0.3",
+      "installed": "8.0.3",
+      "license": "ISC"
+    },
+    {
+      "name": "lucide-react",
+      "declared": "^1.14.0",
+      "installed": "1.14.0",
+      "license": "ISC"
+    },
+    {
+      "name": "next",
+      "declared": "16.2.5",
+      "installed": "16.2.5",
+      "license": "MIT",
+      "engines": {
+        "node": ">=20.9.0"
+      }
+    },
+    {
+      "name": "next-mdx-remote",
+      "declared": "^6.0.0",
+      "installed": "6.0.0",
+      "license": "MPL-2.0",
+      "engines": {
+        "node": ">=14",
+        "npm": ">=7"
+      }
+    },
+    {
+      "name": "pdf-lib",
+      "declared": "^1.17.1",
+      "installed": "1.17.1",
+      "license": "MIT"
+    },
+    {
+      "name": "pdfjs-dist",
+      "declared": "^5.7.284",
+      "installed": "5.7.284",
+      "license": "Apache-2.0",
+      "engines": {
+        "node": ">=22.13.0 || >=24"
+      }
+    },
+    {
+      "name": "react",
+      "declared": "19.2.4",
+      "installed": "19.2.4",
+      "license": "MIT",
+      "engines": {
+        "node": ">=0.10.0"
+      }
+    },
+    {
+      "name": "react-dom",
+      "declared": "19.2.4",
+      "installed": "19.2.4",
+      "license": "MIT"
+    },
+    {
+      "name": "rehype-slug",
+      "declared": "^6.0.0",
+      "installed": "6.0.0",
+      "license": "MIT"
+    },
+    {
+      "name": "remark-gfm",
+      "declared": "^4.0.1",
+      "installed": "4.0.1",
+      "license": "MIT"
+    },
+    {
+      "name": "tailwind-merge",
+      "declared": "^3.5.0",
+      "installed": "3.5.0",
+      "license": "MIT"
+    },
+    {
+      "name": "tesseract.js",
+      "declared": "^7.0.0",
+      "installed": "7.0.0",
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "zod",
+      "declared": "^4.4.3",
+      "installed": "4.4.3",
+      "license": "MIT"
+    },
+    {
+      "name": "@axe-core/playwright",
+      "declared": "^4.11.3",
+      "installed": "4.11.3",
+      "license": "MPL-2.0"
+    },
+    {
+      "name": "@playwright/test",
+      "declared": "^1.59.1",
+      "installed": "1.59.1",
+      "license": "Apache-2.0",
+      "engines": {
+        "node": ">=18"
+      }
+    },
+    {
+      "name": "@tailwindcss/postcss",
+      "declared": "^4",
+      "installed": "4.2.4",
+      "license": "MIT"
+    },
+    {
+      "name": "@types/node",
+      "declared": "^20",
+      "installed": "20.19.39",
+      "license": "MIT"
+    },
+    {
+      "name": "@types/react",
+      "declared": "^19",
+      "installed": "19.2.14",
+      "license": "MIT"
+    },
+    {
+      "name": "@types/react-dom",
+      "declared": "^19",
+      "installed": "19.2.3",
+      "license": "MIT"
+    },
+    {
+      "name": "@vitest/coverage-v8",
+      "declared": "^4.1.5",
+      "installed": "4.1.5",
+      "license": "MIT"
+    },
+    {
+      "name": "@vitest/ui",
+      "declared": "^4.1.5",
+      "installed": "4.1.5",
+      "license": "MIT"
+    },
+    {
+      "name": "eslint",
+      "declared": "^9",
+      "installed": "9.39.4",
+      "license": "MIT",
+      "engines": {
+        "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
+      }
+    },
+    {
+      "name": "eslint-config-next",
+      "declared": "16.2.5",
+      "installed": "16.2.5",
+      "license": "MIT"
+    },
+    {
+      "name": "prettier",
+      "declared": "^3.8.3",
+      "installed": "3.8.3",
+      "license": "MIT",
+      "engines": {
+        "node": ">=14"
+      }
+    },
+    {
+      "name": "tailwindcss",
+      "declared": "^4",
+      "installed": "4.2.4",
+      "license": "MIT"
+    },
+    {
+      "name": "typescript",
+      "declared": "^5",
+      "installed": "5.9.3",
+      "license": "Apache-2.0",
+      "engines": {
+        "node": ">=14.17"
+      }
+    },
+    {
+      "name": "vitest",
+      "declared": "^4.1.5",
+      "installed": "4.1.5",
+      "license": "MIT",
+      "engines": {
+        "node": "^20.0.0 || ^22.0.0 || >=24.0.0"
+      }
+    }
+  ]
+}

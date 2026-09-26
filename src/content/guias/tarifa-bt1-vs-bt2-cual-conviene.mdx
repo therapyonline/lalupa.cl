@@ -1,114 +1,78 @@
 ---
-title: 'Tarifa BT-1 vs BT-2 en Chile: cuál te conviene'
+title: 'Tarifa BT-1 vs BT-2: diferencias y cómo comparar costos'
 slug: 'tarifa-bt1-vs-bt2-cual-conviene'
-description: 'Diferencias entre BT-1 (residencial) y BT-2 (con cargo de potencia) en boletas eléctricas chilenas. Cuándo conviene cambiar, cómo se calcula y trampas frecuentes.'
+description: 'BT-1 mide energía; BT-2 incorpora potencia contratada. Entiende kW y kWh, compara el costo anual y evita decidir con un umbral de consumo sin respaldo.'
 publishedAt: '2026-05-13'
-updatedAt: '2026-05-13'
+updatedAt: '2026-09-25'
 category: 'luz'
 keywords:
   - 'tarifa BT-1'
   - 'tarifa BT-2 chile'
-  - 'opción tarifaria SEC'
   - 'cargo de potencia luz'
 relatedTools:
   - '/boleta-luz'
-  - '/reclamar-sernac'
+  - '/tracker'
 author: 'Equipo lalupa'
+faqs:
+  - q: '¿BT-2 conviene al superar 350 kWh al mes?'
+    a: 'No existe ese umbral universal. La comparación requiere precios de la misma zona y período, potencia contratada, consumo anual y condiciones del suministro.'
+  - q: '¿lalupa recomienda automáticamente cambiar de BT-1 a BT-2?'
+    a: 'No. Puede mostrar la opción que logra leer del documento, pero no calcula ni certifica la conveniencia de cambiarla.'
 ---
 
-La opción tarifaria que tienes contratada con tu distribuidora cambia cuánto pagas cada mes, y casi nadie lo revisa. La gran mayoría de hogares está en BT-1, pero hay casos en los que **BT-2 sale más barata**. Esta guía te explica cómo decidir.
-
-<Callout tone="info" title="Atajo">
-  Si subes tu boleta en <a href="/boleta-luz">/boleta-luz</a>, lalupa identifica
-  la opción tarifaria contratada y, si detectamos un patrón donde BT-2 te
-  saldría más barata, te lo decimos.
-</Callout>
+**BT-2 no es automáticamente más barata que BT-1 cuando consumes mucho.** El resultado depende también de la potencia contratada y de todos los precios aplicables. Para decidir, pide una comparación escrita con tus consumos de doce meses.
 
 ## Las opciones tarifarias en Chile
 
-Cuando contratas electricidad con CGE, Enel, SAESA, Frontel o Chilquinta, te asignan una **opción tarifaria** según el tipo de empalme y el uso esperado. Las más comunes para hogares:
+La [CNE describe BT-1 como una opción con medición de energía y BT-2 con medición de energía y potencia contratada](https://www.cne.cl/tarificacion/electrica/valor-agregado-de-distribucion/opciones-tarifarias-a-usuarios-finales/). En BT-1, la potencia conectada debe ser inferior a 10 kW o estar limitada a 10 kW por el dispositivo indicado en las condiciones de la opción.
 
-- **BT-1**, "Baja Tensión 1": tarifa simple, **sin cargo de potencia**. Pagas cargo fijo + cargo por energía consumida. Es la opción por defecto para hogares.
-- **BT-2**, "Baja Tensión 2": tarifa con cargo de potencia contratada. Pagas cargo fijo + cargo por energía + un cargo adicional por la potencia que reservaste, esté usándose o no.
-- **BT-3, BT-4**, para comercio o industria con consumos altos. No aplican a hogares típicos.
+No confundas “sin medición de potencia” con ausencia de costos asociados a potencia: revisa los componentes de la tabla aplicable. Tampoco confundas una opción tarifaria con el régimen de [cliente libre o regulado](/guias/cambiar-comercializadora-electrica-chile).
+
+| Concepto | Qué representa | Qué buscar |
+| --- | --- | --- |
+| kWh | Energía consumida durante un período | Consumo entre lecturas |
+| kW | Potencia, distinta de la energía acumulada | Potencia conectada y contratada |
+| CLP/kWh | Precio unitario de energía u otro componente variable | Tabla, zona e impuestos |
+| CLP/kW | Precio referido a potencia | Condiciones y base de facturación |
 
 ## Cómo se calcula cada una
 
 ### BT-1
 
-```
-Total = Cargo fijo + (Energía kWh × $ tarifa energía) + Otros cargos + IVA
-```
-
-Es lineal: si consumes más kWh, pagas más; si consumes menos, pagas menos. Sin sorpresas.
+Para reconstruir el costo, suma los cargos aplicables de la tabla BT-1 y usa los kWh del período donde corresponda. Identifica si cada importe incluye IVA. No vuelvas a agregarlo a componentes que ya lo incorporan.
 
 ### BT-2
 
-```
-Total = Cargo fijo + (Energía kWh × $ tarifa energía BT-2) + (Potencia contratada kW × $ cargo potencia) + Otros cargos + IVA
-```
-
-Acá pagas dos cosas: la energía que **realmente consumes** (a una tarifa más baja que BT-1), y la potencia que **reservaste**, uses o no. Si reservas 5 kW pero solo usas 2 kW, igual pagas los 5 kW.
+Además del consumo, necesitas la potencia contratada y las condiciones de su cargo. Pedir solo el precio de energía deja fuera una parte decisiva del costo. Solicita que la cotización muestre todos los conceptos de ambas opciones con la misma base tributaria.
 
 ## Cuándo conviene BT-2 sobre BT-1
 
-La regla simple: **BT-2 conviene si tu factor de carga es alto**, es decir, si usas electricidad de forma constante en lugar de en pocos picos.
+Este ejemplo **inventado y simplificado** muestra por qué no sirve una regla única de kWh. No contiene tarifas chilenas vigentes, no incluye todos los componentes y no es una cotización:
 
-Casos típicos donde BT-2 puede salir más barata:
+| Supuesto ilustrativo | Opción A | Opción B |
+| --- | ---: | ---: |
+| Cargo fijo | $1.000 | $1.000 |
+| Precio variable | $200/kWh | $120/kWh |
+| Cargo mensual adicional | $0 | $20.000 |
+| Total con 200 kWh | $41.000 | $45.000 |
+| Total con 400 kWh | $81.000 | $69.000 |
 
-- Hogar con **consumo estable mensual** > 350 kWh/mes y sin grandes picos.
-- Hogar con **vehículo eléctrico** que carga de noche (consumo distribuido).
-- Hogar con **bomba de calor** o **climatización constante**.
-- **Pequeños talleres** o oficinas con uso parejo durante el día.
+Con estos supuestos, B cuesta más en el primer escenario y menos en el segundo. Si cambia el cargo adicional, cambia también el resultado. Por eso una recomendación necesita tus condiciones reales y los meses de consumo bajo, además de los altos.
 
-Casos donde BT-1 sigue siendo mejor:
+## Qué pedir antes de cambiar
 
-- Consumo bajo (< 250 kWh/mes).
-- Picos de consumo concentrados (cocina eléctrica + secadora + ducha eléctrica simultáneas) que te obligarían a contratar mucha potencia.
-- Casa de fin de semana o vacaciones (mucho mes con consumo bajo).
+1. **Doce meses comparados:** los mismos consumos y períodos bajo ambas opciones, con desglose mensual y suma anual.
+2. **Condiciones identificadas:** empresa, sector, red, potencia y fecha de las tablas utilizadas.
+3. **Costos adicionales:** equipos, obras, instalación, mantenimiento y cualquier cargo único, si corresponde a la propuesta.
+4. **Vigencia y salida:** fecha de inicio, duración de la opción y procedimiento para volver a cambiar.
+5. **Supuestos separados:** qué ocurre si tu consumo baja o necesitas más potencia.
 
-## Cómo saber qué opción tienes ahora
+La CNE señala una duración de un año para las opciones tarifarias. Confirma las condiciones particulares antes de solicitar el cambio; esta guía no promete un trámite de 30 días ni un ahorro fijo.
 
-En tu boleta, busca en el header o en la sección de "datos de servicio" una línea como:
+## Revisar tu opción actual
 
-- "Opción tarifaria: BT1A" o "BT1B"
-- "Tarifa: BT-1"
-- "Pliego tarifario: BT2"
+Busca “Tarifa” u “Opción tarifaria” en la boleta. Si aparece un código incompleto, solicita la identificación a tu distribuidora. Puedes usar el [lector de luz](/boleta-luz) como apoyo, cotejando siempre lo extraído con el original. Para investigar un alza reciente, empieza por [consumo, días y cargos](/guias/por-que-subio-mi-cuenta-de-luz).
 
-Si no aparece explícito, llama al call center con tu número de cliente y pide "qué opción tarifaria tengo contratada y cuál es mi potencia conectada".
+## Fuente y fecha de revisión
 
-## Cómo cambiar de opción tarifaria
-
-Cualquier cliente residencial puede pedir cambio de opción tarifaria. El procedimiento:
-
-1. **Solicitá un análisis técnico** a la distribuidora. Te dicen tu consumo histórico, factor de carga y proyección de costo en cada opción.
-2. Si BT-2 te conviene, pides el cambio por escrito (correo certificado o vía web). La empresa tiene **30 días** para aplicarlo.
-3. La empresa puede pedir una **revisión del empalme** si tu instalación no soporta la potencia que quieres contratar, esto a veces tiene costo.
-4. Una vez aplicado, el cambio se refleja en la siguiente facturación.
-
-<Callout tone="warning" title="Cuidado con el cargo de potencia mal ajustado">
-  El error más frecuente al pasar a BT-2 es contratar más potencia de la que
-  realmente necesitas. Pide a la empresa el "diagrama de carga" de los últimos
-  6 meses para dimensionar bien. Si contratas 10 kW y usas 4 kW, BT-1 te habría
-  salido más barato.
-</Callout>
-
-## Trampas frecuentes
-
-- **No te dejan volver a BT-1**: legalmente sí puedes volver, aunque algunas empresas ponen plazos de permanencia mínima de 12 meses en BT-2. Pide el contrato por escrito antes de cambiar.
-- **Cargo de potencia retroactivo**: si cambias a BT-2 a mitad de mes, el cargo de potencia se prorratea. Verifica que esté bien calculado.
-- **Empalme insuficiente**: la potencia que contratas en BT-2 no puede superar la potencia conectada de tu empalme (la SEC fija máximos). Si tu empalme es de 3 kW, no puedes contratar 10 kW en BT-2.
-
-## Resumen rápido
-
-| Criterio | BT-1 | BT-2 |
-| --- | --- | --- |
-| Tipo de cargo | Solo energía consumida | Energía + potencia reservada |
-| Conviene para | Consumo bajo o picos | Consumo estable y alto |
-| Sorpresas | Pocas | Dimensionar bien la potencia |
-| Cambio | Default | Por solicitud |
-| Volver atrás | N/A | Permitido (a veces con plazo) |
-
-**Regla de bolsillo**: si gastas menos de $ 50.000 al mes en luz, BT-1 casi seguro te conviene. Si gastas más de $ 80.000 con consumo parejo, pide un análisis comparativo a tu distribuidora antes de descartar BT-2.
-
-Y siempre, *siempre*, verifica la liquidación de los primeros dos meses tras el cambio. Súbela a <a href="/boleta-luz">/boleta-luz</a> y compárala con tu boleta previa para confirmar que el ahorro proyectado es real.
+Revisión editorial: **25 de septiembre de 2026**. Fuente: [CNE, opciones tarifarias a usuarios finales y documentos tarifarios enlazados](https://www.cne.cl/tarificacion/electrica/valor-agregado-de-distribucion/opciones-tarifarias-a-usuarios-finales/). La comparación económica debe usar el pliego que corresponda al suministro concreto.

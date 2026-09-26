@@ -18,14 +18,15 @@ import {
   evaluarSubsidioElectrico,
 } from '@/data/subsidio-electrico'
 import { cn } from '@/lib/utils'
+import { safeSessionSet, safeSessionRemove } from '@/lib/session-storage'
+import {
+  readSessionDraft,
+  subsidioDraftSchema,
+  STORAGE_NOTICE,
+} from '@/lib/storage/wizard-state'
 
 const STORAGE_KEY = 'lalupa:subsidio:wizard'
 const TOTAL = PREGUNTAS_2026.length
-
-interface PersistedState {
-  step: number
-  answers: RespuestasWizard
-}
 
 export function SubsidioWizard() {
   const [step, setStep] = useState(0)
@@ -34,32 +35,29 @@ export function SubsidioWizard() {
   const [hydrated, setHydrated] = useState(false)
   const [showResult, setShowResult] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [storageNotice, setStorageNotice] = useState<string | null>(null)
 
   useEffect(() => {
     // Hidratación desde sessionStorage: one-shot en mount.
     /* eslint-disable react-hooks/set-state-in-effect */
-    const raw = sessionStorage.getItem(STORAGE_KEY)
-    if (raw) {
-      try {
-        const parsed = JSON.parse(raw) as PersistedState
-        if (parsed && typeof parsed.step === 'number' && parsed.answers) {
-          setStep(Math.min(parsed.step, TOTAL - 1))
-          setAnswers(parsed.answers)
-        }
-      } catch {
-        // ignore corrupt state
-      }
+    const saved = readSessionDraft(STORAGE_KEY, subsidioDraftSchema)
+    if (saved.data) {
+      setStep(saved.data.step)
+      setAnswers(saved.data.answers)
     }
+    setStorageNotice(saved.notice ?? null)
     setHydrated(true)
     /* eslint-enable react-hooks/set-state-in-effect */
   }, [])
 
   useEffect(() => {
     if (!hydrated) return
-    sessionStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({ step, answers } satisfies PersistedState),
-    )
+    try {
+      safeSessionSet(STORAGE_KEY, JSON.stringify({ version: 2, step, answers }))
+    } catch {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- El efecto informa un fallo de persistencia externo.
+      setStorageNotice(STORAGE_NOTICE)
+    }
   }, [step, answers, hydrated])
 
   const pregunta = PREGUNTAS_2026[step]
@@ -131,7 +129,7 @@ export function SubsidioWizard() {
   }
 
   function handleRestart() {
-    sessionStorage.removeItem(STORAGE_KEY)
+    safeSessionRemove(STORAGE_KEY)
     setAnswers({})
     setStep(0)
     setShowResult(false)
@@ -165,10 +163,15 @@ export function SubsidioWizard() {
             ¿Calificas al subsidio eléctrico?
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-body">
-            13 preguntas. Te tomamos 2 minutos y te decimos si calificas +
-            cómo postular. Tus respuestas viven solo en este celular.
+            13 preguntas. Te tomamos 2 minutos y te decimos si calificas + cómo
+            postular. Tus respuestas viven solo en este celular.
           </p>
           <Stepper current={step + 1} total={TOTAL} />
+          {storageNotice && (
+            <p className="mt-6" role="status">
+              {storageNotice}
+            </p>
+          )}
         </Container>
       </section>
 
@@ -452,10 +455,7 @@ function ResultView({
             {alertas.length > 0 && <AlertasCard alertas={alertas} />}
           </div>
 
-          <PasosCard
-            califica={califica}
-            pasos={resultado.pasosSiguientes}
-          />
+          <PasosCard califica={califica} pasos={resultado.pasosSiguientes} />
         </Container>
       </section>
 
@@ -474,9 +474,14 @@ function ResultView({
                 subsidioelectrico.cl
               </a>{' '}
               con tu ClaveÚnica. Las fechas vigentes (postulación hasta el{' '}
-              {formatFechaCalendario(CALENDARIO_5TA_CONVOCATORIA.postulacionFin)}, estar al día hasta
-              el {formatFechaCalendario(CALENDARIO_5TA_CONVOCATORIA.fechaAlDiaPago)}) las publica la
-              SEC y pueden cambiar.
+              {formatFechaCalendario(
+                CALENDARIO_5TA_CONVOCATORIA.postulacionFin,
+              )}
+              , estar al día hasta el{' '}
+              {formatFechaCalendario(
+                CALENDARIO_5TA_CONVOCATORIA.fechaAlDiaPago,
+              )}
+              ) las publica la SEC y pueden cambiar.
             </Alert.Body>
           </Alert>
 
@@ -515,8 +520,8 @@ function MontoCard({
         $ {Math.round(semestral).toLocaleString('es-CL')}
       </p>
       <p className="mt-2 text-sm text-body">
-        semestral · ${Math.round(mensual).toLocaleString('es-CL')} mensual en
-        6 cuotas.
+        semestral · ${Math.round(mensual).toLocaleString('es-CL')} mensual en 6
+        cuotas.
       </p>
       <Pill
         variant={

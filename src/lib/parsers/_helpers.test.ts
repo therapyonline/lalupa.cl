@@ -286,3 +286,12 @@ describe('extractIVA (tolerante)', () => {
     expect(extractIVA('I V A 19% $ 5.000')).toBe(5000)
   })
 })
+
+describe('fechas imposibles no se normalizan a otro mes', () => {
+  it.each(['31/02/2026', '29/02/2025', '31/04/2026', '00/01/2026', '01/13/2026', '31 febrero 2026'])('%s', (text) => {
+    expect(parseChileanDate(text)).toBeNull()
+  })
+  it('acepta día bisiesto real', () => {
+    expect(parseChileanDate('29/02/2024')?.getDate()).toBe(29)
+  })
+})

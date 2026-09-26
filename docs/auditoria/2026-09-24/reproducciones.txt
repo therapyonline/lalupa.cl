@@ -1,0 +1,82 @@
+{
+  "otsu": {
+    "threshold": 0,
+    "blackPixelAfter": 255
+  },
+  "invalidDate": "2026-03-03T03:00:00.000Z",
+  "idCollision": true,
+  "exportOfInvalidDateImportable": false,
+  "lowAmount": {
+    "estaDentroDelRango": false,
+    "desviacionPct": -52.31100852679168,
+    "alerta": "cobro_indebido_probable",
+    "mensaje": "El cobro está bajo lo esperado en 52.3%. Probable cobro indebido, generar reclamo SERNAC."
+  },
+  "cgeLowFlags": [
+    {
+      "concepto": "Cargo fijo",
+      "monto": 500,
+      "sospechoso": true,
+      "razonSospecha": "Cargo fijo bajo lo regulado por SEC en 52.3%. El cobro está bajo lo esperado en 52.3%. Probable cobro indebido, generar reclamo SERNAC."
+    }
+  ],
+  "waterNoPeak": {
+    "normal": {
+      "cargoFijo": 914,
+      "agua": 29649,
+      "alcantarillado": 37970,
+      "sobreconsumo": 0,
+      "total": 68533,
+      "precioPromedioM3": 1371
+    },
+    "limit40": {
+      "cargoFijo": 914,
+      "agua": 23719,
+      "alcantarillado": 37970,
+      "sobreconsumo": 0,
+      "total": 62603,
+      "precioPromedioM3": 1252
+    }
+  },
+  "letterInventsPriorContact": true
+}
+{
+  "pdfLineBreaks": {
+    "withLines": [
+      {
+        "concepto": "Cargo fijo",
+        "monto": 914
+      },
+      {
+        "concepto": "Ajuste sencillo anterior",
+        "monto": 3
+      },
+      {
+        "concepto": "Ajuste sencillo",
+        "monto": -2
+      },
+      {
+        "concepto": "Consumo agua potable",
+        "monto": 7116
+      },
+      {
+        "concepto": "Servicio de alcantarillado",
+        "monto": 9113
+      }
+    ],
+    "flattened": [
+      {
+        "concepto": "Cargo fijo",
+        "monto": 914
+      },
+      {
+        "concepto": "Ajuste sencillo anterior",
+        "monto": 3
+      },
+      {
+        "concepto": "Ajuste sencillo",
+        "monto": -2
+      }
+    ]
+  }
+}

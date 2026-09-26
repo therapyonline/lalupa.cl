@@ -1,13 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { Container } from '@/components/layout/Container'
@@ -23,6 +17,9 @@ import {
   listarBoletas,
 } from '@/lib/storage/historial'
 import { cn } from '@/lib/utils'
+import { isValidDate } from '@/lib/dates'
+import { formatPeriod } from '@/components/parsers/ResultBlock'
+import { latestPeriodReadings } from '@/lib/storage/comparable-boletas'
 
 type Servicio = 'electricidad' | 'agua' | 'gas'
 
@@ -69,18 +66,25 @@ function emptyBucket(year: number, monthIdx: number): MonthBucket {
   }
 }
 
-function bucketsForYear(boletas: BoletaGuardada[], year: number): MonthBucket[] {
+function bucketsForYear(
+  boletas: BoletaGuardada[],
+  year: number,
+): MonthBucket[] {
   const buckets: MonthBucket[] = Array.from({ length: 12 }, (_, m) =>
     emptyBucket(year, m),
   )
   for (const b of boletas) {
-    if (!b.periodo?.desde) continue
+    if (!isValidDate(b.periodo?.desde)) continue
     if (b.periodo.desde.getFullYear() !== year) continue
     const m = b.periodo.desde.getMonth()
     const bucket = buckets[m]
     bucket.count++
     bucket.total += b.totales.total
-    if (b.servicio === 'electricidad' || b.servicio === 'agua' || b.servicio === 'gas') {
+    if (
+      b.servicio === 'electricidad' ||
+      b.servicio === 'agua' ||
+      b.servicio === 'gas'
+    ) {
       bucket.byService[b.servicio] += b.totales.total
     }
     bucket.boletas.push(b)
@@ -94,14 +98,18 @@ function bucketsLast12(boletas: BoletaGuardada[], now: Date): MonthBucket[] {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
     const bucket = emptyBucket(d.getFullYear(), d.getMonth())
     for (const b of boletas) {
-      if (!b.periodo?.desde) continue
+      if (!isValidDate(b.periodo?.desde)) continue
       if (
         b.periodo.desde.getFullYear() === bucket.year &&
         b.periodo.desde.getMonth() === bucket.monthIdx
       ) {
         bucket.count++
         bucket.total += b.totales.total
-        if (b.servicio === 'electricidad' || b.servicio === 'agua' || b.servicio === 'gas') {
+        if (
+          b.servicio === 'electricidad' ||
+          b.servicio === 'agua' ||
+          b.servicio === 'gas'
+        ) {
           bucket.byService[b.servicio] += b.totales.total
         }
         bucket.boletas.push(b)
@@ -144,13 +152,16 @@ export function Tracker() {
   const [refresh, setRefresh] = useState(0)
 
   useEffect(() => {
+    let cancelled = false
     listarBoletas()
       .then((all) => {
+        if (cancelled) return
         setBoletas(all)
         setLoadError(null)
         setLoaded(true)
       })
       .catch((e) => {
+        if (cancelled) return
         // No silenciamos el error, lo exponemos en UI. Antes el catch
         // vacío hacía pensar al usuario que su histórico estaba vacío
         // cuando en realidad IndexedDB rechazaba la lectura (incógnito,
@@ -162,12 +173,19 @@ export function Tracker() {
         )
         setLoaded(true)
       })
+    return () => {
+      cancelled = true
+    }
   }, [refresh])
 
-  const buckets = useMemo(() => bucketsForYear(boletas, year), [boletas, year])
+  const readings = useMemo(() => latestPeriodReadings(boletas), [boletas])
+  const buckets = useMemo(
+    () => bucketsForYear(readings, year),
+    [readings, year],
+  )
   const bucketsMobile = useMemo(
-    () => bucketsLast12(boletas, new Date()),
-    [boletas],
+    () => bucketsLast12(readings, new Date()),
+    [readings],
   )
 
   const yearTotal = buckets.reduce((s, b) => s + b.total, 0)
@@ -176,9 +194,7 @@ export function Tracker() {
 
   const monthsWithData = buckets.filter((b) => b.count > 0)
   const promedio =
-    monthsWithData.length > 0
-      ? yearTotal / monthsWithData.length
-      : 0
+    monthsWithData.length > 0 ? yearTotal / monthsWithData.length : 0
   const masCaro =
     monthsWithData.length > 0
       ? monthsWithData.reduce((a, b) => (b.total > a.total ? b : a))
@@ -191,13 +207,16 @@ export function Tracker() {
   const yearsAvailable = useMemo(() => {
     const set = new Set<number>()
     for (const b of boletas) {
-      if (b.periodo?.desde) set.add(b.periodo.desde.getFullYear())
+      if (isValidDate(b.periodo?.desde)) set.add(b.periodo.desde.getFullYear())
     }
     set.add(new Date().getFullYear())
     return Array.from(set).sort((a, b) => b - a)
   }, [boletas])
 
   const triggerRefresh = useCallback(() => setRefresh((r) => r + 1), [])
+  const sinPeriodo = boletas.filter((b) => !isValidDate(b.periodo.desde))
+  const currentIds = new Set(readings.map((b) => b.id))
+  const olderVersions = boletas.filter((b) => !currentIds.has(b.id))
 
   return (
     <main className="flex-1">
@@ -245,15 +264,21 @@ export function Tracker() {
                 No pudimos leer tu histórico
               </h2>
               <p className="mt-3 max-w-md text-body">
-                Tu navegador rechazó la lectura de IndexedDB. Esto suele
-                pasar en modo incógnito, con storage bloqueado para este
-                sitio, o si la base se corrompió. Tus boletas siguen en
-                tu dispositivo (no las perdiste), pero la app no puede
-                leerlas en este momento.
+                Tu navegador no permitió leer el almacenamiento local. Revisa
+                los permisos de este sitio y vuelve a intentar.
               </p>
               <p className="mt-2 max-w-md font-mono text-xs text-soft">
                 {loadError}
               </p>
+              <Button
+                className="mt-4"
+                onClick={() => {
+                  setLoaded(false)
+                  triggerRefresh()
+                }}
+              >
+                Reintentar lectura
+              </Button>
             </div>
           </Container>
         </section>
@@ -290,6 +315,62 @@ export function Tracker() {
         <>
           <section className="bg-cream pb-12">
             <Container>
+              {sinPeriodo.length > 0 && (
+                <div className="mb-8 rounded-[20px] border border-border bg-white p-6">
+                  <h2 className="text-xl font-medium">Sin período detectado</h2>
+                  <p className="mt-2 text-body">
+                    Estas {sinPeriodo.length} boletas se conservan en tu
+                    histórico y en los respaldos. No se incluyen en los totales
+                    por mes.
+                  </p>
+                  <Button
+                    className="mt-4"
+                    onClick={() =>
+                      setSelectedMonth({
+                        ...emptyBucket(year, 0),
+                        monthIdx: -1,
+                        label: 'Sin período detectado',
+                        count: sinPeriodo.length,
+                        total: sinPeriodo.reduce(
+                          (sum, b) => sum + b.totales.total,
+                          0,
+                        ),
+                        boletas: sinPeriodo,
+                      })
+                    }
+                  >
+                    Ver boletas sin período
+                  </Button>
+                </div>
+              )}
+              {olderVersions.length > 0 && (
+                <div className="mb-8 rounded-[20px] border border-border bg-white p-6">
+                  <h2 className="text-xl font-medium">Versiones anteriores</h2>
+                  <p className="mt-2 text-body">
+                    Para un mismo suministro y período, los totales usan la
+                    última lectura guardada. Conservamos {olderVersions.length}{' '}
+                    versiones anteriores para que puedas revisarlas.
+                  </p>
+                  <Button
+                    className="mt-4"
+                    onClick={() =>
+                      setSelectedMonth({
+                        ...emptyBucket(year, 0),
+                        monthIdx: -1,
+                        label: 'Versiones anteriores',
+                        count: olderVersions.length,
+                        total: olderVersions.reduce(
+                          (sum, b) => sum + b.totales.total,
+                          0,
+                        ),
+                        boletas: olderVersions,
+                      })
+                    }
+                  >
+                    Ver versiones anteriores
+                  </Button>
+                </div>
+              )}
               <YearNav
                 year={year}
                 onYearChange={setYear}
@@ -368,13 +449,15 @@ export function Tracker() {
               </div>
             </Container>
           </section>
-
-          <section className="bg-cream py-16">
-            <Container>
-              <ManagementPanel onChanged={triggerRefresh} />
-            </Container>
-          </section>
         </>
+      )}
+
+      {loaded && !loadError && (
+        <section className="bg-cream py-16">
+          <Container>
+            <ManagementPanel onChanged={triggerRefresh} />
+          </Container>
+        </section>
       )}
 
       {selectedMonth && (
@@ -440,9 +523,7 @@ function MonthCell({
   const level = levelFor(bucket.total, maxMonthTotal)
   // Empresas únicas en este bucket, para mostrar en el card. Si hay
   // más de 2, las acortamos con "+N".
-  const empresas = Array.from(
-    new Set(bucket.boletas.map((b) => b.empresa)),
-  )
+  const empresas = Array.from(new Set(bucket.boletas.map((b) => b.empresa)))
   const empresasLabel =
     empresas.length === 0
       ? null
@@ -538,7 +619,9 @@ function SummaryCard({
       >
         {value}
       </p>
-      {hint && <p className="mt-2 text-xs uppercase tracking-wide text-soft">{hint}</p>}
+      {hint && (
+        <p className="mt-2 text-xs uppercase tracking-wide text-soft">{hint}</p>
+      )}
     </div>
   )
 }
@@ -699,8 +782,14 @@ function LineChart({
             </thead>
             <tbody>
               {buckets.map((b) => (
-                <tr key={`${b.year}-${b.monthIdx}`} className="border-b border-border/40">
-                  <th scope="row" className="py-2 pr-3 font-mono uppercase text-body">
+                <tr
+                  key={`${b.year}-${b.monthIdx}`}
+                  className="border-b border-border/40"
+                >
+                  <th
+                    scope="row"
+                    className="py-2 pr-3 font-mono uppercase text-body"
+                  >
                     {b.label} {b.year}
                   </th>
                   {SERVICIOS.map((s) => (
@@ -800,9 +889,12 @@ function MonthModal({
         <header className="flex items-start justify-between gap-4 border-b border-border bg-cream px-6 py-5">
           <div>
             <p className="font-mono text-xs uppercase tracking-[0.1em] text-soft">
-              {bucket.label} {bucket.year}
+              {bucket.label} {bucket.monthIdx >= 0 ? bucket.year : ''}
             </p>
-            <h3 id={titleId} className="mt-1 text-2xl font-medium tracking-tight text-ink">
+            <h3
+              id={titleId}
+              className="mt-1 text-2xl font-medium tracking-tight text-ink"
+            >
               {formatCLP(bucket.total)}
             </h3>
             <p className="text-xs text-body">
@@ -821,6 +913,12 @@ function MonthModal({
         </header>
 
         <div className="max-h-[60vh] overflow-y-auto px-6 py-5">
+          {bucket.boletas.some((boleta) => boleta.cargos.some((cargo) => cargo.sospechoso)) && (
+            <p className="mb-4 text-sm leading-relaxed text-body">
+              Las alertas guardadas no se recalculan al abrir el historial.
+              Para revisar una boleta con el lector actual, vuelve a cargar su archivo original.
+            </p>
+          )}
           {bucket.boletas.length === 0 ? (
             <div className="text-center">
               <p className="text-body">Este mes no tiene boletas guardadas.</p>
@@ -845,15 +943,14 @@ function MonthModal({
                     <p className="font-medium text-ink">{b.empresa}</p>
                     <p className="text-xs uppercase tracking-wide text-soft">
                       {SERVICIO_LABEL[b.servicio as Servicio] ?? b.servicio} ·{' '}
-                      {format(b.periodo.desde, 'd MMM', { locale: es })}–
-                      {format(b.periodo.hasta, 'd MMM yyyy', { locale: es })}
+                      {formatPeriod(b.periodo)}
                     </p>
                     {b.cargos.some((c) => c.sospechoso) && (
                       <Pill variant="warning" className="mt-2">
                         {b.cargos.filter((c) => c.sospechoso).length}{' '}
                         {b.cargos.filter((c) => c.sospechoso).length === 1
-                          ? 'flag'
-                          : 'flags'}
+                          ? 'alerta guardada'
+                          : 'alertas guardadas'}
                       </Pill>
                     )}
                   </div>
@@ -909,8 +1006,7 @@ function ManagementPanel({ onChanged }: { onChanged: () => void }) {
     } catch (err) {
       setFeedback({
         kind: 'error',
-        message:
-          err instanceof Error ? err.message : 'No pudimos exportar.',
+        message: err instanceof Error ? err.message : 'No pudimos exportar.',
       })
     }
   }
@@ -1028,8 +1124,8 @@ function ManagementPanel({ onChanged }: { onChanged: () => void }) {
         <Alert.Title>Privacidad</Alert.Title>
         <Alert.Body>
           Todo se guarda en IndexedDB de tu navegador (db `lalupa`). No hay
-          servidor que sincronice. Si limpias los datos del navegador o
-          cambias de celular, se pierde, usa Exportar para hacer respaldo.
+          servidor que sincronice. Si limpias los datos del navegador o cambias
+          de celular, se pierde, usa Exportar para hacer respaldo.
         </Alert.Body>
       </Alert>
     </div>

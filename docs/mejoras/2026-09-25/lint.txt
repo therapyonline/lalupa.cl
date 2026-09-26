@@ -1,0 +1,2 @@
+> lalupa@0.1.0 lint /Users/estebanlorca/Projects/lalupa.cl
+> eslint

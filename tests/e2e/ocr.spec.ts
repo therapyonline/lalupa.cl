@@ -162,7 +162,7 @@ test.describe('OCR pipeline', () => {
     // El error vive en el upload-hub: aparece como Alert.
     // Buscamos el Alert de upload-hub específico (excluye route-announcer
     // de Next que también usa role=alert).
-    const alert = page.locator('main [role="alert"]:has([data-slot="alert-title"])')
+    const alert = page.locator('main [role="alert"]').filter({ hasText: /HEIC|JPEG|JPG/i })
     await expect(alert).toBeVisible({ timeout: 10_000 })
     await expect(alert).toContainText(/HEIC|JPEG|JPG/i)
   })
@@ -195,7 +195,7 @@ test.describe('OCR pipeline', () => {
     })
     // Buscamos el Alert de upload-hub específico (excluye route-announcer
     // de Next que también usa role=alert).
-    const alert = page.locator('main [role="alert"]:has([data-slot="alert-title"])')
+    const alert = page.locator('main [role="alert"]').filter({ hasText: /leer|detectar|nít|distribuidora|empresa/i })
     await expect(alert).toBeVisible({ timeout: 90_000 })
     // El mensaje puede venir del OCR (no leyó texto) o del detector
     // (no identificó empresa). Ambos son aceptables para este caso.

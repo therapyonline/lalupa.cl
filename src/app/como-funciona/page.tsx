@@ -47,7 +47,7 @@ const PRINCIPLES: Array<{
     Icon: Cpu,
     title: 'Open por diseño',
     description:
-      'El parser se ejecuta como JavaScript que tú mismo puedes inspeccionar. Validamos contra tarifas SEC/SISS oficiales públicas.',
+      'El lector se ejecuta como JavaScript que tú mismo puedes inspeccionar. Mostramos los cargos extraídos y el alcance de las alertas.',
   },
 ]
 
@@ -66,7 +66,7 @@ const FAQS: Array<{ q: string; a: string }> = [
   },
   {
     q: '¿Qué tan precisas son las alertas?',
-    a: 'Las alertas son referenciales. Comparamos tu boleta contra tarifas SEC/SISS publicadas y contra tu histórico local. Pueden equivocarse, el formato de boleta cambia y a veces las tarifas se actualizan después de una resolución oficial. Verifica siempre la boleta original antes de usar una alerta como base de un reclamo formal.',
+    a: 'Las alertas revisan conceptos y datos leídos del documento. También puedes comparar períodos compatibles de tu historial local. No verificamos los precios contra una tarifa oficial aplicable a tu suministro. Revisa los datos extraídos y la tarifa correspondiente antes de reclamar.',
   },
   {
     q: '¿Por qué confiar en una herramienta gratuita?',

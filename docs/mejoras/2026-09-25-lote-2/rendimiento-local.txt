@@ -1,0 +1,26 @@
+Iniciando `pnpm start` en background...
+Server listo.
+
+
+🔍 Auditando http://localhost:3102
+
+✓ /
+✓ /boleta-luz
+✓ /guias
+✓ /comparador-internet-hogar
+
+📊 Core Web Vitals (ms / count / kB):
+
+route                              FCP    LCP    CLS     TTFB   JS     CSS   img
+-----------------------------------------------------------------------------
+/                                     56     56   0.0000      5   971.1kB   0.0kB   0.0kB
+/boleta-luz                           64     64   0.0000      4   971.1kB   0.0kB   0.0kB
+/guias                                60     60   0.0002      4   973.6kB   0.0kB   0.0kB
+/comparador-internet-hogar            64     64   0.0000      5   973.6kB   0.0kB   0.0kB
+
+Umbrales (Web.dev / Lighthouse mobile):
+  LCP < 2500ms (good)  < 1500ms (excellent)
+  CLS < 0.1   (good)  < 0.05   (excellent)
+  FCP < 1800ms (good)  < 1000ms (excellent)
+
+✓ Within all perf budgets

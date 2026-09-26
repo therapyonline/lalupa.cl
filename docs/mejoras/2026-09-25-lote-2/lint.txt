@@ -1,0 +1,2 @@
+> lalupa@0.1.0 lint <repo>
+> eslint

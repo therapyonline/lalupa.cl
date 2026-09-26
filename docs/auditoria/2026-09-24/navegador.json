@@ -1,0 +1,215 @@
+{
+  "axe": [
+    {
+      "route": "/",
+      "violations": []
+    },
+    {
+      "route": "/boleta-luz",
+      "violations": []
+    },
+    {
+      "route": "/boleta-agua",
+      "violations": []
+    },
+    {
+      "route": "/boleta-gas",
+      "violations": []
+    },
+    {
+      "route": "/comparador-internet-hogar",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            {
+              "target": [
+                ".border-primary.bg-primary-soft.cursor-pointer > .flex-col.flex > .text-\\[11px\\].text-soft"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.14 (foreground color: #6b6b6b, background color: #dde3f1, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "route": "/subsidio-electrico",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            {
+              "target": [
+                ".animate-slide-from-right > .tracking-\\[0\\.1em\\].font-mono.text-soft"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2 (foreground color: #b7b7b7, background color: #ffffff, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                ".animate-slide-from-right > .mt-3.text-body"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.43 (foreground color: #a6a6a6, background color: #ffffff, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                ".border-\\[1\\.5px\\].text-left.text-\\[15px\\]:nth-child(1)"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.07 (foreground color: #939393, background color: #ffffff, font size: 11.3pt (15px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                ".border-\\[1\\.5px\\].text-left.text-\\[15px\\]:nth-child(2)"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.07 (foreground color: #939393, background color: #ffffff, font size: 11.3pt (15px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "route": "/reclamar-sernac",
+      "violations": []
+    },
+    {
+      "route": "/guias",
+      "violations": []
+    },
+    {
+      "route": "/como-funciona",
+      "violations": []
+    },
+    {
+      "route": "/sobre",
+      "violations": []
+    },
+    {
+      "route": "/privacidad",
+      "violations": []
+    },
+    {
+      "route": "/terminos",
+      "violations": []
+    },
+    {
+      "route": "/contacto",
+      "violations": []
+    },
+    {
+      "route": "/tracker",
+      "violations": []
+    }
+  ],
+  "mobile": [
+    {
+      "route": "/",
+      "viewport": 390,
+      "scrollWidth": 390
+    },
+    {
+      "route": "/boleta-luz",
+      "viewport": 390,
+      "scrollWidth": 390
+    },
+    {
+      "route": "/boleta-agua",
+      "viewport": 390,
+      "scrollWidth": 390
+    },
+    {
+      "route": "/boleta-gas",
+      "viewport": 390,
+      "scrollWidth": 390
+    },
+    {
+      "route": "/comparador-internet-hogar",
+      "viewport": 390,
+      "scrollWidth": 390
+    },
+    {
+      "route": "/subsidio-electrico",
+      "viewport": 390,
+      "scrollWidth": 390
+    },
+    {
+      "route": "/reclamar-sernac",
+      "viewport": 390,
+      "scrollWidth": 390
+    },
+    {
+      "route": "/guias",
+      "viewport": 390,
+      "scrollWidth": 390
+    },
+    {
+      "route": "/como-funciona",
+      "viewport": 390,
+      "scrollWidth": 390
+    },
+    {
+      "route": "/sobre",
+      "viewport": 390,
+      "scrollWidth": 390
+    },
+    {
+      "route": "/privacidad",
+      "viewport": 390,
+      "scrollWidth": 390
+    },
+    {
+      "route": "/terminos",
+      "viewport": 390,
+      "scrollWidth": 390
+    },
+    {
+      "route": "/contacto",
+      "viewport": 390,
+      "scrollWidth": 390
+    },
+    {
+      "route": "/tracker",
+      "viewport": 390,
+      "scrollWidth": 390
+    }
+  ],
+  "edge": [
+    {
+      "case": "storage blocked",
+      "route": "/subsidio-electrico",
+      "errors": [],
+      "boundary": 1
+    },
+    {
+      "case": "storage blocked",
+      "route": "/reclamar-sernac",
+      "errors": [],
+      "boundary": 1
+    },
+    {
+      "case": "corrupt step",
+      "route": "/subsidio-electrico",
+      "errors": [],
+      "boundary": 1
+    },
+    {
+      "case": "corrupt step",
+      "route": "/reclamar-sernac",
+      "errors": [],
+      "boundary": 0
+    },
+    {
+      "case": "partial reading",
+      "positiveClaim": 1,
+      "partialWarning": 1
+    },
+    {
+      "case": "empty MIME .pdf",
+      "error": "Formato no soportado: desconocido. Aceptamos PDF, JPG, PNG y WebP."
+    },
+    {
+      "case": "Promise.withResolvers absent",
+      "error": "No pudimos abrir el PDF: Promise.withResolvers is not a function"
+    }
+  ]
+}

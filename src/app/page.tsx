@@ -35,14 +35,14 @@ const TOOLS = [
     badge: null,
     title: 'Revisa tu boleta de gas',
     description:
-      'Metrogas, Lipigas, Abastible, Gasco. Cilindro o red, detectamos recargos y diferencias contra precios SEC.',
+      'Metrogas, Lipigas, Abastible, Gasco y más. Revisa los cargos que logramos leer en boletas de cilindro o red.',
   },
   {
     href: '/reclamar-sernac',
     badge: null,
     title: 'Genera tu reclamo SERNAC',
     description:
-      'Wizard de 5 preguntas → carta legal lista para enviar. Plantillas validadas según el tipo de empresa.',
+      'Completa los antecedentes y prepara un borrador de reclamo para revisar antes de enviarlo.',
   },
   {
     href: '/subsidio-electrico',
@@ -78,7 +78,7 @@ const STEPS: Array<{
     Icon: Cpu,
     title: 'Procesamos en tu navegador',
     description:
-      'Analizamos cada cargo en segundos, comparamos con tu histórico y validamos contra tarifas SEC/SISS oficiales vigentes.',
+      'Leemos los cargos del documento, señalamos conceptos para revisar y comparamos períodos compatibles con tu historial local. No verificamos la tarifa aplicable.',
   },
   {
     number: '03',
@@ -90,7 +90,13 @@ const STEPS: Array<{
 ]
 
 export default async function HomePage() {
-  const guias = (await getAllGuias()).slice(0, 3)
+  const allGuias = await getAllGuias()
+  const destacados = [
+    'gas-red-vs-cilindro-cual-conviene',
+    'como-leer-boleta-cge',
+    'por-que-subio-mi-cuenta-de-luz',
+  ]
+  const guias = destacados.flatMap((slug) => allGuias.filter((g) => g.slug === slug))
   return (
     <main className="flex-1">
       <section className="relative bg-cream py-15 md:py-20">
@@ -297,10 +303,10 @@ export default async function HomePage() {
       <section className="bg-cream-warm py-20">
         <Container>
           <h3 className="text-3xl font-medium tracking-tight text-ink md:text-4xl">
-            Chile, en cifras
+            Qué revisar en tu cuenta
           </h3>
           <p className="mt-3 max-w-xl text-body">
-            Datos públicos vigentes para que sepas dónde estás parado.
+            Cuatro puntos de partida para entender lo que estás pagando.
           </p>
 
           <div className="mt-12 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
@@ -312,25 +318,12 @@ export default async function HomePage() {
                 <p className="mt-3 text-sm leading-relaxed text-body">
                   {ind.caption}
                 </p>
-                {ind.external ? (
-                  <a
-                    href={ind.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary transition-colors hover:text-primary-deep"
-                  >
-                    {ind.linkLabel}{' '}
-                    <span aria-hidden>→</span>
-                  </a>
-                ) : (
-                  <Link
-                    href={ind.href}
-                    className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary transition-colors hover:text-primary-deep"
-                  >
-                    {ind.linkLabel}{' '}
-                    <span aria-hidden>→</span>
-                  </Link>
-                )}
+                <Link
+                  href={ind.href}
+                  className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary transition-colors hover:text-primary-deep"
+                >
+                  {ind.linkLabel}{' '}<span aria-hidden>→</span>
+                </Link>
               </div>
             ))}
           </div>
@@ -344,10 +337,10 @@ const STATS = [
   {
     number: (
       <>
-        <em>14</em> empresas
+        <em>17</em> empresas
       </>
     ),
-    label: '5 luz · 5 agua · 4 gas, chequeadas contra tarifas SEC y SISS',
+    label: '5 de luz · 6 de agua · 6 de gas, con lectores de boletas',
   },
   {
     number: (

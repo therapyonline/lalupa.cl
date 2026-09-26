@@ -7,6 +7,7 @@
  * (grayscale + contrast stretch), mejora la precisión en fotos de
  * celular con sombras o papel térmico desteñido.
  */
+import { PARSER_ASSETS } from '@/generated/parser-assets'
 import { normalizeOcrText } from './_helpers'
 import { preprocessImageForOcr } from './image-preprocess'
 
@@ -21,27 +22,31 @@ type TesseractWorker = Awaited<
   ReturnType<typeof import('tesseract.js').createWorker>
 >
 
+let progressListener: ((p: OcrProgress) => void) | undefined
+let workerGeneration = 0
+let queue: Promise<unknown> = Promise.resolve()
+
 let workerPromise: Promise<TesseractWorker> | null = null
 
-async function getWorker(
-  onProgress?: (p: OcrProgress) => void,
-): Promise<TesseractWorker> {
+async function getWorker(): Promise<TesseractWorker> {
   if (workerPromise) return workerPromise
 
+  const generation = ++workerGeneration
   workerPromise = (async () => {
     const { createWorker, PSM } = await import('tesseract.js')
     const worker = await createWorker('spa', 1, {
       // Servir todos los assets desde el mismo origen, sin CDN externo.
       // Setup automático en `pnpm install` via scripts/setup-tesseract.mjs.
-      workerPath: '/tesseract/worker.min.js',
-      corePath: '/tesseract/core',
-      langPath: '/tesseract/lang',
+      workerPath: `${PARSER_ASSETS.ocrBase}/worker.min.js`,
+      corePath: `${PARSER_ASSETS.ocrBase}/core`,
+      langPath: `${PARSER_ASSETS.ocrBase}/lang`,
+      cachePath: PARSER_ASSETS.ocrBase,
       // Los archivos del modelo se sirven con .gz desde Vercel
       gzip: true,
-      logger: onProgress
-        ? (m: { status: string; progress: number }) =>
-            onProgress({ status: m.status, progress: m.progress })
-        : undefined,
+      logger: (m: OcrProgress) => {
+        if (generation === workerGeneration)
+          progressListener?.({ status: m.status, progress: m.progress })
+      },
     })
 
     // Tuning específico para boletas chilenas. Probado contra fotos de
@@ -57,11 +62,16 @@ async function getWorker(
     //     un bloque uniforme. AUTO (default 3) divide a veces mal y se
     //     come secciones de cargos. SINGLE_BLOCK es más confiable para
     //     este tipo de documento (texto + tabla simple).
-    await worker.setParameters({
-      preserve_interword_spaces: '1',
-      user_defined_dpi: '300',
-      tessedit_pageseg_mode: PSM.SINGLE_BLOCK,
-    })
+    try {
+      await worker.setParameters({
+        preserve_interword_spaces: '1',
+        user_defined_dpi: '300',
+        tessedit_pageseg_mode: PSM.SINGLE_BLOCK,
+      })
+    } catch (error) {
+      await worker.terminate().catch(() => undefined)
+      throw error
+    }
 
     return worker
   })()
@@ -87,12 +97,17 @@ function countAlphanumeric(text: string): number {
       (code >= 48 && code <= 57) ||
       (code >= 65 && code <= 90) ||
       (code >= 97 && code <= 122)
-    ) n++
+    )
+      n++
   }
   return n
 }
 
-function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+function withTimeout<T>(
+  promise: Promise<T>,
+  ms: number,
+  label: string,
+): Promise<T> {
   return new Promise<T>((resolve, reject) => {
     const timer = setTimeout(() => {
       reject(
@@ -123,26 +138,34 @@ function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise
  *
  * Si el pipeline excede `OCR_TIMEOUT_MS` (90s), aborta con error claro.
  */
-export async function extractTextFromImage(
+async function recognizeImage(
   file: File,
   onProgress?: (p: OcrProgress) => void,
 ): Promise<string> {
   if (typeof window === 'undefined') {
-    throw new Error('extractTextFromImage solo puede ejecutarse en el navegador.')
+    throw new Error(
+      'extractTextFromImage solo puede ejecutarse en el navegador.',
+    )
   }
   if (!file.type.startsWith('image/')) {
     throw new Error('extractTextFromImage requiere un archivo de imagen.')
   }
 
+  progressListener = onProgress
+  let cancelled = false
   const run = (async () => {
-    const worker = await getWorker(onProgress)
+    const worker = await getWorker()
+    if (cancelled) throw new Error('Lectura cancelada.')
     const preprocessed = await preprocessImageForOcr(file)
+    if (cancelled) throw new Error('Lectura cancelada.')
     const result = await worker.recognize(preprocessed)
     // tesseract.js v7's RecognizeResult exposes the text on `data.text` (or
     // `data.blocks[*].text`). We normalize defensively.
-    const data = (result as {
-      data: { text?: string; confidence?: number }
-    }).data
+    const data = (
+      result as {
+        data: { text?: string; confidence?: number }
+      }
+    ).data
     const rawText = data?.text ?? ''
 
     // Validación post-OCR: si Tesseract devuelve básicamente nada o
@@ -163,10 +186,13 @@ export async function extractTextFromImage(
   try {
     return await withTimeout(run, OCR_TIMEOUT_MS, 'El OCR')
   } catch (err) {
+    cancelled = true
     // En cualquier fallo del pipeline (timeout o crash), descartamos el
     // worker, la próxima llamada construirá uno limpio.
     void disposeOcrWorker()
     throw err
+  } finally {
+    progressListener = undefined
   }
 }
 
@@ -182,10 +208,21 @@ export async function disposeOcrWorker(): Promise<void> {
   const p = workerPromise
   if (!p) return
   workerPromise = null
+  workerGeneration++
   try {
     const worker = await p
     await worker.terminate()
   } catch {
     // ya estaba en proceso de terminación o falló, no es bloqueante
   }
+}
+
+/** Serializa trabajos para no mezclar reconocimiento ni progreso de dos llamadas. */
+export function extractTextFromImage(
+  file: File,
+  onProgress?: (p: OcrProgress) => void,
+): Promise<string> {
+  const run = queue.then(() => recognizeImage(file, onProgress))
+  queue = run.catch(() => undefined)
+  return run
 }

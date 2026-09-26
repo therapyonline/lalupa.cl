@@ -90,7 +90,7 @@ export default function BoletaLuzPage() {
           webApplicationSchema({
             name: 'Revisor de boleta de luz',
             description:
-              'Sube tu boleta de electricidad y la lupa la analiza línea por línea contra las tarifas SEC vigentes.',
+              'Sube tu boleta de electricidad para leer sus cargos y revisar las alertas sobre los datos extraídos. La tarifa aplicable no se verifica automáticamente.',
             path: '/boleta-luz',
           }),
           breadcrumbsSchema([

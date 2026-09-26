@@ -1,4 +1,3 @@
-import { validarCobro } from '@/data/tarifas'
 import { ParserError } from '../errors'
 import {
   buildCargoPattern,
@@ -92,13 +91,6 @@ const EXPLICACION_ESTACIONAL_REGEX =
 const CONSUMO_ANTERIOR_REGEX =
   /(?:mes anterior|consumo anterior|per[íi]odo anterior|kWh\s+anterior)[\s:]*?(\d+(?:\.\d{3})*)/i
 
-/**
- * Cargo fijo regulatorio publicado por la SEC para CGE (tarifa BT-1, sector
- * STxD-3 RM). Si tu boleta tiene cargo fijo muy distinto a éste, hay
- * sospecha. Sectores STxE rurales pueden ser similares (~$1.048).
- */
-const CGE_CARGO_FIJO_REGULATORIO_CLP = 1048.46
-
 function detectarSospecha(
   cargo: Cargo,
   text: string,
@@ -114,15 +106,8 @@ function detectarSospecha(
     return 'Cargo único no es un componente estándar de la tarifa BT-1. Pedir detalle del concepto.'
   }
 
-  if (cargo.concepto === 'Cargo fijo') {
-    const result = validarCobro(cargo.monto, CGE_CARGO_FIJO_REGULATORIO_CLP)
-    if (result.alerta === 'cobro_indebido_probable') {
-      return `Cargo fijo ${result.desviacionPct > 0 ? 'sobre' : 'bajo'} lo regulado por SEC en ${Math.abs(result.desviacionPct).toFixed(1)}%. ${result.mensaje}`
-    }
-    if (result.alerta === 'sospechoso') {
-      return `Cargo fijo difiere ${Math.abs(result.desviacionPct).toFixed(1)}% del valor SEC publicado ($${CGE_CARGO_FIJO_REGULATORIO_CLP.toFixed(0)}). Verifica tu sector tarifario.`
-    }
-  }
+  // La extracción no acredita sector tarifario, IVA por línea ni vigencia
+  // aplicable. Un monto distinto al catálogo histórico no prueba un error.
 
   if (cargo.concepto === 'Cargo por energía' && consumo.valor > 0) {
     const previoMatch = text.match(CONSUMO_ANTERIOR_REGEX)

@@ -1,0 +1,2738 @@
+{
+  "as_of": "2026-09-24",
+  "source_files": [
+    {
+      "file": "/Users/estebanlorca/Downloads/lalupa.cl-Performance-on-Search-2026-09-24/Aparición en búsquedas.csv",
+      "rows": 0,
+      "sha256": "fc461129af3cb4e5289a639bb63ede6c68ca1b6f9fff6d8276b9e90d908c208f"
+    },
+    {
+      "file": "/Users/estebanlorca/Downloads/lalupa.cl-Performance-on-Search-2026-09-24/Consultas.csv",
+      "rows": 127,
+      "sha256": "a5f8edf38eada05bdc2446991fbce2a9f578a1e3098a79239e9609353b62e37f"
+    },
+    {
+      "file": "/Users/estebanlorca/Downloads/lalupa.cl-Performance-on-Search-2026-09-24/Dispositivos.csv",
+      "rows": 3,
+      "sha256": "2d4cf12aa0fb6752fee5c482611ab80793fea3cfbac79f316a8c2631067b6b10"
+    },
+    {
+      "file": "/Users/estebanlorca/Downloads/lalupa.cl-Performance-on-Search-2026-09-24/Filtros.csv",
+      "rows": 2,
+      "sha256": "6b834180536603dbff15a7f65d30c482d759d928c847d28f361dd8b87ceae675"
+    },
+    {
+      "file": "/Users/estebanlorca/Downloads/lalupa.cl-Performance-on-Search-2026-09-24/Gráfico.csv",
+      "rows": 28,
+      "sha256": "305560276094451089d3efb6599dea3e2cb428c83f9e4e6df06e9ac55bc912d2"
+    },
+    {
+      "file": "/Users/estebanlorca/Downloads/lalupa.cl-Performance-on-Search-2026-09-24/Países.csv",
+      "rows": 35,
+      "sha256": "392246a910dbe2f88df9cdca25ec2ce260a325e1c6ee3bf4899ec9f6df76c929"
+    },
+    {
+      "file": "/Users/estebanlorca/Downloads/lalupa.cl-Performance-on-Search-2026-09-24/Páginas.csv",
+      "rows": 31,
+      "sha256": "b6e3d8e64ef09082de9b62fd9617c42f0a0f50fc3a8c750d04b463e2b9863e3e"
+    }
+  ],
+  "filters": [
+    {
+      "Filtrar": "Tipo de búsqueda",
+      "Valor": "Web"
+    },
+    {
+      "Filtrar": "Fecha",
+      "Valor": "Últimos 28 días"
+    }
+  ],
+  "totals_by_dimension": {
+    "Aparición en búsquedas": {
+      "rows": 0,
+      "clicks": null,
+      "impressions": null,
+      "ctr": null,
+      "weighted_position_approx": null
+    },
+    "Consultas": {
+      "rows": 127,
+      "clicks": 0,
+      "impressions": 294,
+      "ctr": 0.0,
+      "weighted_position_approx": 30.795374149659864
+    },
+    "Dispositivos": {
+      "rows": 3,
+      "clicks": 36,
+      "impressions": 2376,
+      "ctr": 0.015151515151515152,
+      "weighted_position_approx": 11.052798821548821
+    },
+    "Gráfico": {
+      "rows": 28,
+      "clicks": 36,
+      "impressions": 2376,
+      "ctr": 0.015151515151515152,
+      "weighted_position_approx": 11.053282828282828
+    },
+    "Países": {
+      "rows": 35,
+      "clicks": 36,
+      "impressions": 2376,
+      "ctr": 0.015151515151515152,
+      "weighted_position_approx": 11.04952441077441
+    },
+    "Páginas": {
+      "rows": 31,
+      "clicks": 36,
+      "impressions": 2754,
+      "ctr": 0.013071895424836602,
+      "weighted_position_approx": 10.257850399419027
+    }
+  },
+  "periods_7_days": [
+    {
+      "start": "2026-08-26",
+      "end": "2026-09-01",
+      "rows": 7,
+      "clicks": 12,
+      "impressions": 705,
+      "ctr": 0.01702127659574468,
+      "weighted_position_approx": 13.142127659574468
+    },
+    {
+      "start": "2026-09-02",
+      "end": "2026-09-08",
+      "rows": 7,
+      "clicks": 10,
+      "impressions": 649,
+      "ctr": 0.015408320493066256,
+      "weighted_position_approx": 10.362865947611711
+    },
+    {
+      "start": "2026-09-09",
+      "end": "2026-09-15",
+      "rows": 7,
+      "clicks": 11,
+      "impressions": 561,
+      "ctr": 0.0196078431372549,
+      "weighted_position_approx": 9.984135472370767
+    },
+    {
+      "start": "2026-09-16",
+      "end": "2026-09-22",
+      "rows": 7,
+      "clicks": 3,
+      "impressions": 461,
+      "ctr": 0.006507592190889371,
+      "weighted_position_approx": 10.131887201735358
+    }
+  ],
+  "halves": [
+    {
+      "start": "2026-08-26",
+      "end": "2026-09-08",
+      "rows": 14,
+      "clicks": 22,
+      "impressions": 1354,
+      "ctr": 0.01624815361890694,
+      "weighted_position_approx": 11.80997045790251
+    },
+    {
+      "start": "2026-09-09",
+      "end": "2026-09-22",
+      "rows": 14,
+      "clicks": 14,
+      "impressions": 1022,
+      "ctr": 0.0136986301369863,
+      "weighted_position_approx": 10.05078277886497
+    }
+  ],
+  "base_page_rows": {
+    "rows": 25,
+    "clicks": 36,
+    "impressions": 2378,
+    "ctr": 0.015138772077375946,
+    "weighted_position_approx": 11.0461480235492
+  },
+  "fragment_rows": {
+    "rows": 6,
+    "clicks": 0,
+    "impressions": 376,
+    "ctr": 0.0,
+    "weighted_position_approx": 5.272287234042554
+  },
+  "guide_base_rows": {
+    "rows": 14,
+    "clicks": 34,
+    "impressions": 2127,
+    "ctr": 0.015984955336154207,
+    "weighted_position_approx": 9.891941701927598
+  },
+  "query_clusters": {
+    "gas": {
+      "rows": 47,
+      "clicks": 0,
+      "impressions": 146,
+      "ctr": 0.0,
+      "weighted_position_approx": 26.615616438356163,
+      "queries": [
+        {
+          "Consultas principales": "red de gas",
+          "Clics": 0,
+          "Impresiones": 53,
+          "CTR": 0.0,
+          "Posición": 28.13
+        },
+        {
+          "Consultas principales": "boleta de gas",
+          "Clics": 0,
+          "Impresiones": 12,
+          "CTR": 0.0,
+          "Posición": 29.33
+        },
+        {
+          "Consultas principales": "gas por red",
+          "Clics": 0,
+          "Impresiones": 6,
+          "CTR": 0.0,
+          "Posición": 14.5
+        },
+        {
+          "Consultas principales": "galón de gas tipos",
+          "Clics": 0,
+          "Impresiones": 6,
+          "CTR": 0.0,
+          "Posición": 30.67
+        },
+        {
+          "Consultas principales": "que gas es mas barato en chile",
+          "Clics": 0,
+          "Impresiones": 4,
+          "CTR": 0.0,
+          "Posición": 9.5
+        },
+        {
+          "Consultas principales": "gas natural vs gas licuado",
+          "Clics": 0,
+          "Impresiones": 4,
+          "CTR": 0.0,
+          "Posición": 15.25
+        },
+        {
+          "Consultas principales": "gas",
+          "Clics": 0,
+          "Impresiones": 4,
+          "CTR": 0.0,
+          "Posición": 27.5
+        },
+        {
+          "Consultas principales": "tipos de gas en chile",
+          "Clics": 0,
+          "Impresiones": 4,
+          "CTR": 0.0,
+          "Posición": 40.5
+        },
+        {
+          "Consultas principales": "red gas",
+          "Clics": 0,
+          "Impresiones": 3,
+          "CTR": 0.0,
+          "Posición": 12.67
+        },
+        {
+          "Consultas principales": "precio de gas stgo",
+          "Clics": 0,
+          "Impresiones": 3,
+          "CTR": 0.0,
+          "Posición": 28.0
+        },
+        {
+          "Consultas principales": "cuanto cuesta el gas natural",
+          "Clics": 0,
+          "Impresiones": 2,
+          "CTR": 0.0,
+          "Posición": 8.5
+        },
+        {
+          "Consultas principales": "cual gas es mas barato",
+          "Clics": 0,
+          "Impresiones": 2,
+          "CTR": 0.0,
+          "Posición": 10.5
+        },
+        {
+          "Consultas principales": "que compañia de gas es la mas barata",
+          "Clics": 0,
+          "Impresiones": 2,
+          "CTR": 0.0,
+          "Posición": 11.0
+        },
+        {
+          "Consultas principales": "que gas es mas barato",
+          "Clics": 0,
+          "Impresiones": 2,
+          "CTR": 0.0,
+          "Posición": 14.5
+        },
+        {
+          "Consultas principales": "con gas",
+          "Clics": 0,
+          "Impresiones": 2,
+          "CTR": 0.0,
+          "Posición": 24.0
+        },
+        {
+          "Consultas principales": "diferencia cilindros de gas cataliticos",
+          "Clics": 0,
+          "Impresiones": 2,
+          "CTR": 0.0,
+          "Posición": 26.0
+        },
+        {
+          "Consultas principales": "tipos de cilindro de gas",
+          "Clics": 0,
+          "Impresiones": 2,
+          "CTR": 0.0,
+          "Posición": 44.5
+        },
+        {
+          "Consultas principales": "tipos de cilindros de gas",
+          "Clics": 0,
+          "Impresiones": 2,
+          "CTR": 0.0,
+          "Posición": 51.5
+        },
+        {
+          "Consultas principales": "gas natural para el hogar",
+          "Clics": 0,
+          "Impresiones": 2,
+          "CTR": 0.0,
+          "Posición": 52.5
+        },
+        {
+          "Consultas principales": "tarifas metrogas",
+          "Clics": 0,
+          "Impresiones": 2,
+          "CTR": 0.0,
+          "Posición": 58.0
+        },
+        {
+          "Consultas principales": "que pasa si me cortan el gas y la conecto",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 4.0
+        },
+        {
+          "Consultas principales": "gas rojo",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 7.0
+        },
+        {
+          "Consultas principales": "que hacer cuando cortan el gas",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 8.0
+        },
+        {
+          "Consultas principales": "que hacer si me cortan el gas",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 8.0
+        },
+        {
+          "Consultas principales": "cual es la compañia de gas mas barata",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 9.0
+        },
+        {
+          "Consultas principales": "compañia gas mas barata",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 10.0
+        },
+        {
+          "Consultas principales": "cuanto se gasta de gas al mes",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 10.0
+        },
+        {
+          "Consultas principales": "cual es el gas mas barato",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 11.0
+        },
+        {
+          "Consultas principales": "que compañia de gas es mas barata",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 11.0
+        },
+        {
+          "Consultas principales": "cuanto cuesta el gas en chile",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 12.0
+        },
+        {
+          "Consultas principales": "gas red",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 12.0
+        },
+        {
+          "Consultas principales": "gas mas barato",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 18.0
+        },
+        {
+          "Consultas principales": "cuanto se paga de gas al mes",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 19.0
+        },
+        {
+          "Consultas principales": "el gas mas barato",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 22.0
+        },
+        {
+          "Consultas principales": "a como esta el gas",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 23.0
+        },
+        {
+          "Consultas principales": "cual es el mejor gas en chile",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 25.0
+        },
+        {
+          "Consultas principales": "gas valor",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 26.0
+        },
+        {
+          "Consultas principales": "tipos de galones de gas",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 27.0
+        },
+        {
+          "Consultas principales": "marcas de gas",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 29.0
+        },
+        {
+          "Consultas principales": "boleta del gas",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 34.0
+        },
+        {
+          "Consultas principales": "gasco precios",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 34.0
+        },
+        {
+          "Consultas principales": "un gas",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 39.0
+        },
+        {
+          "Consultas principales": "metrogas boleta",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 44.0
+        },
+        {
+          "Consultas principales": "es galon o balon de gas",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 52.0
+        },
+        {
+          "Consultas principales": "cual es el mejor calefont en chile",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 54.0
+        },
+        {
+          "Consultas principales": "gas cilindro",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 59.0
+        },
+        {
+          "Consultas principales": "como saber que calefon necesito",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 70.0
+        }
+      ]
+    },
+    "electricidad": {
+      "rows": 44,
+      "clicks": 0,
+      "impressions": 84,
+      "ctr": 0.0,
+      "weighted_position_approx": 17.642500000000002,
+      "queries": [
+        {
+          "Consultas principales": "valor kwh cge 2026",
+          "Clics": 0,
+          "Impresiones": 17,
+          "CTR": 0.0,
+          "Posición": 10.35
+        },
+        {
+          "Consultas principales": "cargo potencia base distribución cge",
+          "Clics": 0,
+          "Impresiones": 9,
+          "CTR": 0.0,
+          "Posición": 6.89
+        },
+        {
+          "Consultas principales": "valor kilowatt cge 2026",
+          "Clics": 0,
+          "Impresiones": 7,
+          "CTR": 0.0,
+          "Posición": 8.86
+        },
+        {
+          "Consultas principales": "bt1 vs bt2",
+          "Clics": 0,
+          "Impresiones": 3,
+          "CTR": 0.0,
+          "Posición": 7.33
+        },
+        {
+          "Consultas principales": "tarifa bt2 cge",
+          "Clics": 0,
+          "Impresiones": 2,
+          "CTR": 0.0,
+          "Posición": 7.0
+        },
+        {
+          "Consultas principales": "bt chile",
+          "Clics": 0,
+          "Impresiones": 2,
+          "CTR": 0.0,
+          "Posición": 10.0
+        },
+        {
+          "Consultas principales": "valor de 1 kwh en chile cge 2026",
+          "Clics": 0,
+          "Impresiones": 2,
+          "CTR": 0.0,
+          "Posición": 11.0
+        },
+        {
+          "Consultas principales": "porque subió la luz",
+          "Clics": 0,
+          "Impresiones": 2,
+          "CTR": 0.0,
+          "Posición": 22.5
+        },
+        {
+          "Consultas principales": "lectura cge",
+          "Clics": 0,
+          "Impresiones": 2,
+          "CTR": 0.0,
+          "Posición": 23.5
+        },
+        {
+          "Consultas principales": "cge medidor",
+          "Clics": 0,
+          "Impresiones": 2,
+          "CTR": 0.0,
+          "Posición": 28.0
+        },
+        {
+          "Consultas principales": "lectura medidor de luz",
+          "Clics": 0,
+          "Impresiones": 2,
+          "CTR": 0.0,
+          "Posición": 35.5
+        },
+        {
+          "Consultas principales": "migrar a cliente libre",
+          "Clics": 0,
+          "Impresiones": 2,
+          "CTR": 0.0,
+          "Posición": 66.5
+        },
+        {
+          "Consultas principales": "pagar cuenta luz cge",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 3.0
+        },
+        {
+          "Consultas principales": "cge boleta",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 4.0
+        },
+        {
+          "Consultas principales": "pagar cge con rut",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 5.0
+        },
+        {
+          "Consultas principales": "bt2",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 9.0
+        },
+        {
+          "Consultas principales": "cambio de lud",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 9.0
+        },
+        {
+          "Consultas principales": "hay convenios para pagar la luz",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 9.0
+        },
+        {
+          "Consultas principales": "cambio de luz",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 11.0
+        },
+        {
+          "Consultas principales": "cuanto es el cargo fijo de la luz",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 11.0
+        },
+        {
+          "Consultas principales": "que día llega el recibo de luz",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 11.0
+        },
+        {
+          "Consultas principales": "ultima lectura cge",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 11.0
+        },
+        {
+          "Consultas principales": "boleta cge por rut",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 18.0
+        },
+        {
+          "Consultas principales": "boleta de luz chile",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 18.0
+        },
+        {
+          "Consultas principales": "por que subio la luz este mes",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 21.0
+        },
+        {
+          "Consultas principales": "cge aporte de lectura",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 24.0
+        },
+        {
+          "Consultas principales": "cge lectura",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 24.0
+        },
+        {
+          "Consultas principales": "cge lectura de medidor",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 25.0
+        },
+        {
+          "Consultas principales": "convenio de luz",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 25.0
+        },
+        {
+          "Consultas principales": "lectura medidor de luz cge",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 25.0
+        },
+        {
+          "Consultas principales": "cuenta de luz cge",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 26.0
+        },
+        {
+          "Consultas principales": "lectura medidor cge",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 27.0
+        },
+        {
+          "Consultas principales": "aporte lectura cge",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 28.0
+        },
+        {
+          "Consultas principales": "cge ingresar lectura",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 28.0
+        },
+        {
+          "Consultas principales": "cge consumo",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 29.0
+        },
+        {
+          "Consultas principales": "informar lectura cge",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 29.0
+        },
+        {
+          "Consultas principales": "ingreso de lectura cge",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 30.0
+        },
+        {
+          "Consultas principales": "cge informar lectura",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 31.0
+        },
+        {
+          "Consultas principales": "ingreso lectura cge",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 31.0
+        },
+        {
+          "Consultas principales": "medidor cge",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 33.0
+        },
+        {
+          "Consultas principales": "tarifas cge",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 40.0
+        },
+        {
+          "Consultas principales": "boleta luz parral",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 41.0
+        },
+        {
+          "Consultas principales": "cómo cambiar de proveedor eléctrico",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 48.0
+        },
+        {
+          "Consultas principales": "que tarifa contratar de luz",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 68.0
+        }
+      ]
+    },
+    "internet": {
+      "rows": 25,
+      "clicks": 0,
+      "impressions": 48,
+      "ctr": 0.0,
+      "weighted_position_approx": 57.00020833333334,
+      "queries": [
+        {
+          "Consultas principales": "internet hogar precio",
+          "Clics": 0,
+          "Impresiones": 4,
+          "CTR": 0.0,
+          "Posición": 52.5
+        },
+        {
+          "Consultas principales": "mejor banda ancha hogar",
+          "Clics": 0,
+          "Impresiones": 4,
+          "CTR": 0.0,
+          "Posición": 53.75
+        },
+        {
+          "Consultas principales": "comparador de banda ancha",
+          "Clics": 0,
+          "Impresiones": 4,
+          "CTR": 0.0,
+          "Posición": 57.0
+        },
+        {
+          "Consultas principales": "mejor banda ancha hogar chile",
+          "Clics": 0,
+          "Impresiones": 4,
+          "CTR": 0.0,
+          "Posición": 57.0
+        },
+        {
+          "Consultas principales": "mejor plan internet hogar chile",
+          "Clics": 0,
+          "Impresiones": 3,
+          "CTR": 0.0,
+          "Posición": 51.67
+        },
+        {
+          "Consultas principales": "precios del internet",
+          "Clics": 0,
+          "Impresiones": 3,
+          "CTR": 0.0,
+          "Posición": 54.33
+        },
+        {
+          "Consultas principales": "cual es la mejor banda ancha hogar",
+          "Clics": 0,
+          "Impresiones": 3,
+          "CTR": 0.0,
+          "Posición": 58.67
+        },
+        {
+          "Consultas principales": "cual es el mejor servicio de internet y cable",
+          "Clics": 0,
+          "Impresiones": 3,
+          "CTR": 0.0,
+          "Posición": 62.0
+        },
+        {
+          "Consultas principales": "cual es el mejor paquete de internet y cable",
+          "Clics": 0,
+          "Impresiones": 2,
+          "CTR": 0.0,
+          "Posición": 58.0
+        },
+        {
+          "Consultas principales": "cual es la mejor banda ancha hogar en chile",
+          "Clics": 0,
+          "Impresiones": 2,
+          "CTR": 0.0,
+          "Posición": 60.5
+        },
+        {
+          "Consultas principales": "mejor internet banda ancha",
+          "Clics": 0,
+          "Impresiones": 2,
+          "CTR": 0.0,
+          "Posición": 63.5
+        },
+        {
+          "Consultas principales": "comparador banda ancha",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 41.0
+        },
+        {
+          "Consultas principales": "precios de internet para casa",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 48.0
+        },
+        {
+          "Consultas principales": "valor internet hogar",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 48.0
+        },
+        {
+          "Consultas principales": "internet hogar mas barato",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 50.0
+        },
+        {
+          "Consultas principales": "precios internet hogar",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 52.0
+        },
+        {
+          "Consultas principales": "mejor compañia de internet y cable",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 53.0
+        },
+        {
+          "Consultas principales": "que internet hogar es mejor",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 53.0
+        },
+        {
+          "Consultas principales": "precios de internet",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 54.0
+        },
+        {
+          "Consultas principales": "cual es el mejor plan de internet movil en chile",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 56.0
+        },
+        {
+          "Consultas principales": "1. mejor internet hogar chile",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 58.0
+        },
+        {
+          "Consultas principales": "cuál es el mejor internet hogar",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 64.0
+        },
+        {
+          "Consultas principales": "cual es el mejor internet en chile",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 68.0
+        },
+        {
+          "Consultas principales": "que compañia de cable e internet es mejor",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 68.0
+        },
+        {
+          "Consultas principales": "mejor internet hogar",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 98.0
+        }
+      ]
+    },
+    "agua": {
+      "rows": 9,
+      "clicks": 0,
+      "impressions": 14,
+      "ctr": 0.0,
+      "weighted_position_approx": 63.49857142857143,
+      "queries": [
+        {
+          "Consultas principales": "subsidio de agua",
+          "Clics": 0,
+          "Impresiones": 3,
+          "CTR": 0.0,
+          "Posición": 72.33
+        },
+        {
+          "Consultas principales": "subsidio del agua",
+          "Clics": 0,
+          "Impresiones": 3,
+          "CTR": 0.0,
+          "Posición": 73.33
+        },
+        {
+          "Consultas principales": "cuanto dura el subsidio del agua",
+          "Clics": 0,
+          "Impresiones": 2,
+          "CTR": 0.0,
+          "Posición": 50.5
+        },
+        {
+          "Consultas principales": "boleta agua lampa",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 37.0
+        },
+        {
+          "Consultas principales": "subsidios de agua y luz",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 46.0
+        },
+        {
+          "Consultas principales": "subsidio de agua requisitos",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 60.0
+        },
+        {
+          "Consultas principales": "subsidio al agua potable",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 68.0
+        },
+        {
+          "Consultas principales": "subsidio de agua potable",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 69.0
+        },
+        {
+          "Consultas principales": "subsidio agua",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 71.0
+        }
+      ]
+    },
+    "otros": {
+      "rows": 2,
+      "clicks": 0,
+      "impressions": 2,
+      "ctr": 0.0,
+      "weighted_position_approx": 30.5,
+      "queries": [
+        {
+          "Consultas principales": "lpopa",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 3.0
+        },
+        {
+          "Consultas principales": "cuanto cuesta llamar al 007",
+          "Clics": 0,
+          "Impresiones": 1,
+          "CTR": 0.0,
+          "Posición": 58.0
+        }
+      ]
+    }
+  },
+  "query_position_bands": {
+    "1-10": {
+      "rows": 21,
+      "clicks": 0,
+      "impressions": 43,
+      "ctr": 0.0,
+      "weighted_position_approx": 7.7446511627906975
+    },
+    "10-20": {
+      "rows": 20,
+      "clicks": 0,
+      "impressions": 50,
+      "ctr": 0.0,
+      "weighted_position_approx": 12.3792
+    },
+    "over20": {
+      "rows": 86,
+      "clicks": 0,
+      "impressions": 201,
+      "ctr": 0.0,
+      "weighted_position_approx": 40.30776119402985
+    }
+  },
+  "tables": {
+    "Aparición en búsquedas": [],
+    "Consultas": [
+      {
+        "Consultas principales": "red de gas",
+        "Clics": 0,
+        "Impresiones": 53,
+        "CTR": 0.0,
+        "Posición": 28.13
+      },
+      {
+        "Consultas principales": "valor kwh cge 2026",
+        "Clics": 0,
+        "Impresiones": 17,
+        "CTR": 0.0,
+        "Posición": 10.35
+      },
+      {
+        "Consultas principales": "boleta de gas",
+        "Clics": 0,
+        "Impresiones": 12,
+        "CTR": 0.0,
+        "Posición": 29.33
+      },
+      {
+        "Consultas principales": "cargo potencia base distribución cge",
+        "Clics": 0,
+        "Impresiones": 9,
+        "CTR": 0.0,
+        "Posición": 6.89
+      },
+      {
+        "Consultas principales": "valor kilowatt cge 2026",
+        "Clics": 0,
+        "Impresiones": 7,
+        "CTR": 0.0,
+        "Posición": 8.86
+      },
+      {
+        "Consultas principales": "gas por red",
+        "Clics": 0,
+        "Impresiones": 6,
+        "CTR": 0.0,
+        "Posición": 14.5
+      },
+      {
+        "Consultas principales": "galón de gas tipos",
+        "Clics": 0,
+        "Impresiones": 6,
+        "CTR": 0.0,
+        "Posición": 30.67
+      },
+      {
+        "Consultas principales": "que gas es mas barato en chile",
+        "Clics": 0,
+        "Impresiones": 4,
+        "CTR": 0.0,
+        "Posición": 9.5
+      },
+      {
+        "Consultas principales": "gas natural vs gas licuado",
+        "Clics": 0,
+        "Impresiones": 4,
+        "CTR": 0.0,
+        "Posición": 15.25
+      },
+      {
+        "Consultas principales": "gas",
+        "Clics": 0,
+        "Impresiones": 4,
+        "CTR": 0.0,
+        "Posición": 27.5
+      },
+      {
+        "Consultas principales": "tipos de gas en chile",
+        "Clics": 0,
+        "Impresiones": 4,
+        "CTR": 0.0,
+        "Posición": 40.5
+      },
+      {
+        "Consultas principales": "internet hogar precio",
+        "Clics": 0,
+        "Impresiones": 4,
+        "CTR": 0.0,
+        "Posición": 52.5
+      },
+      {
+        "Consultas principales": "mejor banda ancha hogar",
+        "Clics": 0,
+        "Impresiones": 4,
+        "CTR": 0.0,
+        "Posición": 53.75
+      },
+      {
+        "Consultas principales": "comparador de banda ancha",
+        "Clics": 0,
+        "Impresiones": 4,
+        "CTR": 0.0,
+        "Posición": 57.0
+      },
+      {
+        "Consultas principales": "mejor banda ancha hogar chile",
+        "Clics": 0,
+        "Impresiones": 4,
+        "CTR": 0.0,
+        "Posición": 57.0
+      },
+      {
+        "Consultas principales": "bt1 vs bt2",
+        "Clics": 0,
+        "Impresiones": 3,
+        "CTR": 0.0,
+        "Posición": 7.33
+      },
+      {
+        "Consultas principales": "red gas",
+        "Clics": 0,
+        "Impresiones": 3,
+        "CTR": 0.0,
+        "Posición": 12.67
+      },
+      {
+        "Consultas principales": "precio de gas stgo",
+        "Clics": 0,
+        "Impresiones": 3,
+        "CTR": 0.0,
+        "Posición": 28.0
+      },
+      {
+        "Consultas principales": "mejor plan internet hogar chile",
+        "Clics": 0,
+        "Impresiones": 3,
+        "CTR": 0.0,
+        "Posición": 51.67
+      },
+      {
+        "Consultas principales": "precios del internet",
+        "Clics": 0,
+        "Impresiones": 3,
+        "CTR": 0.0,
+        "Posición": 54.33
+      },
+      {
+        "Consultas principales": "cual es la mejor banda ancha hogar",
+        "Clics": 0,
+        "Impresiones": 3,
+        "CTR": 0.0,
+        "Posición": 58.67
+      },
+      {
+        "Consultas principales": "cual es el mejor servicio de internet y cable",
+        "Clics": 0,
+        "Impresiones": 3,
+        "CTR": 0.0,
+        "Posición": 62.0
+      },
+      {
+        "Consultas principales": "subsidio de agua",
+        "Clics": 0,
+        "Impresiones": 3,
+        "CTR": 0.0,
+        "Posición": 72.33
+      },
+      {
+        "Consultas principales": "subsidio del agua",
+        "Clics": 0,
+        "Impresiones": 3,
+        "CTR": 0.0,
+        "Posición": 73.33
+      },
+      {
+        "Consultas principales": "tarifa bt2 cge",
+        "Clics": 0,
+        "Impresiones": 2,
+        "CTR": 0.0,
+        "Posición": 7.0
+      },
+      {
+        "Consultas principales": "cuanto cuesta el gas natural",
+        "Clics": 0,
+        "Impresiones": 2,
+        "CTR": 0.0,
+        "Posición": 8.5
+      },
+      {
+        "Consultas principales": "bt chile",
+        "Clics": 0,
+        "Impresiones": 2,
+        "CTR": 0.0,
+        "Posición": 10.0
+      },
+      {
+        "Consultas principales": "cual gas es mas barato",
+        "Clics": 0,
+        "Impresiones": 2,
+        "CTR": 0.0,
+        "Posición": 10.5
+      },
+      {
+        "Consultas principales": "que compañia de gas es la mas barata",
+        "Clics": 0,
+        "Impresiones": 2,
+        "CTR": 0.0,
+        "Posición": 11.0
+      },
+      {
+        "Consultas principales": "valor de 1 kwh en chile cge 2026",
+        "Clics": 0,
+        "Impresiones": 2,
+        "CTR": 0.0,
+        "Posición": 11.0
+      },
+      {
+        "Consultas principales": "que gas es mas barato",
+        "Clics": 0,
+        "Impresiones": 2,
+        "CTR": 0.0,
+        "Posición": 14.5
+      },
+      {
+        "Consultas principales": "porque subió la luz",
+        "Clics": 0,
+        "Impresiones": 2,
+        "CTR": 0.0,
+        "Posición": 22.5
+      },
+      {
+        "Consultas principales": "lectura cge",
+        "Clics": 0,
+        "Impresiones": 2,
+        "CTR": 0.0,
+        "Posición": 23.5
+      },
+      {
+        "Consultas principales": "con gas",
+        "Clics": 0,
+        "Impresiones": 2,
+        "CTR": 0.0,
+        "Posición": 24.0
+      },
+      {
+        "Consultas principales": "diferencia cilindros de gas cataliticos",
+        "Clics": 0,
+        "Impresiones": 2,
+        "CTR": 0.0,
+        "Posición": 26.0
+      },
+      {
+        "Consultas principales": "cge medidor",
+        "Clics": 0,
+        "Impresiones": 2,
+        "CTR": 0.0,
+        "Posición": 28.0
+      },
+      {
+        "Consultas principales": "lectura medidor de luz",
+        "Clics": 0,
+        "Impresiones": 2,
+        "CTR": 0.0,
+        "Posición": 35.5
+      },
+      {
+        "Consultas principales": "tipos de cilindro de gas",
+        "Clics": 0,
+        "Impresiones": 2,
+        "CTR": 0.0,
+        "Posición": 44.5
+      },
+      {
+        "Consultas principales": "cuanto dura el subsidio del agua",
+        "Clics": 0,
+        "Impresiones": 2,
+        "CTR": 0.0,
+        "Posición": 50.5
+      },
+      {
+        "Consultas principales": "tipos de cilindros de gas",
+        "Clics": 0,
+        "Impresiones": 2,
+        "CTR": 0.0,
+        "Posición": 51.5
+      },
+      {
+        "Consultas principales": "gas natural para el hogar",
+        "Clics": 0,
+        "Impresiones": 2,
+        "CTR": 0.0,
+        "Posición": 52.5
+      },
+      {
+        "Consultas principales": "cual es el mejor paquete de internet y cable",
+        "Clics": 0,
+        "Impresiones": 2,
+        "CTR": 0.0,
+        "Posición": 58.0
+      },
+      {
+        "Consultas principales": "tarifas metrogas",
+        "Clics": 0,
+        "Impresiones": 2,
+        "CTR": 0.0,
+        "Posición": 58.0
+      },
+      {
+        "Consultas principales": "cual es la mejor banda ancha hogar en chile",
+        "Clics": 0,
+        "Impresiones": 2,
+        "CTR": 0.0,
+        "Posición": 60.5
+      },
+      {
+        "Consultas principales": "mejor internet banda ancha",
+        "Clics": 0,
+        "Impresiones": 2,
+        "CTR": 0.0,
+        "Posición": 63.5
+      },
+      {
+        "Consultas principales": "migrar a cliente libre",
+        "Clics": 0,
+        "Impresiones": 2,
+        "CTR": 0.0,
+        "Posición": 66.5
+      },
+      {
+        "Consultas principales": "lpopa",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 3.0
+      },
+      {
+        "Consultas principales": "pagar cuenta luz cge",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 3.0
+      },
+      {
+        "Consultas principales": "cge boleta",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 4.0
+      },
+      {
+        "Consultas principales": "que pasa si me cortan el gas y la conecto",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 4.0
+      },
+      {
+        "Consultas principales": "pagar cge con rut",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 5.0
+      },
+      {
+        "Consultas principales": "gas rojo",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 7.0
+      },
+      {
+        "Consultas principales": "que hacer cuando cortan el gas",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 8.0
+      },
+      {
+        "Consultas principales": "que hacer si me cortan el gas",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 8.0
+      },
+      {
+        "Consultas principales": "bt2",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 9.0
+      },
+      {
+        "Consultas principales": "cambio de lud",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 9.0
+      },
+      {
+        "Consultas principales": "cual es la compañia de gas mas barata",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 9.0
+      },
+      {
+        "Consultas principales": "hay convenios para pagar la luz",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 9.0
+      },
+      {
+        "Consultas principales": "compañia gas mas barata",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 10.0
+      },
+      {
+        "Consultas principales": "cuanto se gasta de gas al mes",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 10.0
+      },
+      {
+        "Consultas principales": "cambio de luz",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 11.0
+      },
+      {
+        "Consultas principales": "cual es el gas mas barato",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 11.0
+      },
+      {
+        "Consultas principales": "cuanto es el cargo fijo de la luz",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 11.0
+      },
+      {
+        "Consultas principales": "que compañia de gas es mas barata",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 11.0
+      },
+      {
+        "Consultas principales": "que día llega el recibo de luz",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 11.0
+      },
+      {
+        "Consultas principales": "ultima lectura cge",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 11.0
+      },
+      {
+        "Consultas principales": "cuanto cuesta el gas en chile",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 12.0
+      },
+      {
+        "Consultas principales": "gas red",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 12.0
+      },
+      {
+        "Consultas principales": "boleta cge por rut",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 18.0
+      },
+      {
+        "Consultas principales": "boleta de luz chile",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 18.0
+      },
+      {
+        "Consultas principales": "gas mas barato",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 18.0
+      },
+      {
+        "Consultas principales": "cuanto se paga de gas al mes",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 19.0
+      },
+      {
+        "Consultas principales": "por que subio la luz este mes",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 21.0
+      },
+      {
+        "Consultas principales": "el gas mas barato",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 22.0
+      },
+      {
+        "Consultas principales": "a como esta el gas",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 23.0
+      },
+      {
+        "Consultas principales": "cge aporte de lectura",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 24.0
+      },
+      {
+        "Consultas principales": "cge lectura",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 24.0
+      },
+      {
+        "Consultas principales": "cge lectura de medidor",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 25.0
+      },
+      {
+        "Consultas principales": "convenio de luz",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 25.0
+      },
+      {
+        "Consultas principales": "cual es el mejor gas en chile",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 25.0
+      },
+      {
+        "Consultas principales": "lectura medidor de luz cge",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 25.0
+      },
+      {
+        "Consultas principales": "cuenta de luz cge",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 26.0
+      },
+      {
+        "Consultas principales": "gas valor",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 26.0
+      },
+      {
+        "Consultas principales": "lectura medidor cge",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 27.0
+      },
+      {
+        "Consultas principales": "tipos de galones de gas",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 27.0
+      },
+      {
+        "Consultas principales": "aporte lectura cge",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 28.0
+      },
+      {
+        "Consultas principales": "cge ingresar lectura",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 28.0
+      },
+      {
+        "Consultas principales": "cge consumo",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 29.0
+      },
+      {
+        "Consultas principales": "informar lectura cge",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 29.0
+      },
+      {
+        "Consultas principales": "marcas de gas",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 29.0
+      },
+      {
+        "Consultas principales": "ingreso de lectura cge",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 30.0
+      },
+      {
+        "Consultas principales": "cge informar lectura",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 31.0
+      },
+      {
+        "Consultas principales": "ingreso lectura cge",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 31.0
+      },
+      {
+        "Consultas principales": "medidor cge",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 33.0
+      },
+      {
+        "Consultas principales": "boleta del gas",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 34.0
+      },
+      {
+        "Consultas principales": "gasco precios",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 34.0
+      },
+      {
+        "Consultas principales": "boleta agua lampa",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 37.0
+      },
+      {
+        "Consultas principales": "un gas",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 39.0
+      },
+      {
+        "Consultas principales": "tarifas cge",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 40.0
+      },
+      {
+        "Consultas principales": "boleta luz parral",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 41.0
+      },
+      {
+        "Consultas principales": "comparador banda ancha",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 41.0
+      },
+      {
+        "Consultas principales": "metrogas boleta",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 44.0
+      },
+      {
+        "Consultas principales": "subsidios de agua y luz",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 46.0
+      },
+      {
+        "Consultas principales": "cómo cambiar de proveedor eléctrico",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 48.0
+      },
+      {
+        "Consultas principales": "precios de internet para casa",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 48.0
+      },
+      {
+        "Consultas principales": "valor internet hogar",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 48.0
+      },
+      {
+        "Consultas principales": "internet hogar mas barato",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 50.0
+      },
+      {
+        "Consultas principales": "es galon o balon de gas",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 52.0
+      },
+      {
+        "Consultas principales": "precios internet hogar",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 52.0
+      },
+      {
+        "Consultas principales": "mejor compañia de internet y cable",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 53.0
+      },
+      {
+        "Consultas principales": "que internet hogar es mejor",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 53.0
+      },
+      {
+        "Consultas principales": "cual es el mejor calefont en chile",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 54.0
+      },
+      {
+        "Consultas principales": "precios de internet",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 54.0
+      },
+      {
+        "Consultas principales": "cual es el mejor plan de internet movil en chile",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 56.0
+      },
+      {
+        "Consultas principales": "1. mejor internet hogar chile",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 58.0
+      },
+      {
+        "Consultas principales": "cuanto cuesta llamar al 007",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 58.0
+      },
+      {
+        "Consultas principales": "gas cilindro",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 59.0
+      },
+      {
+        "Consultas principales": "subsidio de agua requisitos",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 60.0
+      },
+      {
+        "Consultas principales": "cuál es el mejor internet hogar",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 64.0
+      },
+      {
+        "Consultas principales": "cual es el mejor internet en chile",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 68.0
+      },
+      {
+        "Consultas principales": "que compañia de cable e internet es mejor",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 68.0
+      },
+      {
+        "Consultas principales": "que tarifa contratar de luz",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 68.0
+      },
+      {
+        "Consultas principales": "subsidio al agua potable",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 68.0
+      },
+      {
+        "Consultas principales": "subsidio de agua potable",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 69.0
+      },
+      {
+        "Consultas principales": "como saber que calefon necesito",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 70.0
+      },
+      {
+        "Consultas principales": "subsidio agua",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 71.0
+      },
+      {
+        "Consultas principales": "mejor internet hogar",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 98.0
+      }
+    ],
+    "Dispositivos": [
+      {
+        "Dispositivo": "Móviles",
+        "Clics": 21,
+        "Impresiones": 1561,
+        "CTR": 0.013500000000000002,
+        "Posición": 10.16
+      },
+      {
+        "Dispositivo": "Ordenador",
+        "Clics": 15,
+        "Impresiones": 811,
+        "CTR": 0.018500000000000003,
+        "Posición": 12.79
+      },
+      {
+        "Dispositivo": "Tablet",
+        "Clics": 0,
+        "Impresiones": 4,
+        "CTR": 0.0,
+        "Posición": 7.25
+      }
+    ],
+    "Filtros": [
+      {
+        "Filtrar": "Tipo de búsqueda",
+        "Valor": "Web"
+      },
+      {
+        "Filtrar": "Fecha",
+        "Valor": "Últimos 28 días"
+      }
+    ],
+    "Gráfico": [
+      {
+        "Fecha": "2026-08-26",
+        "Clics": 5,
+        "Impresiones": 166,
+        "CTR": 0.0301,
+        "Posición": 20.2
+      },
+      {
+        "Fecha": "2026-08-27",
+        "Clics": 2,
+        "Impresiones": 109,
+        "CTR": 0.0183,
+        "Posición": 11.4
+      },
+      {
+        "Fecha": "2026-08-28",
+        "Clics": 1,
+        "Impresiones": 109,
+        "CTR": 0.0092,
+        "Posición": 11.7
+      },
+      {
+        "Fecha": "2026-08-29",
+        "Clics": 0,
+        "Impresiones": 55,
+        "CTR": 0.0,
+        "Posición": 10.0
+      },
+      {
+        "Fecha": "2026-08-30",
+        "Clics": 2,
+        "Impresiones": 77,
+        "CTR": 0.026000000000000002,
+        "Posición": 10.1
+      },
+      {
+        "Fecha": "2026-08-31",
+        "Clics": 1,
+        "Impresiones": 102,
+        "CTR": 0.0098,
+        "Posición": 11.9
+      },
+      {
+        "Fecha": "2026-09-01",
+        "Clics": 1,
+        "Impresiones": 87,
+        "CTR": 0.0115,
+        "Posición": 9.8
+      },
+      {
+        "Fecha": "2026-09-02",
+        "Clics": 1,
+        "Impresiones": 97,
+        "CTR": 0.0103,
+        "Posición": 9.3
+      },
+      {
+        "Fecha": "2026-09-03",
+        "Clics": 3,
+        "Impresiones": 100,
+        "CTR": 0.03,
+        "Posición": 11.6
+      },
+      {
+        "Fecha": "2026-09-04",
+        "Clics": 1,
+        "Impresiones": 105,
+        "CTR": 0.0095,
+        "Posición": 9.7
+      },
+      {
+        "Fecha": "2026-09-05",
+        "Clics": 0,
+        "Impresiones": 69,
+        "CTR": 0.0,
+        "Posición": 13.0
+      },
+      {
+        "Fecha": "2026-09-06",
+        "Clics": 1,
+        "Impresiones": 70,
+        "CTR": 0.0143,
+        "Posición": 13.2
+      },
+      {
+        "Fecha": "2026-09-07",
+        "Clics": 2,
+        "Impresiones": 91,
+        "CTR": 0.022000000000000002,
+        "Posición": 9.5
+      },
+      {
+        "Fecha": "2026-09-08",
+        "Clics": 2,
+        "Impresiones": 117,
+        "CTR": 0.0171,
+        "Posición": 8.2
+      },
+      {
+        "Fecha": "2026-09-09",
+        "Clics": 3,
+        "Impresiones": 119,
+        "CTR": 0.0252,
+        "Posición": 12.2
+      },
+      {
+        "Fecha": "2026-09-10",
+        "Clics": 1,
+        "Impresiones": 83,
+        "CTR": 0.012,
+        "Posición": 9.0
+      },
+      {
+        "Fecha": "2026-09-11",
+        "Clics": 2,
+        "Impresiones": 74,
+        "CTR": 0.027000000000000003,
+        "Posición": 9.4
+      },
+      {
+        "Fecha": "2026-09-12",
+        "Clics": 4,
+        "Impresiones": 61,
+        "CTR": 0.06559999999999999,
+        "Posición": 9.4
+      },
+      {
+        "Fecha": "2026-09-13",
+        "Clics": 0,
+        "Impresiones": 53,
+        "CTR": 0.0,
+        "Posición": 11.2
+      },
+      {
+        "Fecha": "2026-09-14",
+        "Clics": 1,
+        "Impresiones": 86,
+        "CTR": 0.0116,
+        "Posición": 9.7
+      },
+      {
+        "Fecha": "2026-09-15",
+        "Clics": 0,
+        "Impresiones": 85,
+        "CTR": 0.0,
+        "Posición": 8.3
+      },
+      {
+        "Fecha": "2026-09-16",
+        "Clics": 1,
+        "Impresiones": 73,
+        "CTR": 0.0137,
+        "Posición": 8.7
+      },
+      {
+        "Fecha": "2026-09-17",
+        "Clics": 0,
+        "Impresiones": 55,
+        "CTR": 0.0,
+        "Posición": 10.3
+      },
+      {
+        "Fecha": "2026-09-18",
+        "Clics": 0,
+        "Impresiones": 26,
+        "CTR": 0.0,
+        "Posición": 14.3
+      },
+      {
+        "Fecha": "2026-09-19",
+        "Clics": 0,
+        "Impresiones": 39,
+        "CTR": 0.0,
+        "Posición": 13.5
+      },
+      {
+        "Fecha": "2026-09-20",
+        "Clics": 0,
+        "Impresiones": 50,
+        "CTR": 0.0,
+        "Posición": 13.3
+      },
+      {
+        "Fecha": "2026-09-21",
+        "Clics": 2,
+        "Impresiones": 127,
+        "CTR": 0.015700000000000002,
+        "Posición": 8.2
+      },
+      {
+        "Fecha": "2026-09-22",
+        "Clics": 0,
+        "Impresiones": 91,
+        "CTR": 0.0,
+        "Posición": 9.5
+      }
+    ],
+    "Países": [
+      {
+        "País": "Chile",
+        "Clics": 36,
+        "Impresiones": 2224,
+        "CTR": 0.016200000000000003,
+        "Posición": 11.03
+      },
+      {
+        "País": "Estados Unidos",
+        "Clics": 0,
+        "Impresiones": 66,
+        "CTR": 0.0,
+        "Posición": 7.59
+      },
+      {
+        "País": "Brasil",
+        "Clics": 0,
+        "Impresiones": 10,
+        "CTR": 0.0,
+        "Posición": 8.8
+      },
+      {
+        "País": "España",
+        "Clics": 0,
+        "Impresiones": 9,
+        "CTR": 0.0,
+        "Posición": 15.22
+      },
+      {
+        "País": "Canadá",
+        "Clics": 0,
+        "Impresiones": 7,
+        "CTR": 0.0,
+        "Posición": 7.57
+      },
+      {
+        "País": "Colombia",
+        "Clics": 0,
+        "Impresiones": 7,
+        "CTR": 0.0,
+        "Posición": 10.86
+      },
+      {
+        "País": "Países Bajos",
+        "Clics": 0,
+        "Impresiones": 6,
+        "CTR": 0.0,
+        "Posición": 9.0
+      },
+      {
+        "País": "Argentina",
+        "Clics": 0,
+        "Impresiones": 6,
+        "CTR": 0.0,
+        "Posición": 9.17
+      },
+      {
+        "País": "Reino Unido",
+        "Clics": 0,
+        "Impresiones": 5,
+        "CTR": 0.0,
+        "Posición": 19.6
+      },
+      {
+        "País": "México",
+        "Clics": 0,
+        "Impresiones": 4,
+        "CTR": 0.0,
+        "Posición": 11.25
+      },
+      {
+        "País": "La India",
+        "Clics": 0,
+        "Impresiones": 4,
+        "CTR": 0.0,
+        "Posición": 46.75
+      },
+      {
+        "País": "Francia",
+        "Clics": 0,
+        "Impresiones": 3,
+        "CTR": 0.0,
+        "Posición": 10.0
+      },
+      {
+        "País": "Serbia",
+        "Clics": 0,
+        "Impresiones": 2,
+        "CTR": 0.0,
+        "Posición": 6.0
+      },
+      {
+        "País": "Venezuela",
+        "Clics": 0,
+        "Impresiones": 2,
+        "CTR": 0.0,
+        "Posición": 7.5
+      },
+      {
+        "País": "China",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 3.0
+      },
+      {
+        "País": "Lituania",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 3.0
+      },
+      {
+        "País": "Dinamarca",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 4.0
+      },
+      {
+        "País": "Polonia",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 5.0
+      },
+      {
+        "País": "Indonesia",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 6.0
+      },
+      {
+        "País": "Rusia",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 6.0
+      },
+      {
+        "País": "Uzbekistán",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 6.0
+      },
+      {
+        "País": "Alemania",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 7.0
+      },
+      {
+        "País": "Guatemala",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 7.0
+      },
+      {
+        "País": "Hong Kong",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 7.0
+      },
+      {
+        "País": "Honduras",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 7.0
+      },
+      {
+        "País": "Italia",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 7.0
+      },
+      {
+        "País": "Bélgica",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 8.0
+      },
+      {
+        "País": "Perú",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 8.0
+      },
+      {
+        "País": "Emiratos Árabes Unidos",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 10.0
+      },
+      {
+        "País": "Ecuador",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 12.0
+      },
+      {
+        "País": "Kirguistán",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 14.0
+      },
+      {
+        "País": "Filipinas",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 18.0
+      },
+      {
+        "País": "Turquía",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 61.0
+      },
+      {
+        "País": "Vietnam",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 86.0
+      },
+      {
+        "País": "Bangladés",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 87.0
+      }
+    ],
+    "Páginas": [
+      {
+        "Páginas principales": "https://lalupa.cl/guias/gas-red-vs-cilindro-cual-conviene",
+        "Clics": 17,
+        "Impresiones": 728,
+        "CTR": 0.023399999999999997,
+        "Posición": 10.54
+      },
+      {
+        "Páginas principales": "https://lalupa.cl/guias/como-leer-boleta-cge",
+        "Clics": 12,
+        "Impresiones": 611,
+        "CTR": 0.0196,
+        "Posición": 9.03
+      },
+      {
+        "Páginas principales": "https://lalupa.cl/comparador-internet-hogar",
+        "Clics": 2,
+        "Impresiones": 207,
+        "CTR": 0.0097,
+        "Posición": 20.37
+      },
+      {
+        "Páginas principales": "https://lalupa.cl/guias/lectura-estimada-medidor-luz-cuando-es-legal",
+        "Clics": 2,
+        "Impresiones": 104,
+        "CTR": 0.0192,
+        "Posición": 8.3
+      },
+      {
+        "Páginas principales": "https://lalupa.cl/guias/calefont-gas-elegir-potencia-ahorrar",
+        "Clics": 1,
+        "Impresiones": 120,
+        "CTR": 0.0083,
+        "Posición": 11.43
+      },
+      {
+        "Páginas principales": "https://lalupa.cl/guias/como-leer-boleta-agua",
+        "Clics": 1,
+        "Impresiones": 103,
+        "CTR": 0.0097,
+        "Posición": 8.11
+      },
+      {
+        "Páginas principales": "https://lalupa.cl/guias/te-cortaron-servicio-sin-aviso-que-hacer",
+        "Clics": 1,
+        "Impresiones": 39,
+        "CTR": 0.0256,
+        "Posición": 7.56
+      },
+      {
+        "Páginas principales": "https://lalupa.cl/guias/por-que-subio-mi-cuenta-de-luz",
+        "Clics": 0,
+        "Impresiones": 161,
+        "CTR": 0.0,
+        "Posición": 8.3
+      },
+      {
+        "Páginas principales": "https://lalupa.cl/guias/gas-red-vs-cilindro-cual-conviene#precio-real-por-kwh-gas-red-versus-cilindro",
+        "Clics": 0,
+        "Impresiones": 107,
+        "CTR": 0.0,
+        "Posición": 5.3
+      },
+      {
+        "Páginas principales": "https://lalupa.cl/guias/gas-red-vs-cilindro-cual-conviene#lo-que-est%C3%A1s-comparando-kwh-no-kilos",
+        "Clics": 0,
+        "Impresiones": 104,
+        "CTR": 0.0,
+        "Posición": 5.26
+      },
+      {
+        "Páginas principales": "https://lalupa.cl/guias/tarifa-bt1-vs-bt2-cual-conviene",
+        "Clics": 0,
+        "Impresiones": 89,
+        "CTR": 0.0,
+        "Posición": 10.08
+      },
+      {
+        "Páginas principales": "https://lalupa.cl/guias/gas-red-vs-cilindro-cual-conviene#tabla-comparativa-r%C3%A1pida",
+        "Clics": 0,
+        "Impresiones": 82,
+        "CTR": 0.0,
+        "Posición": 5.26
+      },
+      {
+        "Páginas principales": "https://lalupa.cl/guias/gas-red-vs-cilindro-cual-conviene#los-cargos-fijos-que-cambian-la-ecuaci%C3%B3n",
+        "Clics": 0,
+        "Impresiones": 81,
+        "CTR": 0.0,
+        "Posición": 5.32
+      },
+      {
+        "Páginas principales": "https://lalupa.cl/guias/cambiar-comercializadora-electrica-chile",
+        "Clics": 0,
+        "Impresiones": 76,
+        "CTR": 0.0,
+        "Posición": 8.61
+      },
+      {
+        "Páginas principales": "https://lalupa.cl/guias/deuda-electrica-convenios-pago-chile",
+        "Clics": 0,
+        "Impresiones": 74,
+        "CTR": 0.0,
+        "Posición": 8.31
+      },
+      {
+        "Páginas principales": "https://lalupa.cl/boleta-gas",
+        "Clics": 0,
+        "Impresiones": 20,
+        "CTR": 0.0,
+        "Posición": 31.1
+      },
+      {
+        "Páginas principales": "https://lalupa.cl/guias/subsidio-agua-potable-sap-chile",
+        "Clics": 0,
+        "Impresiones": 17,
+        "CTR": 0.0,
+        "Posición": 52.06
+      },
+      {
+        "Páginas principales": "https://lalupa.cl/boleta-agua",
+        "Clics": 0,
+        "Impresiones": 7,
+        "CTR": 0.0,
+        "Posición": 13.0
+      },
+      {
+        "Páginas principales": "https://lalupa.cl/como-funciona",
+        "Clics": 0,
+        "Impresiones": 4,
+        "CTR": 0.0,
+        "Posición": 3.5
+      },
+      {
+        "Páginas principales": "https://lalupa.cl/sobre",
+        "Clics": 0,
+        "Impresiones": 3,
+        "CTR": 0.0,
+        "Posición": 9.0
+      },
+      {
+        "Páginas principales": "https://lalupa.cl/boleta-luz",
+        "Clics": 0,
+        "Impresiones": 3,
+        "CTR": 0.0,
+        "Posición": 30.33
+      },
+      {
+        "Páginas principales": "https://lalupa.cl/contacto",
+        "Clics": 0,
+        "Impresiones": 2,
+        "CTR": 0.0,
+        "Posición": 3.0
+      },
+      {
+        "Páginas principales": "https://lalupa.cl/guias/reclamar-cobro-indebido-paso-a-paso",
+        "Clics": 0,
+        "Impresiones": 2,
+        "CTR": 0.0,
+        "Posición": 11.0
+      },
+      {
+        "Páginas principales": "https://lalupa.cl/guias",
+        "Clics": 0,
+        "Impresiones": 2,
+        "CTR": 0.0,
+        "Posición": 31.0
+      },
+      {
+        "Páginas principales": "https://lalupa.cl/guias/reclamar-subtel-internet-paso-a-paso",
+        "Clics": 0,
+        "Impresiones": 2,
+        "CTR": 0.0,
+        "Posición": 32.0
+      },
+      {
+        "Páginas principales": "https://lalupa.cl/guias/lectura-estimada-medidor-luz-cuando-es-legal#c%C3%B3mo-identificarla-en-tu-boleta",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 3.0
+      },
+      {
+        "Páginas principales": "https://lalupa.cl/guias/lectura-estimada-medidor-luz-cuando-es-legal#qu%C3%A9-es-una-lectura-estimada",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 3.0
+      },
+      {
+        "Páginas principales": "https://lalupa.cl/",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 4.0
+      },
+      {
+        "Páginas principales": "https://lalupa.cl/terminos",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 8.0
+      },
+      {
+        "Páginas principales": "https://lalupa.cl/guias/derechos-consumidor-chile-servicios-basicos",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 11.0
+      },
+      {
+        "Páginas principales": "https://lalupa.cl/reclamar-sernac",
+        "Clics": 0,
+        "Impresiones": 1,
+        "CTR": 0.0,
+        "Posición": 86.0
+      }
+    ]
+  },
+  "editorial_consistency_example": {
+    "scope": "Counterexample using the gas guide's own example prices, not verified current market prices",
+    "cylinders_per_year": 5,
+    "kg_per_cylinder": 15,
+    "kwh_per_kg": 13.6,
+    "annual_kwh": 1020.0,
+    "cylinder_price": 25000,
+    "annual_cylinder_cost": 125000,
+    "network_price_per_kwh_best_case": 70,
+    "network_fixed_monthly_best_case": 1500,
+    "annual_network_best_case": 89400.0,
+    "annual_saving_best_case": 35600.0,
+    "installation_minimum": 200000,
+    "payback_years_best_case": 5.617977528089888
+  }
+}

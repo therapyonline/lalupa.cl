@@ -1,0 +1,16 @@
+Lockfile is up to date, resolution step is skipped
+Already up to date
+
+. postinstall$ pnpm setup:parser-assets
+. postinstall: > lalupa@0.1.0 setup:parser-assets <repo>
+. postinstall: > node scripts/setup-parser-assets.mjs
+. postinstall: Recursos verificados: PDF.js 6.3.289, Tesseract 7.0.0/7.0.0. src/generated/parser-assets-manifest.json
+. postinstall: Done
+╭ Warning ─────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│   Ignored build scripts: tesseract.js@7.0.0.                                 │
+│   Run "pnpm approve-builds" to pick which dependencies should be allowed     │
+│   to run scripts.                                                            │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+Done in 484ms using pnpm v10.33.4

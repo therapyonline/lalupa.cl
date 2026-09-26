@@ -12,7 +12,6 @@
  * Total y vencimiento aparecen separados arriba; IVA en "Datos tributarios".
  */
 
-import { TARIFAS_AGUA_2026, validarCobro } from '@/data/tarifas'
 import { ParserError } from '../errors'
 import {
   CL_NUMBER,
@@ -26,11 +25,6 @@ import {
   parseChileanNumber,
 } from '../_helpers'
 import type { Cargo, EmpresaSanitaria, ParsedBoleta } from '../types'
-
-/** Mapeo entre nombre de parser y clave en TARIFAS_AGUA_2026 (cuando exista). */
-const TARIFA_KEY: Partial<Record<EmpresaSanitaria, string>> = {
-  'Aguas Andinas': 'aguas_andinas_g1',
-}
 
 const LECTURA_ACTUAL_REGEX =
   /Lectura\s+Actual\s+(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})/i
@@ -171,20 +165,18 @@ const MULTI_NUMBER_LABELS: ReadonlyArray<{ concepto: string; label: string }> = 
   },
 ]
 
-const REPOSICION_CONTEXTO_REGEX = /(corte|suspensi[óo]n|reposici[óo]n)/i
+const REPOSICION_CONTEXTO_REGEX = /(corte|suspensi[óo]n|desconexi[óo]n|reconexi[óo]n)/i
 
 function detectarSospecha(
   cargo: Cargo,
   text: string,
-  empresa: EmpresaSanitaria,
-  consumoM3: number,
 ): string | null {
   if (cargo.concepto === 'Reposición' && !REPOSICION_CONTEXTO_REGEX.test(text)) {
     return 'Cargo por reposición pero la boleta no menciona ningún corte previo. Pide desglose.'
   }
 
   if (cargo.concepto === 'Sobreconsumo' && cargo.monto > 0) {
-    return 'Cargo por sobreconsumo (consumo mayor al promedio invernal). Verifica que tu consumo real lo justifique. Si no hay fuga ni cambios de uso, pide al SISS revisar el cálculo.'
+    return 'Cargo por sobreconsumo. Pide a la sanitaria el grupo tarifario, período, límite y cálculo aplicados; contrasta el consumo con tus lecturas.'
   }
 
   if (cargo.concepto === 'Reliquidación' && cargo.monto !== 0) {
@@ -192,55 +184,11 @@ function detectarSospecha(
   }
 
   if (cargo.concepto === 'Ajuste por lectura estimada') {
-    return 'Tu medidor no fue leído (consumo estimado). Tienes derecho a pedir relectura sin costo si crees que la estimación está inflada.'
+    return 'La boleta incluye un ajuste por lectura estimada. Pide las lecturas, los períodos y el cálculo que originaron el ajuste.'
   }
 
-  const tarifaKey = TARIFA_KEY[empresa]
-  const tarifa = tarifaKey ? TARIFAS_AGUA_2026[tarifaKey] : null
-
-  // Tarifa-aware: Cargo fijo vs valor SISS.
-  if (cargo.concepto === 'Cargo fijo' && tarifa?.cargoFijoCLP) {
-    const r = validarCobro(cargo.monto, tarifa.cargoFijoCLP)
-    if (r.alerta === 'cobro_indebido_probable') {
-      return `Cargo fijo ${r.desviacionPct > 0 ? 'sobre' : 'bajo'} lo regulado por SISS en ${Math.abs(r.desviacionPct).toFixed(1)}%. ${r.mensaje}`
-    }
-    if (r.alerta === 'sospechoso') {
-      return `Cargo fijo difiere ${Math.abs(r.desviacionPct).toFixed(1)}% del valor SISS publicado ($${tarifa.cargoFijoCLP}). Verifica tu grupo tarifario.`
-    }
-  }
-
-  // Tarifa-aware: Consumo Agua Potable vs (m³ × tarifa SISS).
-  if (
-    cargo.concepto === 'Consumo agua potable' &&
-    tarifa?.aguaPotableNoPuntaCLPM3 &&
-    consumoM3 > 0
-  ) {
-    const esperado = tarifa.aguaPotableNoPuntaCLPM3 * consumoM3
-    const r = validarCobro(cargo.monto, esperado)
-    if (r.alerta === 'cobro_indebido_probable') {
-      return `Consumo agua potable ${r.desviacionPct > 0 ? 'sobre' : 'bajo'} lo esperado en ${Math.abs(r.desviacionPct).toFixed(1)}% (${consumoM3} m³ × $${tarifa.aguaPotableNoPuntaCLPM3.toFixed(2)} ≈ $${Math.round(esperado).toLocaleString('es-CL')}). ${r.mensaje}`
-    }
-    if (r.alerta === 'sospechoso') {
-      return `Consumo agua potable difiere ${Math.abs(r.desviacionPct).toFixed(1)}% del valor esperado según tarifa SISS. Pide desglose.`
-    }
-  }
-
-  // Tarifa-aware: Alcantarillado vs (m³ × tarifa SISS).
-  if (
-    cargo.concepto === 'Servicio de alcantarillado' &&
-    tarifa?.alcantarilladoCLPM3 &&
-    consumoM3 > 0
-  ) {
-    const esperado = tarifa.alcantarilladoCLPM3 * consumoM3
-    const r = validarCobro(cargo.monto, esperado)
-    if (r.alerta === 'cobro_indebido_probable') {
-      return `Alcantarillado ${r.desviacionPct > 0 ? 'sobre' : 'bajo'} lo esperado en ${Math.abs(r.desviacionPct).toFixed(1)}% (${consumoM3} m³ × $${tarifa.alcantarilladoCLPM3.toFixed(2)} ≈ $${Math.round(esperado).toLocaleString('es-CL')}). ${r.mensaje}`
-    }
-    if (r.alerta === 'sospechoso') {
-      return `Alcantarillado difiere ${Math.abs(r.desviacionPct).toFixed(1)}% del valor esperado según tarifa SISS. Pide desglose.`
-    }
-  }
-
+  // No asignar grupo 1 a toda Aguas Andinas ni comparar importes sin
+  // grupo, temporada, vigencia e impuestos confirmados.
   return null
 }
 
@@ -304,7 +252,7 @@ export function parseSissFamily(
     }
   }
   for (const cargo of cargos) {
-    const razon = detectarSospecha(cargo, text, cfg.empresa, consumo.valor)
+    const razon = detectarSospecha(cargo, text)
     if (razon) {
       cargo.sospechoso = true
       cargo.razonSospecha = razon

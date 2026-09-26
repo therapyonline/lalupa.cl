@@ -1,3 +1,4 @@
+import { PARSER_ASSETS } from '../../src/generated/parser-assets'
 import { expect, test } from '@playwright/test'
 
 /**
@@ -47,7 +48,7 @@ test.describe('Security headers', () => {
   test('Tesseract worker se sirve same-origin con headers de seguridad', async ({
     request,
   }) => {
-    const res = await request.get('/tesseract/worker.min.js')
+    const res = await request.get(`${PARSER_ASSETS.ocrBase}/worker.min.js`)
     expect(res.ok()).toBe(true)
     const h = res.headers()
     expect(h['x-content-type-options']).toBe('nosniff')

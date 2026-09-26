@@ -85,7 +85,7 @@ describe('sospecha: Recargo de delivery extraordinario (Gasco GLP)', () => {
   })
 })
 
-describe('sospecha: Cargo fijo CGE vs valor SEC publicado', () => {
+describe('regresión: CGE no aplica una tarifa histórica sin contexto', () => {
   function makeCgeFixture(cargoFijo: number): string {
     return `COMPAÑIA GENERAL DE ELECTRICIDAD S.A.
 RUT: 99.513.400-4
@@ -102,29 +102,32 @@ Total a pagar ................ $ 56.000
 `
   }
 
-  it('NO marca cargo fijo dentro de ±5% del valor SEC ($1.048)', () => {
+  it('extrae el cargo fijo sin certificar la tarifa', () => {
     const r = parseCGE(makeCgeFixture(1048))
     const cargoFijo = r.cargos.find((c) => c.concepto === 'Cargo fijo')
+    expect(cargoFijo).toBeDefined()
     expect(cargoFijo?.sospechoso).toBeFalsy()
   })
 
-  it('marca como sospechoso cuando cargo fijo difiere 5-20% del SEC', () => {
-    // 1300 vs 1048 = +24%, entra en cobro_indebido_probable
+  it('no compara abril con una referencia de mayo de 2026', () => {
+    // Regresión: antes se comparaba abril con una referencia de mayo.
     const r = parseCGE(makeCgeFixture(1300))
     const cargoFijo = r.cargos.find((c) => c.concepto === 'Cargo fijo')
-    expect(cargoFijo?.sospechoso).toBe(true)
-    expect(cargoFijo?.razonSospecha).toMatch(/SEC|regulado/i)
+    expect(cargoFijo).toBeDefined()
+    expect(cargoFijo?.sospechoso).toBeFalsy()
+    expect(cargoFijo?.razonSospecha).toBeUndefined()
   })
 
-  it('marca como cobro_indebido_probable cuando difiere >20%', () => {
+  it('no infiere sobrecobro aunque el cargo supere la referencia histórica', () => {
     const r = parseCGE(makeCgeFixture(1500))
     const cargoFijo = r.cargos.find((c) => c.concepto === 'Cargo fijo')
-    expect(cargoFijo?.sospechoso).toBe(true)
-    expect(cargoFijo?.razonSospecha).toMatch(/SEC|sobre/i)
+    expect(cargoFijo).toBeDefined()
+    expect(cargoFijo?.sospechoso).toBeFalsy()
+    expect(cargoFijo?.razonSospecha).toBeUndefined()
   })
 })
 
-describe('sospecha: Cargo fijo Aguas Andinas vs valor SISS publicado', () => {
+describe('regresión: Aguas Andinas no implica grupo tarifario 1', () => {
   function makeAaFixture(cargoFijo: number): string {
     return `AGUAS ANDINAS S.A.
 RUT: 61.808.000-5
@@ -147,27 +150,30 @@ Datos tributarios: Neto $14.407, IVA $2.737
 `
   }
 
-  it('NO marca cargo fijo $914 (valor SISS exacto Aguas Andinas G1)', async () => {
+  it('extrae el cargo fijo sin asignar grupo tarifario', async () => {
     const { parseAguasAndinas } = await import('./agua/aguasandinas')
     const r = parseAguasAndinas(makeAaFixture(914))
     const cargoFijo = r.cargos.find((c) => c.concepto === 'Cargo fijo')
+    expect(cargoFijo).toBeDefined()
     expect(cargoFijo?.sospechoso).toBeFalsy()
   })
 
-  it('marca como sospechoso si cargo fijo difiere >5% del SISS', async () => {
+  it('no aplica el importe de grupo 1 sin acreditar el grupo', async () => {
     const { parseAguasAndinas } = await import('./agua/aguasandinas')
     const r = parseAguasAndinas(makeAaFixture(1100))
     const cargoFijo = r.cargos.find((c) => c.concepto === 'Cargo fijo')
-    expect(cargoFijo?.sospechoso).toBe(true)
-    expect(cargoFijo?.razonSospecha).toMatch(/SISS/i)
+    expect(cargoFijo).toBeDefined()
+    expect(cargoFijo?.sospechoso).toBeFalsy()
+    expect(cargoFijo?.razonSospecha).toBeUndefined()
   })
 
-  it('marca cobro_indebido_probable si difiere >20%', async () => {
+  it('no supone impuestos o vigencia al evaluar un cargo fijo', async () => {
     const { parseAguasAndinas } = await import('./agua/aguasandinas')
     const r = parseAguasAndinas(makeAaFixture(1500))
     const cargoFijo = r.cargos.find((c) => c.concepto === 'Cargo fijo')
-    expect(cargoFijo?.sospechoso).toBe(true)
-    expect(cargoFijo?.razonSospecha).toMatch(/SISS|sobre/i)
+    expect(cargoFijo).toBeDefined()
+    expect(cargoFijo?.sospechoso).toBeFalsy()
+    expect(cargoFijo?.razonSospecha).toBeUndefined()
   })
 })
 
@@ -184,7 +190,7 @@ describe('sospecha: el resultado del fixture base no tiene falsos positivos', ()
     expect(sospechosos).toHaveLength(0)
   })
 
-  it('Aguas Andinas fixture (cargo fijo $914 = SISS) no genera falsos positivos', async () => {
+  it('Aguas Andinas fixture sin conceptos de alerta no genera falsos positivos', async () => {
     const { parseAguasAndinas } = await import('./agua/aguasandinas')
     const { AGUASANDINAS_REAL_2026_03 } = await import(
       './__fixtures__/aguasandinas-real-2026-03'
@@ -195,7 +201,7 @@ describe('sospecha: el resultado del fixture base no tiene falsos positivos', ()
   })
 })
 
-describe('sospecha: Consumo agua potable (m³ × tarifa SISS)', () => {
+describe('regresión: consumo de agua con grupo y temporada sin confirmar', () => {
   function makeAaConsumoFixture(consumoCLP: number): string {
     return `AGUAS ANDINAS S.A.
 RUT: 61.808.000-5
@@ -216,24 +222,26 @@ Datos tributarios: Neto $14.407, IVA $2.737
 `
   }
 
-  it('NO marca consumo $7.116 (12 m³ × $592,98 SISS = $7.115,76 ≈ esperado)', async () => {
+  it('extrae consumo sin certificar el precio por m³', async () => {
     const { parseAguasAndinas } = await import('./agua/aguasandinas')
     const r = parseAguasAndinas(makeAaConsumoFixture(7116))
     const consumo = r.cargos.find((c) => c.concepto === 'Consumo agua potable')
+    expect(consumo).toBeDefined()
     expect(consumo?.sospechoso).toBeFalsy()
   })
 
-  it('marca como cobro_indebido_probable si consumo es muy superior al esperado', async () => {
+  it('no compara febrero con un precio no punta de marzo', async () => {
     const { parseAguasAndinas } = await import('./agua/aguasandinas')
-    // 12 m³ × 592,98 = 7.116. Inflamos a 12.000 = +68% sobre esperado
+    // El monto distinto no acredita grupo, temporada, impuestos ni fecha.
     const r = parseAguasAndinas(makeAaConsumoFixture(12000))
     const consumo = r.cargos.find((c) => c.concepto === 'Consumo agua potable')
-    expect(consumo?.sospechoso).toBe(true)
-    expect(consumo?.razonSospecha).toMatch(/sobre.*esperado|SERNAC/i)
+    expect(consumo).toBeDefined()
+    expect(consumo?.sospechoso).toBeFalsy()
+    expect(consumo?.razonSospecha).toBeUndefined()
   })
 })
 
-describe('sospecha: Alcantarillado (m³ × tarifa SISS)', () => {
+describe('regresión: alcantarillado sin referencia aplicable', () => {
   function makeAaAlcFixture(alcCLP: number): string {
     return `AGUAS ANDINAS S.A.
 RUT: 61.808.000-5
@@ -254,19 +262,21 @@ Datos tributarios: Neto $14.407, IVA $2.737
 `
   }
 
-  it('NO marca alcantarillado $9.113 (12 m³ × $759,39 SISS = $9.112,68 ≈ esperado)', async () => {
+  it('extrae alcantarillado sin certificar el precio por m³', async () => {
     const { parseAguasAndinas } = await import('./agua/aguasandinas')
     const r = parseAguasAndinas(makeAaAlcFixture(9113))
     const alc = r.cargos.find((c) => c.concepto === 'Servicio de alcantarillado')
+    expect(alc).toBeDefined()
     expect(alc?.sospechoso).toBeFalsy()
   })
 
-  it('marca cobro_indebido_probable si alcantarillado supera 20% del esperado', async () => {
+  it('no compara alcantarillado sin grupo ni impuestos confirmados', async () => {
     const { parseAguasAndinas } = await import('./agua/aguasandinas')
-    // 12 m³ × 759,39 = 9.113. Inflamos a 14.000 = +54% sobre esperado.
+    // El importe alto por sí solo no acredita un sobrecobro.
     const r = parseAguasAndinas(makeAaAlcFixture(14000))
     const alc = r.cargos.find((c) => c.concepto === 'Servicio de alcantarillado')
-    expect(alc?.sospechoso).toBe(true)
-    expect(alc?.razonSospecha).toMatch(/SERNAC|sobre.*esperado/i)
+    expect(alc).toBeDefined()
+    expect(alc?.sospechoso).toBeFalsy()
+    expect(alc?.razonSospecha).toBeUndefined()
   })
 })

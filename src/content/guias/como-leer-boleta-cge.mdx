@@ -1,175 +1,136 @@
 ---
 title: 'Cómo leer tu boleta CGE 2026: cada cargo explicado'
 slug: 'como-leer-boleta-cge'
-description: 'Guía para entender cada cargo de tu boleta CGE en 2026: cargo fijo, energía, transmisión, servicio público, IVA y subsidio Ley 21.667. Con ejemplos reales.'
-ogTitle: 'Cómo leer tu boleta CGE 2026: cada cargo explicado'
+description: 'Entiende consumo, precio por kWh, potencia base, IVA y saldos de tu boleta CGE. Aprende a localizar la tarifa del período y revisar diferencias.'
+ogTitle: 'Cómo leer tu boleta CGE: consumo, cargos y tarifas'
 publishedAt: '2026-05-10'
-updatedAt: '2026-05-26'
+updatedAt: '2026-09-25'
 category: 'luz'
 keywords:
   - 'cómo leer boleta CGE'
-  - 'cargo fijo CGE'
-  - 'cargo por energía CGE'
-  - 'entender boleta luz'
-  - 'subsidio Ley 21.667 CGE'
-  - 'reclamar boleta CGE'
+  - 'valor kWh CGE'
+  - 'cargo potencia base CGE'
+  - 'tarifa BT1 CGE'
+  - 'reclamo boleta CGE'
 relatedTools:
   - '/boleta-luz'
+  - '/reclamar-sernac'
 author: 'Equipo lalupa'
 faqs:
-  - q: '¿Por qué subió tanto mi cuenta de luz CGE este mes?'
-    a: 'Tres causas comunes: ajuste tarifario semestral (1 mayo y 1 julio, hasta 8-12% de alza por decreto SEC), cambio estacional (invierno aumenta consumo 20-40% en hogares con calefón eléctrico), o lectura estimada inflada (si CGE no leyó tu medidor por 2 meses y estimó alto, luego ajusta en una sola boleta). Si tu alza supera 40% sin explicación estacional, conviene validar la boleta contra las tarifas SEC vigentes.'
-  - q: '¿Qué hago si veo un cargo que no entiendo en mi boleta CGE?'
-    a: 'Llama al 600 600 4040 y pide el detalle desglosado del cargo específico. CGE está obligada a explicártelo. Anota el número de ticket. Si después de la llamada sigues sin entender, pide una boleta corregida por escrito. Si no responden en 5 días hábiles, reclama en sec.cl adjuntando el folio del ticket que te dieron como antecedente del reclamo formal a la empresa.'
-  - q: '¿Cómo sé si me aplican el subsidio Ley 21.667 correctamente?'
-    a: 'Hay que postular en subsidioelectrico.cl con ClaveÚnica. Si fuiste seleccionado, CGE debe aplicar el descuento automáticamente como una línea con monto negativo etiquetada "Subsidio Eléctrico Ley 21.667". El monto depende del tramo del Registro Social de Hogares y el número de integrantes (entre $11.700 y $32.224 mensuales). Si postulaste, fuiste seleccionado y no aparece, contacta a la SEC: la distribuidora está obligada a aplicarlo.'
-  - q: '¿Puedo pagar mi boleta CGE en línea sin recargos?'
-    a: 'Sí. Los canales digitales de CGE no cobran recargo: portal web cge.cl, app móvil, débito automático (PAT) y transferencia bancaria con el código de pago. Los puntos físicos (Servipag, Sencillito, Caja Vecina) tampoco cobran comisión. Lo que sí tiene recargo es pagar después de la fecha de vencimiento: el interés moratorio se calcula según la tasa máxima convencional publicada por la CMF y se suma a la siguiente boleta.'
-  - q: '¿Qué es el cargo por servicio público (FET) y por qué me lo cobran?'
-    a: 'El Fondo de Estabilización Tarifaria se creó en 2019 (Ley 21.185) para amortiguar el impacto de alzas tarifarias sobre hogares residenciales. Se cobra como componente fijo por kWh consumido (aproximadamente $0,855 por kWh sin IVA, regulado por la SEC). No es un cargo arbitrario de CGE; es regulado y aplica a todas las distribuidoras por igual. Pesa entre $150 y $250 en una boleta residencial promedio.'
-  - q: '¿En cuánto tiempo me cortan la luz si no pago la boleta?'
-    a: 'CGE debe avisar por escrito con al menos 15 días corridos antes de cortar el suministro por mora. No pueden cortar en fines de semana ni feriados. Si hay una persona electrodependiente inscrita en el Registro de Electrodependientes, no pueden cortar el suministro bajo ninguna circunstancia, solo negociar plan de pago. Si te cortaron sin cumplir los 15 días de aviso, es corte ilegal y aplica multa SEC más indemnización vía SERNAC.'
+  - q: '¿Cuánto vale el kWh de CGE?'
+    a: 'No hay un valor único que esta guía pueda aplicar a todas las boletas. Localiza la opción tarifaria, zona y período de tu suministro en el tarifario oficial de CGE. Distingue el precio de un componente por kWh del costo total de la cuenta y comprueba si incluye IVA.'
+  - q: '¿Qué es el cargo por potencia base de CGE?'
+    a: 'Es un concepto que debes contrastar con la opción tarifaria y la unidad que aparece en tu boleta. Si figura en pesos por kWh, revisa su cálculo con la energía facturada; si figura en pesos por kW, la cantidad es otra. El nombre por sí solo no permite concluir que sea un cobro incorrecto.'
+  - q: '¿Dividir el total por los kWh entrega la tarifa?'
+    a: 'Entrega un costo promedio por kWh de esa cuenta. Si el total incluye cargos fijos, impuestos, deuda anterior o descuentos, no equivale al precio unitario del cargo por energía.'
+  - q: '¿Una alerta de lalupa demuestra un cobro indebido?'
+    a: 'No. La extracción puede ser parcial y las referencias pueden no corresponder a tu zona, opción o período. Compara cada dato con el documento original y pide antecedentes a la empresa antes de concluir que existe una diferencia.'
+  - q: '¿Puedo consultar o pagar mi boleta CGE aquí?'
+    a: 'No. lalupa es una herramienta independiente: no consulta cuentas por RUT o número de cliente ni recibe pagos. Para obtener la boleta o pagar utiliza los canales oficiales de CGE.'
+  - q: '¿Cuándo puedo acudir a la SEC por un reclamo?'
+    a: 'La SEC indica reclamar primero a la empresa y permite acudir si no recibes respuesta después de 30 días o si estás disconforme con la respuesta. Conserva el reclamo, su folio, la respuesta y la boleta. Consulta los requisitos actuales en el canal oficial de SEC.'
 ---
 
-La boleta de CGE tiene 4 partes que casi nadie mira en orden, y por eso los cargos sospechosos pasan desapercibidos. Esta guía te lleva por cada una con cifras reales de mayo 2026 y señales de alerta concretas.
+**Empieza por cuatro datos: período, consumo en kWh, opción tarifaria y total del mes.** Después separa los saldos anteriores, pagos y descuentos. Así podrás identificar si la diferencia viene del consumo, del precio o de otro concepto.
 
-<Callout tone="info" title="Tip rápido">
-  Si solo quieres saber si te están cobrando de más, sube tu boleta en{' '}
-  <a href="/boleta-luz">/boleta-luz</a>. Si quieres entender cada
-  línea, sigue leyendo.
+<Callout tone="info" title="Antes de revisar">
+  Ten a mano el PDF original y, si es posible, la boleta anterior.
+  <a href="/boleta-luz">Nuestro lector de boletas</a> ayuda a ordenar los datos,
+  pero una lectura puede quedar incompleta y no certifica que la tarifa sea correcta.
+  Esta guía no publica precios vigentes de CGE: los ejemplos son ilustrativos.
 </Callout>
 
 ## El encabezado: período facturado y fechas clave
 
-El header tiene 6 datos críticos que pocos miran: RUT de la empresa (`99.513.400-4` si es CGE Distribución, `96.783.220-7` si es CONAFE), tu número de cliente, la dirección de suministro, el período facturado, la fecha de emisión y la fecha de vencimiento.
+Ubica el número de cliente, dirección de suministro, medidor, opción tarifaria, fechas de lectura, emisión y vencimiento. No compartas esos datos personales en comentarios o capturas públicas.
 
-La señal de alerta más común está en el **período facturado**. Si tu boleta cubre días que cruzan un cambio tarifario (típicamente 1 de mayo o 1 de julio, cuando se publica el decreto de la <a href="https://www.sec.cl" target="_blank" rel="noopener noreferrer">SEC</a>), CGE debe **ponderar el cargo por energía entre los días con tarifa antigua y los días con tarifa nueva**. Si te aplicaron la tarifa más alta a todo el período, tienes derecho a pedir reliquidación. Es uno de los errores más frecuentes que vemos cuando un usuario sube su boleta.
+El **período de consumo** y la **fecha de emisión** cumplen funciones distintas. Para comparar dos cuentas, cuenta los días entre lecturas y verifica si la lectura es real o estimada. Una cuenta con más días no es comparable directamente con una más corta.
 
-Otro dato clave es la diferencia entre fecha de emisión y fecha de vencimiento: deben mediar al menos 15 días corridos. Si te llega una boleta con vencimiento al día siguiente, no estás obligado a pagarla en ese plazo; pide reemisión.
+Si el período cruza un cambio de precio, pide a CGE el detalle de los valores aplicados y su distribución. No deduzcas la tarifa correcta solo por el mes del título de un archivo.
 
-<DataPoint
-  value="$ 1.048,46"
-  label="Cargo fijo CGE BT-1 vigente desde 1 mayo 2026, IVA incluido. Es constante en todas las zonas STxD y STxE."
-  source="CGE Distribución"
-  sourceUrl="https://www.cge.cl/wp-content/uploads/2026/04/Tarifas_de_Suministro_Electrico_vigentes_a_partir_del_1_de_mayo_2026.pdf"
-/>
+Para localizarla, abre [Tarifa de suministro de CGE](https://www.cge.cl/informacion-comercial/tarifas-y-procesos-tarifarios/tarifa-de-suministro/), identifica la tabla que corresponde a tu opción, zona y vigencia, y guarda una copia. Comprueba las unidades y si los valores incluyen impuestos. Si no encuentras la tabla aplicable, solicítala a la empresa indicando tu período de facturación.
 
 ## Cada cargo de tu boleta CGE, explicado
 
-Una boleta BT-1 residencial típica tiene 6 a 8 líneas de cargo más el IVA. Acá va cada una con su monto típico para un hogar de **200-250 kWh mensuales** (consumo promedio chileno) y la señal de alerta de cada cargo.
+Usa el detalle de tu propia cuenta: no todas las boletas tienen los mismos conceptos. Esta tabla orienta la revisión sin fijar un monto universal.
+
+| Dato o concepto | Qué comprobar |
+| --- | --- |
+| Consumo | Lecturas, multiplicador si aparece y kWh facturados |
+| Precio unitario | Unidad, tarifa y fecha de vigencia |
+| Cargo calculado | Cantidad × precio, considerando redondeos y tramos si corresponden |
+| Impuestos | Base afecta e impuesto, sin duplicar IVA |
+| Descuentos o subsidios | Período y monto efectivamente informado |
+| Total a pagar | Cargos del período, saldos anteriores, abonos y ajustes |
 
 ### Cargo fijo BT-1
 
-Monto único e independiente del consumo. Para CGE es `$ 1.048,46` mensual con IVA. Cubre el costo de mantener tu medidor activo y leer tu consumo, no importa si consumes 1 kWh o 500. Si vives a medias en una vivienda (segunda casa, vivienda alquilada vacante), igual te lo cobran.
+Revisa el cargo fijo de **la opción tarifaria de tu suministro**. No uses un monto de otra zona o un tarifario histórico como si fuera vigente para todas las cuentas. Su importe no se comprueba multiplicándolo por tus kWh.
 
-**Seña de alerta:** si el cargo fijo aparece duplicado en tu boleta o supera `$ 1.200`, hay un error. Pide aclaración llamando al call center antes de pagar.
+Si aparece más de una vez, primero revisa si hay períodos distintos o ajustes identificados; pide su desglose si no queda claro.
 
 ### Cargo por energía
 
-Es el corazón de tu boleta. Se calcula como `kWh consumidos × precio del kWh`. Para CGE en sector tarifario STxD-3 (RM, comunas como San Bernardo, Buin, Calera de Tango), el precio total del kWh en mayo 2026 es de aproximadamente `$ 172,40` con IVA, sumando todos los componentes variables. En sectores STxE rurales del sur llega a `$ 180,18`.
+Comprueba la cantidad de energía y el precio unitario de esa línea. Por ejemplo, **200 kWh × $100/kWh = $20.000**. Son números ficticios para mostrar la multiplicación, no el valor vigente del kWh de CGE ni el costo completo del suministro.
 
-**Seña de alerta:** este cargo no debería superar el 75% de tu boleta total para un consumo residencial normal. Si lo hace, revisa que el período facturado no esté inflado por una lectura estimada de un mes anterior.
+En cambio, dividir una cuenta hipotética de $50.000 por 200 kWh da $250/kWh de costo promedio. Ese cociente puede incluir cargos fijos, impuestos, saldos u otros conceptos: no lo compares directamente con una sola línea del tarifario.
 
 ### Cargo por uso del sistema de transmisión
 
-Cubre el costo de transportar la energía desde las centrales generadoras hasta tu distribuidora. En la boleta aparece como `$ × kWh consumidos`. Para CGE STxD-3 es de `$ 15,964` por kWh.
+Identifica la unidad y el precio que aplica la boleta. Si está expresado por kWh, contrasta cantidad y multiplicación con el detalle tarifario. Revisa que no estés comparando un valor neto con otro que ya incluye IVA.
 
-**Seña de alerta:** debería pesar entre el 5% y el 8% del total de tu boleta. Si supera el 10%, vale la pena revisar.
+<span id="cargo-por-servicio-público-fet" />
 
-### Cargo por servicio público (FET)
+### Cargo por servicio público
 
-El **Fondo de Estabilización Tarifaria** se introdujo en 2019 para amortiguar las alzas en cuentas residenciales y compensar parcialmente los gastos del sistema eléctrico. Aparece a `$ 0,855` por kWh sin IVA y es bastante constante en todas las distribuidoras. Es el cargo más chico de tu boleta (~`$ 200` para un consumo promedio) y vale la pena saber qué es: muchos lo confunden con un cargo discrecional de la empresa, pero es regulado por la SEC.
+Revisa la denominación exacta, unidad y fundamento en el tarifario aplicable. No equipares automáticamente este concepto con el Fondo de Estabilización Tarifaria ni con cualquier ajuste de energía: pide el desglose si la boleta agrupa conceptos distintos.
 
 ### Cargo por compras de potencia
 
-Refleja el costo de la potencia que la distribuidora compra al sistema interconectado en bloque. Para CGE STxD-3 es de `$ 1,778` por kWh en mayo 2026. Es uno de los componentes más estables. **No siempre aparece** en boletas BT-1 simples; en CGE sí lo desglosan separado.
+La palabra potencia no basta para saber cómo se factura la línea. Anota su unidad, cantidad, precio y opción tarifaria. Evita concluir que es un cargo extra solo porque su nombre no te resulta familiar.
 
 ### Cargo por potencia base
 
-Cubre el costo de mantener disponible la red de distribución para que tu casa pueda recibir energía cuando la pide. Para CGE STxD-3 es el cargo más grande en términos unitarios: `$ 150,873` por kWh. Lo notable es que no se paga sobre la potencia que efectivamente usaste, sino sobre la que tienes disponible.
+**Lee la unidad antes de calcular.** Si está expresado en $/kWh, comprueba la energía utilizada en esa multiplicación. Si está en $/kW, corresponde revisar la cantidad de potencia y las condiciones de tu tarifa. Si la unidad no aparece, pide el cálculo a CGE.
 
-**Seña de alerta:** en tarifa BT-1 (sin potencia contratada) no debería aparecer un cargo de "potencia contratada" separado. Si lo ves, posiblemente la empresa te facturó como BT-2 por error. Pide cambio de tarifa retroactivo.
+Un concepto de potencia no demuestra, por sí solo, que tu equipo haya consumido más energía ese mes. Para entender esa diferencia consulta [BT-1 y BT-2](/guias/tarifa-bt1-vs-bt2-cual-conviene).
 
 ### IVA 19%
 
-El IVA se calcula sobre la suma de todos los cargos del mes, exceptuando el cargo por servicio público que ya viene con sus propias reglas tributarias. Para una boleta de `$ 50.000` netos el IVA típico ronda los `$ 8.000-9.500`. Es invariable y no se puede discutir.
+El [SII informa una tasa general de IVA del 19%](https://www.sii.cl/preguntas_frecuentes/impuestos_mensuales/001_130_0572.htm). Comprueba la base afecta que muestra el documento y evita añadir IVA de nuevo a importes que ya lo incluyen. No supongas que todo el total pendiente es una base afecta: puede contener saldos y abonos de otros períodos.
 
 ### Subsidio Eléctrico Ley 21.667
 
-Si te aplica el subsidio, aparece como una línea con **monto negativo** (descuento) etiquetada "Subsidio Eléctrico Ley N°21.667" o "Ley 21.667". Para hogares calificados puede descontar entre `$ 11.700` y `$ 32.224` por mes según el tramo del Registro Social de Hogares y la cantidad de integrantes del hogar.
-
-La <a href="https://www.bcn.cl/leychile" target="_blank" rel="noopener noreferrer">Ley 21.667</a> establece que el descuento se aplica automáticamente si postulaste y fuiste seleccionado. La postulación se hace en <a href="https://www.subsidioelectrico.cl" target="_blank" rel="noopener noreferrer">subsidioelectrico.cl</a> con ClaveÚnica.
-
-**Seña de alerta:** si postulaste, fuiste seleccionado y el subsidio no aparece como descuento, contacta a la SEC. La distribuidora está obligada a aplicarlo.
-
-<RelatedTool
-  href="/boleta-luz"
-  description="Sube tu PDF y la lupa identifica el cargo exacto que subió vs el mes pasado, y valida cada componente contra las tarifas SEC publicadas."
-/>
+Si esperas un descuento, contrasta el resultado de tu postulación y el período informado con la línea que aparece en la boleta. No uses un monto mensual fijo tomado de una convocatoria distinta. Consulta las condiciones y resultados a través del [Ministerio de Energía](https://energia.gob.cl/) y conserva el comprobante que corresponda a tu caso.
 
 ## El gráfico de los últimos 12 meses: cómo interpretarlo
 
-CGE incluye en cada boleta una comparativa de los últimos 12 meses de consumo en kWh y de monto pagado en CLP. Es una herramienta que **casi nadie usa** y es la mejor manera de detectar problemas a tiempo.
+Compara primero **kWh**, luego precios. Divide cada consumo por los días facturados para obtener kWh/día. Después revisa cambios de uso, estación del año, lectura estimada y regularizaciones.
 
-**Cómo usarla:**
+Un aumento del monto no demuestra por sí solo que haya un error. Tampoco existe un porcentaje de alza que esta guía pueda usar para declarar automáticamente un cobro indebido. Reúne datos antes de atribuir una causa.
 
-1. **Compara mes contra mes anterior.** Si tu consumo subió más de 40% sin un cambio estacional obvio (por ejemplo, no estás entrando a invierno y no compraste una estufa eléctrica), hay algo raro: lectura estimada inflada, fuga eléctrica en tu casa, o medidor con falla.
-
-2. **Compara mes contra mismo mes año anterior.** Si llevas más de 12 meses en la vivienda, esta comparativa te aísla del efecto estacional. Si junio 2026 es 30% más caro que junio 2025 sin haber cambiado tu consumo, es probable un alza tarifaria; sube tu boleta a <a href="/boleta-luz">/boleta-luz</a> y la lupa te dice si el alza es coherente con el decreto SEC vigente.
-
-3. **Detecta meses con estimación.** CGE marca con un ícono o nota los meses en que no leyeron tu medidor y estimaron tu consumo. Por ley pueden estimar hasta 2 meses seguidos; si ves 3 o más estimaciones consecutivas, exige relectura sin costo (es tu derecho según la <a href="https://www.bcn.cl/leychile" target="_blank" rel="noopener noreferrer">Ley 18.410</a> de servicios eléctricos).
-
-<Alert variant="warning">
-  <Alert.Title>Alza superior a 40% mes a mes</Alert.Title>
-  <Alert.Body>
-    Si tu boleta subió más de 40% comparado con el mes anterior sin
-    cambio estacional ni nuevos equipos en tu casa, no es normal.
-    Pide a CGE el detalle de la lectura (kWh inicial y final) y
-    compáralo con el número que muestra tu medidor hoy. Si no coincide,
-    hay error en la lectura.
-  </Alert.Body>
-</Alert>
+<RelatedTool href="/boleta-luz" label="Revisar los datos de mi boleta" description="Procesamiento en tu navegador. Contrasta la lectura y las alertas orientativas con el PDF original y la tarifa de tu período." />
 
 ## Códigos de pago y dónde reclamar
 
-La última parte de la boleta tiene los códigos para pagar (QR, código de barra, número de identificación de la cuenta) y la información para reclamar. Acá va la ruta de escalamiento si encuentras un error:
+Para obtener una copia o pagar, entra a [CGE](https://www.cge.cl/) por sus canales oficiales. lalupa no recibe pagos ni tiene acceso a tu cuenta de cliente.
 
 ### Paso 1: Reclamo directo a CGE
 
-Antes de ir a SERNAC o SEC, **debes reclamar primero a la empresa**. Esto es requisito legal: SERNAC y SEC piden el número de reclamo de CGE como antecedente.
-
-- **Teléfono:** 600 600 4040 (mantén el número de ticket que te entreguen).
-- **Web:** <a href="https://www.cge.cl/contacto" target="_blank" rel="noopener noreferrer">cge.cl/contacto</a>.
-- **Plazo de respuesta legal:** 5 días hábiles para reclamos simples, 15 días hábiles si hay monto en disputa.
-
-Pide siempre tu número de ticket o folio. Si CGE no te lo entrega, tienes argumento adicional ante SEC por incumplimiento de procedimiento.
+Describe el concepto que quieres revisar, período, monto y cálculo que no coincide. Adjunta la boleta y la referencia utilizada. Pide una explicación y, si se confirma una diferencia, la corrección correspondiente. Guarda el folio y la fecha de tu gestión; no declares contactos que no realizaste.
 
 ### Paso 2: SEC si CGE no responde o rechaza sin fundamento
 
-La **Superintendencia de Electricidad y Combustibles** es el regulador y tiene poder de multa. Tiene un procedimiento de reclamo formal vía web.
-
-- **Web:** <a href="https://www.sec.cl" target="_blank" rel="noopener noreferrer">sec.cl</a>, sección "Reclamos y consultas".
-- **Plazo SEC:** 30 a 60 días según complejidad para resolver.
-- **Multas que puede aplicar:** desde UF 50 a UF 10.000 según gravedad. Si te dan la razón, la empresa además debe reembolsar el monto cobrado de más.
+La [SEC detalla cómo presentar un reclamo](https://www.sec.cl/area-ciudadana/reclamos-y-la-sec/). Indica acudir si no recibes respuesta después de 30 días o si la respuesta no te satisface. Conserva la boleta, el reclamo presentado y la respuesta, si existe. Este canal no supone una devolución o sanción automática.
 
 ### Paso 3: SERNAC para mediación
 
-El **Servicio Nacional del Consumidor** no tiene poder de multa directa sobre CGE (eso es de la SEC), pero sí media en disputas y puede llevar el caso a tribunales si la empresa se niega a una solución razonable.
+Consulta en el [portal de consumidores de SERNAC](https://www.sernac.cl/portal/617/w3-propertyvalue-518.html) el canal apropiado para tu problema de consumo. Si preparas una carta, revisa sus hechos y la solución que pides antes de enviarla.
 
-- **Web:** <a href="https://www.sernac.cl" target="_blank" rel="noopener noreferrer">sernac.cl</a>, sección "Reclamos".
-- **Caso colectivo:** si tu reclamo es parte de un patrón (muchos clientes con el mismo problema), SERNAC puede iniciar acción colectiva.
+<RelatedTool href="/reclamar-sernac" label="Preparar un borrador de reclamo" description="Completa y verifica tus antecedentes. El borrador no se envía automáticamente ni garantiza un resultado." />
 
-<Callout tone="info" title="Tip importante">
-  Si el monto en disputa supera 10 UF (aproximadamente{' '}
-  $ 380.000), también puedes ir directo al Juzgado de Policía Local
-  vía Ley 19.496 sobre Derechos del Consumidor. SERNAC puede asesorarte.
-</Callout>
+## Fuentes y alcance de esta revisión
 
-<Alert variant="info">
-  <Alert.Title>Aplicable también a CONAFE</Alert.Title>
-  <Alert.Body>
-    CONAFE es subsidiaria de CGE y usa el mismo formato de boleta. Los
-    nombres de cargos son idénticos. La única diferencia visible es el
-    RUT empresa en el header.
-  </Alert.Body>
-</Alert>
+Revisión editorial: **25 de septiembre de 2026**. Las referencias de CGE, SEC, SII y SERNAC están enlazadas junto al tema que respaldan. No se ha verificado un precio unitario vigente de CGE para todas las zonas; los ejemplos no sustituyen el tarifario de tu suministro.
+
+Esta revisión retira montos y plazos presentados antes como universales y aclara la diferencia entre costo promedio y precio de un componente. Consulta nuestro [criterio editorial](/sobre#criterio-editorial) o [reporta un error](/contacto).

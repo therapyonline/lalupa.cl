@@ -6,6 +6,12 @@ Registro de actualizaciones de los datasets en `src/data/`. Cada fila refleja el
 
 ---
 
+## 2026-09-25: Alcance tarifario y portada (tercer lote)
+
+- `tarifas.ts`: los importes originales no se revalidaron ni se presentan como vigentes. Metadatos `historico_no_verificado`, uso de simulación y vigencia final desconocida. Se sustituyeron conversiones inseguras de `null` por tipos anulables y validación de entradas. El PDF CGE consultado respondió HTTP 403; no se infirieron nuevos precios.
+- `indicadores.ts`: se retiraron los cuatro indicadores numéricos de portada sin evidencia suficiente (promedio nacional, subsidio, reclamos y variación anual). Ahora contiene recursos editoriales de consumo, tarifa, lectura e historial; no estadísticas ni promedios de una muestra incompleta.
+- No se cambiaron precios, condiciones de subsidio ni otros datasets. Las notas de lanzamiento de abajo se conservan como registro histórico y no acreditan una verificación actual.
+
 ## 2026-05-06: Lanzamiento inicial
 
 Primera versión de los 6 datasets, generada desde la investigación en `~/Desktop/research/` y verificada contra fuentes oficiales chilenas. Todos los archivos llevan su propio bloque `*_METADATA` con `ultimaActualizacion: '2026-05-06'`.
@@ -52,7 +58,7 @@ Agregamos 13 fixtures reales en `src/lib/parsers/__fixtures__/` (texto extraído
 - **`tarifas.ts`**: componentes variables en `null` para varias empresas siguen sin parsearse (no afecta parsers de boleta, los usa el motor de validación, función separada).
 - **Lipigas y Abastible cilindro**: el fixture cubre solo gas por red (medidor). Una boleta de venta directa de cilindro Lipigas/Abastible probablemente requiera un parser adicional con `tipoVenta: 'producto'` (como Gasco GLP).
 
-### Cómo se usa en la app
+### Uso documentado al lanzamiento (histórico; ver revisión del 2026-09-25)
 
 - `empresas.ts` → wizard SERNAC, autocompletado de empresa en formularios, parsers de boleta para resolver el `EmpresaServicio` desde el RUT detectado
 - `tarifas.ts` → motor de validación: compara cargo real de boleta vs cargo esperado (helpers `calcularBoletaEsperada*` y `validarCobro`)

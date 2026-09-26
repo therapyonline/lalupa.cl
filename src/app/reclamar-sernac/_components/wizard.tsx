@@ -26,9 +26,19 @@ import {
 } from '@/lib/sernac/letter'
 import { formatRut, normalizeRut, validateRut } from '@/lib/validators/rut'
 import { cn } from '@/lib/utils'
+import { safeSessionSet, safeSessionRemove } from '@/lib/session-storage'
+import {
+  readSessionDraft,
+  reclamoDraftSchema,
+  reclamoPayloadSchema,
+  reclamoSource,
+  STORAGE_NOTICE,
+  type ReclamoDraft,
+} from '@/lib/storage/wizard-state'
 
 const RECLAMO_KEY = 'lalupa:reclamo'
 const WIZARD_KEY = 'lalupa:reclamo:wizard'
+const PREVIOUS_KEY = 'lalupa:reclamo:wizard:anterior'
 
 const EMPTY: ReclamoFormData = {
   tipoReclamo: '',
@@ -54,7 +64,10 @@ const stepSchemas = {
     tipoReclamo: z
       .string()
       .min(1, 'Elige un tipo de reclamo')
-      .refine((v) => (TIPOS_RECLAMO as readonly string[]).includes(v), 'Opción inválida'),
+      .refine(
+        (v) => (TIPOS_RECLAMO as readonly string[]).includes(v),
+        'Opción inválida',
+      ),
   }),
   2: z.object({
     nombre: z.string().min(2, 'Mínimo 2 caracteres').max(120),
@@ -71,11 +84,10 @@ const stepSchemas = {
     empresaRut: z
       .string()
       .min(1, 'Ingresa el RUT de la empresa')
-      .refine(
-        (v) => /^[\dkK.\-]+$/.test(v),
-        'Solo dígitos, puntos y guion',
-      ),
-    empresaDireccion: z.string().min(5, 'Ingresa una dirección de notificación'),
+      .refine((v) => /^[\dkK.\-]+$/.test(v), 'Solo dígitos, puntos y guion'),
+    empresaDireccion: z
+      .string()
+      .min(5, 'Ingresa una dirección de notificación'),
   }),
   4: z.object({
     hechos: z
@@ -97,11 +109,6 @@ const STEPS: Array<{ n: StepNumber; label: string }> = [
   { n: 5, label: 'Petición' },
 ]
 
-interface PersistedState {
-  step: StepNumber
-  data: ReclamoFormData
-}
-
 function buildPrefill(payload: ReclamoBoletaPayload): Partial<ReclamoFormData> {
   const empresa = getEmpresa(payload.empresaSlug)
   return {
@@ -119,6 +126,11 @@ export function Wizard() {
   const [data, setData] = useState<ReclamoFormData>(EMPTY)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [hydrated, setHydrated] = useState(false)
+  const [source, setSource] = useState<string | null>(null)
+  const [previous, setPrevious] = useState<ReclamoDraft | null>(null)
+  const [draftNotice, setDraftNotice] = useState<string | null>(null)
+  const [storageWarning, setStorageWarning] = useState(false)
+  const pdfGeneration = useRef(0)
   const [pdfStatus, setPdfStatus] = useState<
     | { kind: 'idle' }
     | { kind: 'generating' }
@@ -130,51 +142,101 @@ export function Wizard() {
   )
 
   useEffect(() => {
-    // Hidratación desde sessionStorage: el wizard preserva pasos previos
-    // y/o pre-llena con datos del result-view anterior. One-shot en mount.
-    /* eslint-disable react-hooks/set-state-in-effect */
-    const wizardRaw = sessionStorage.getItem(WIZARD_KEY)
-    if (wizardRaw) {
+    let cancelled = false
+    async function restore() {
+      const saved = readSessionDraft(WIZARD_KEY, reclamoDraftSchema)
+      const incoming = readSessionDraft(RECLAMO_KEY, reclamoPayloadSchema)
+      let incomingSource: string | null = null
       try {
-        const parsed = JSON.parse(wizardRaw) as PersistedState
-        if (parsed.data && typeof parsed.step === 'number') {
-          setData({ ...EMPTY, ...parsed.data })
-          setStep(parsed.step)
-          setHydrated(true)
-          return
+        if (incoming.data) incomingSource = await reclamoSource(incoming.data)
+      } catch {
+        /* Sin crypto, la boleta entrante se considera nueva. */
+      }
+      if (cancelled) return
+      setDraftNotice(saved.notice ?? incoming.notice ?? null)
+      setPrevious(readSessionDraft(PREVIOUS_KEY, reclamoDraftSchema).data)
+      if (
+        incoming.data &&
+        (!saved.data || !incomingSource || saved.data.source !== incomingSource)
+      ) {
+        if (saved.data) {
+          setPrevious(saved.data)
+          try {
+            safeSessionSet(PREVIOUS_KEY, JSON.stringify(saved.data))
+          } catch {
+            setStorageWarning(true)
+          }
+          setDraftNotice(
+            'Cargamos una boleta distinta. Conservamos tus datos personales y el borrador anterior; revisa la empresa, los hechos y la petición.',
+          )
         }
-      } catch {
-        // ignore corrupt state
+        const personal = saved.data?.data
+        setData({
+          ...EMPTY,
+          ...(personal
+            ? {
+                nombre: personal.nombre,
+                rut: personal.rut,
+                email: personal.email,
+                telefono: personal.telefono,
+                direccion: personal.direccion,
+              }
+            : {}),
+          ...buildPrefill(incoming.data),
+        })
+        setSource(incomingSource)
+      } else if (saved.data) {
+        setData(saved.data.data)
+        setStep(saved.data.step)
+        setSource(saved.data.source ?? null)
       }
+      setHydrated(true)
     }
-
-    const reclamoRaw = sessionStorage.getItem(RECLAMO_KEY)
-    if (reclamoRaw) {
-      try {
-        const payload = JSON.parse(reclamoRaw) as ReclamoBoletaPayload
-        const prefill = buildPrefill(payload)
-        setData((prev) => ({ ...prev, ...prefill }))
-      } catch {
-        // ignore
-      }
+    void restore()
+    return () => {
+      cancelled = true
     }
-    setHydrated(true)
-    /* eslint-enable react-hooks/set-state-in-effect */
   }, [])
 
   useEffect(() => {
     if (!hydrated) return
-    sessionStorage.setItem(
-      WIZARD_KEY,
-      JSON.stringify({ step, data } satisfies PersistedState),
-    )
-  }, [step, data, hydrated])
+    try {
+      safeSessionSet(
+        WIZARD_KEY,
+        JSON.stringify({
+          version: 2,
+          source,
+          step,
+          data,
+        } satisfies ReclamoDraft),
+      )
+    } catch {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- El efecto informa un fallo de persistencia externo.
+      setStorageWarning(true)
+    }
+  }, [step, data, source, hydrated])
+
+  const pdfUrl = pdfStatus.kind === 'ready' ? pdfStatus.url : null
+  useEffect(
+    () => () => {
+      if (pdfUrl) URL.revokeObjectURL(pdfUrl)
+    },
+    [pdfUrl],
+  )
+  useEffect(
+    () => () => {
+      pdfGeneration.current++
+    },
+    [],
+  )
 
   function updateField<K extends keyof ReclamoFormData>(
     key: K,
     value: ReclamoFormData[K],
   ) {
     setData((d) => ({ ...d, [key]: value }))
+    pdfGeneration.current++
+    setPdfStatus({ kind: 'idle' })
     setErrors((e) => {
       if (!e[key as string]) return e
       const next = { ...e }
@@ -292,7 +354,8 @@ export function Wizard() {
   // que el reclamo no salga con huecos visibles.
   function tienePlaceholdersSinCompletar(): string | null {
     const corchetes = /\[[^\]]+\]/
-    const frases = /no\s+detectad[oa]|completar\s+(?:el|la|aqu[íi])|\(completar\)/i
+    const frases =
+      /no\s+detectad[oa]|completar\s+(?:el|la|aqu[íi])|\(completar\)/i
     for (const campo of [data.hechos ?? '', data.peticion ?? '']) {
       if (corchetes.test(campo) || frases.test(campo)) {
         return 'Tu reclamo tiene partes sin completar (marcadas con corchetes o "no detectado"). Revisa los pasos de Hechos y Petición y reemplaza esos espacios antes de generar el documento.'
@@ -315,12 +378,15 @@ export function Wizard() {
       return
     }
     setPdfStatus({ kind: 'generating' })
+    const generation = ++pdfGeneration.current
     try {
       const blob = await buildLetterPdf(data)
+      if (generation !== pdfGeneration.current) return
       const url = URL.createObjectURL(blob)
       const filename = `reclamo-sernac-${new Date().toISOString().slice(0, 10)}.pdf`
       setPdfStatus({ kind: 'ready', url, filename })
     } catch (err) {
+      if (generation !== pdfGeneration.current) return
       setPdfStatus({
         kind: 'error',
         message:
@@ -348,11 +414,37 @@ export function Wizard() {
   }
 
   function handleReset() {
-    sessionStorage.removeItem(WIZARD_KEY)
+    pdfGeneration.current++
+    for (const key of [WIZARD_KEY, RECLAMO_KEY, PREVIOUS_KEY])
+      safeSessionRemove(key)
+    setSource(null)
+    setPrevious(null)
+    setDraftNotice(null)
     setData(EMPTY)
     setStep(1)
     setErrors({})
     setPdfStatus({ kind: 'idle' })
+  }
+
+  function restorePrevious() {
+    if (!previous) return
+    pdfGeneration.current++
+    const current: ReclamoDraft = { version: 2, step, data, source }
+    try {
+      safeSessionSet(PREVIOUS_KEY, JSON.stringify(current))
+    } catch {
+      setStorageWarning(true)
+    }
+    safeSessionRemove(RECLAMO_KEY)
+    setData(previous.data)
+    setStep(previous.step)
+    setSource(previous.source ?? null)
+    setPrevious(current)
+    setErrors({})
+    setPdfStatus({ kind: 'idle' })
+    setDraftNotice(
+      'Recuperamos el borrador anterior. Revisa su contenido antes de generar la carta.',
+    )
   }
 
   return (
@@ -378,6 +470,16 @@ export function Wizard() {
             . Todo se arma en tu navegador.
           </p>
           <Stepper current={step} />
+          {(draftNotice || storageWarning) && (
+            <div className="mt-6" role="status">
+              <p>{storageWarning ? STORAGE_NOTICE : draftNotice}</p>
+            </div>
+          )}
+          {previous && (
+            <Button variant="ghost" className="mt-4" onClick={restorePrevious}>
+              Recuperar borrador anterior
+            </Button>
+          )}
         </Container>
       </section>
 
@@ -460,11 +562,7 @@ export function Wizard() {
                       ? 'Generando…'
                       : 'Generar PDF'}
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="md"
-                    onClick={handleCopyText}
-                  >
+                  <Button variant="ghost" size="md" onClick={handleCopyText}>
                     {copyStatus === 'copied'
                       ? 'Copiado ✓'
                       : copyStatus === 'error'
@@ -761,9 +859,7 @@ function Step4({
 }) {
   return (
     <div>
-      <h2 className="text-2xl font-medium tracking-tight text-ink">
-        Hechos
-      </h2>
+      <h2 className="text-2xl font-medium tracking-tight text-ink">Hechos</h2>
       <p className="mt-2 text-body">
         Pre-armamos un texto base con los datos de tu boleta. Edítalo si hace
         falta, es lo que SERNAC va a leer primero.
@@ -791,12 +887,8 @@ function Step5({
 }) {
   return (
     <div>
-      <h2 className="text-2xl font-medium tracking-tight text-ink">
-        Petición
-      </h2>
-      <p className="mt-2 text-body">
-        Qué le pides a SERNAC y a la empresa.
-      </p>
+      <h2 className="text-2xl font-medium tracking-tight text-ink">Petición</h2>
+      <p className="mt-2 text-body">Qué le pides a SERNAC y a la empresa.</p>
       <Textarea
         value={value}
         onChange={onChange}

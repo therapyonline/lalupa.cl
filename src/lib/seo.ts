@@ -162,9 +162,11 @@ export function articleSchema(opts: {
     datePublished: opts.publishedAt,
     dateModified: opts.updatedAt,
     inLanguage: 'es-CL',
-    author: opts.author
-      ? { '@type': 'Person', name: opts.author }
-      : { '@type': 'Organization', name: SITE_NAME },
+    author: {
+      '@type': 'Organization',
+      name: opts.author ?? SITE_NAME,
+      url: `${SITE_URL}/sobre#criterio-editorial`,
+    },
     publisher: {
       '@type': 'Organization',
       name: SITE_NAME,
@@ -239,8 +241,8 @@ export function faqPageSchema(qas: ReadonlyArray<{ q: string; a: string }>) {
 }
 
 /**
- * Schema HowTo para instrucciones paso a paso. Google muestra esto
- * como rich result con los pasos numerados y descripciones.
+ * Schema HowTo para describir instrucciones visibles paso a paso.
+ * No implica un resultado enriquecido.
  */
 export function howToSchema(howTo: {
   name: string

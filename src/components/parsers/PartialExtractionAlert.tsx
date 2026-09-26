@@ -1,5 +1,5 @@
 import { Alert } from '@/components/ui/Alert'
-import { isValidDate } from '@/lib/dates'
+import { getExtractionIssues } from '@/lib/parsers/extraction-quality'
 import type { ParsedBoleta } from '@/lib/parsers'
 import { AddPagesButton } from './AddPagesButton'
 
@@ -46,23 +46,7 @@ export function PartialExtractionAlert({
    */
   addAttempts?: number
 }) {
-  const issues: string[] = []
-
-  if (!isValidDate(boleta.periodo.desde) || !isValidDate(boleta.periodo.hasta)) {
-    issues.push('el período facturado')
-  }
-  if (boleta.cargos.length === 0) {
-    issues.push('el detalle de cargos')
-  }
-  if (
-    boleta.servicio !== 'gas' ||
-    boleta.tipoVenta !== 'producto'
-  ) {
-    // Para luz/agua/gas red, esperamos consumo > 0. En cilindros no.
-    if (boleta.consumo && (!boleta.consumo.valor || boleta.consumo.valor === 0)) {
-      issues.push('el consumo del período')
-    }
-  }
+  const issues = getExtractionIssues(boleta)
 
   if (issues.length === 0) return null
 
@@ -85,17 +69,16 @@ export function PartialExtractionAlert({
             <strong className="font-medium">
               PDF original descargado del sitio de la empresa
             </strong>
-            : el texto se procesa al 100% sin pasar por OCR. También
+            : puede ofrecer texto más legible que una foto. También
             puede ayudar usar menos fotos pero más nítidas, sin sombras
             ni recortes.
           </>
         ) : (
           <>
-            Pudimos identificar la empresa y el total, pero no logramos
-            extraer {issuesText}. Si tu boleta tiene el detalle al
+            La lectura necesita que compruebes {issuesText}. Si tu boleta tiene el detalle al
             reverso, agrega esa foto acá abajo. También puedes subir el
             PDF original descargado del sitio de la empresa para
-            análisis completo.
+            intentar una lectura más completa.
           </>
         )}
       </Alert.Body>
@@ -122,10 +105,10 @@ function RawOcrDetails({ text }: { text: string }) {
   return (
     <details className="mt-4 text-xs">
       <summary className="cursor-pointer font-medium text-ink underline-offset-2 hover:underline">
-        Ver texto leído por OCR (debug)
+        Ver texto extraído
       </summary>
       <p className="mt-2 text-soft">
-        Esto es exactamente lo que el OCR leyó de tus fotos. Si los
+        Este es el texto extraído del archivo. Si los
         cargos no aparecen acá, no los podemos detectar; conviene subir
         el PDF original.
       </p>

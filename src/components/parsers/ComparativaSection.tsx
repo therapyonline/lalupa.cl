@@ -7,16 +7,14 @@ import {
   ComparativaSkeleton,
 } from '@/components/parsers/Comparativa'
 import type { ParsedBoleta } from '@/lib/parsers'
-import {
-  type BoletaGuardada,
-  listarBoletas,
-} from '@/lib/storage/historial'
+import { comparableBoletas } from '@/lib/storage/comparable-boletas'
+import { type BoletaGuardada, listarBoletas } from '@/lib/storage/historial'
 
 /**
  * Sección "Histórico {Empresa}" compartida por los 3 result-view.
  *
  * Carga las boletas guardadas del IndexedDB para esta empresa+servicio,
- * deduplica vs la actual (misma fecha de inicio = misma boleta), y
+ * selecciona períodos anteriores del mismo suministro, y
  * renderiza la tabla de Comparativa o un estado vacío con CTA a guardar.
  *
  * Maneja error de carga (IndexedDB corrupta o version mismatch) con un
@@ -36,17 +34,19 @@ export function ComparativaSection({
   const [historicas, setHistoricas] = useState<BoletaGuardada[]>([])
   const [loaded, setLoaded] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
+  const [retry, setRetry] = useState(0)
 
   useEffect(() => {
+    let cancelled = false
     listarBoletas(empresa, actual.servicio)
       .then((all) => {
-        const dedup = all.filter(
-          (b) => b.periodo.desde.getTime() !== actual.periodo.desde.getTime(),
-        )
-        setHistoricas(dedup.slice(-5))
+        if (cancelled) return
+        setHistoricas(comparableBoletas(all, actual))
+        setLoadError(null)
         setLoaded(true)
       })
       .catch((e) => {
+        if (cancelled) return
         setLoadError(
           e instanceof Error
             ? e.message
@@ -55,7 +55,10 @@ export function ComparativaSection({
         setHistoricas([])
         setLoaded(true)
       })
-  }, [empresa, actual.servicio, actual.periodo.desde, refreshTick])
+    return () => {
+      cancelled = true
+    }
+  }, [empresa, actual, refreshTick, retry])
 
   if (!loaded) {
     return (
@@ -85,14 +88,21 @@ export function ComparativaSection({
               No pudimos leer tu histórico
             </h2>
             <p className="mt-3 max-w-md text-body">
-              El navegador rechazó la lectura de IndexedDB. Esto pasa en
-              modo incógnito o si bloqueaste storage para este sitio. Tus
-              datos siguen en tu dispositivo, pero la app no los puede ver
-              en este momento.
+              El navegador no permitió leer el almacenamiento local. Revisa los
+              permisos de este sitio y vuelve a intentar.
             </p>
             <p className="mt-2 max-w-md font-mono text-xs text-soft">
               {loadError}
             </p>
+            <button
+              className="mt-4 text-primary underline"
+              onClick={() => {
+                setLoaded(false)
+                setRetry((n) => n + 1)
+              }}
+            >
+              Reintentar lectura
+            </button>
           </div>
         </Container>
       </section>
@@ -108,12 +118,12 @@ export function ComparativaSection({
               Histórico {empresa}
             </p>
             <h2 className="mt-3 text-2xl font-medium tracking-tight text-ink md:text-3xl">
-              Esta es tu primera boleta acá
+              Aún no hay períodos comparables
             </h2>
             <p className="mx-auto mt-3 max-w-md text-body">
-              Cuando guardes este período en tu histórico (botón de arriba),
-              empezamos a comparar mes a mes y te avisamos si tu cuenta sube
-              sin razón aparente.
+              Guarda tus boletas para comparar períodos anteriores del mismo
+              suministro. Necesitamos fechas y un número de cliente o dirección
+              detectados para evitar mezclar cuentas.
             </p>
           </div>
         </Container>
@@ -131,15 +141,12 @@ export function ComparativaSection({
           Tus últimos {historicas.length + 1} períodos
         </h2>
         <p className="mt-3 max-w-2xl text-body">
-          Comparamos las últimas boletas guardadas contra la actual. Si la
-          actual supera el promedio, la fila queda destacada.
+          Comparamos períodos anteriores del mismo suministro contra la actual.
+          Si hay varias versiones de un período, usamos la última guardada. Si
+          la actual supera el promedio, la fila queda destacada.
         </p>
 
-        <Comparativa
-          className="mt-8"
-          historicas={historicas}
-          actual={actual}
-        />
+        <Comparativa className="mt-8" historicas={historicas} actual={actual} />
       </Container>
     </section>
   )

@@ -10,7 +10,7 @@ import { Comparador } from './_components/comparador'
 export const metadata = buildMetadata({
   title: 'Comparador internet hogar 2026',
   description:
-    'Comparador de planes de internet residencial en Chile: WOM, Movistar, Entel, Claro, VTR, Mundo y GTD. Filtros por velocidad, presupuesto y comuna.',
+    'Compara planes de internet hogar en Chile por velocidad, presupuesto y servicios. Confirma precio y cobertura de tu dirección con cada empresa.',
   path: '/comparador-internet-hogar',
   ogKind: 'tool',
   ogCategory: 'Internet',

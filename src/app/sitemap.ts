@@ -32,12 +32,10 @@ const STATIC_ROUTES: StaticEntry[] = [
 ]
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const now = new Date()
   const guias = await getAllGuias()
 
   const staticEntries: MetadataRoute.Sitemap = STATIC_ROUTES.map((r) => ({
     url: `${SITE_URL}${r.path}`,
-    lastModified: now,
     changeFrequency: r.changeFrequency,
     priority: r.priority,
   }))
@@ -53,7 +51,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const categoriaEntries: MetadataRoute.Sitemap = categoriaSlugs.map(
     (slug) => ({
       url: `${SITE_URL}/guias/categoria/${slug}`,
-      lastModified: now,
+      lastModified: guias
+        .filter((g) => g.category === slug)
+        .map((g) => g.updatedAt)
+        .sort()
+        .at(-1),
       changeFrequency: 'weekly',
       priority: 0.7,
     }),

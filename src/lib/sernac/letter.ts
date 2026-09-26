@@ -79,49 +79,27 @@ export function buildHechosTemplate(payload: ReclamoBoletaPayload): string {
   const fechaEmision = formatFechaEmision(payload.fechaEmision)
   const cargo = payload.cargosSospechosos[0]
   const cargoText = cargo
-    ? `un cargo por "${cargo.concepto}" por ${formatCLP(cargo.monto)} que no corresponde porque ${cargo.razon ?? '[completar motivo]'}`
-    : 'cargos que no corresponden a las tarifas SEC vigentes'
+    ? `un cargo por "${cargo.concepto}" de ${formatCLP(cargo.monto)} que solicito revisar. La lectura orientativa señaló: ${cargo.razon ?? '[completar motivo y antecedentes]'}`
+    : 'conceptos que solicito aclarar: [identificar cargo, monto y motivo]'
   const numeroCliente = payload.numeroCliente
     ? `, asociada a mi número de cliente ${payload.numeroCliente}`
     : ''
 
-  return `Con fecha ${fechaEmision} recibí boleta${numeroCliente} de ${payload.empresaNombre} por servicio de ${payload.servicio} correspondiente al período ${periodo}, por un total de ${formatCLP(payload.total)}.
+  return `Reviso la boleta emitida el ${fechaEmision}${numeroCliente} de ${payload.empresaNombre} por servicio de ${payload.servicio} correspondiente al período ${periodo}, por un total de ${formatCLP(payload.total)}.
 
 En dicha boleta se incluye ${cargoText}.
 
-Solicité aclaración a la empresa pero la respuesta no resolvió el problema, por lo que recurro al SERNAC para iniciar mediación formal en virtud de la Ley 19.496 sobre Protección de los Derechos del Consumidor.`
+[Completar solo las gestiones efectivamente realizadas: fecha, canal, folio y respuesta, si existen.]`
 }
 
 export function buildPeticionTemplate(payload: ReclamoBoletaPayload): string {
-  const sospechosos = payload.cargosSospechosos.filter((c) => c.monto > 0)
+  const conceptos = payload.cargosSospechosos.map((c) => c.concepto).join(', ')
+  const detalle = conceptos ? ` (${conceptos})` : ''
+  return `Solicito que se explique por escrito el cálculo de los conceptos cuestionados${detalle}, indicando cantidades, precios, impuestos y condiciones aplicadas al período de mi boleta.
 
-  // Caso 1: hay cargos sospechosos identificados.
-  if (sospechosos.length > 0) {
-    const total = sospechosos.reduce((sum, c) => sum + c.monto, 0)
-    const montoText = formatCLP(total)
-    const conceptoText =
-      sospechosos.length === 1
-        ? sospechosos[0].concepto
-        : `los siguientes cargos: ${sospechosos.map((c) => c.concepto).join(', ')}`
-    return `Solicito a SERNAC mediar con la empresa para que:
+Si se confirma un error, solicito corregir la facturación y devolver o abonar únicamente la diferencia cobrada en exceso que se determine. El monto completo de un cargo señalado para revisión no representa necesariamente esa diferencia.
 
-1. Se anule el cobro indebido por ${montoText} (${conceptoText}) y se me reembolse en mi próxima boleta.
-2. Se entreguen, por escrito, las disculpas correspondientes y la corrección del cobro.
-3. Se garantice que el sistema de facturación no vuelva a aplicar este cargo de forma indebida.
-
-Adjunto antecedentes de la boleta cuestionada y reservo el derecho de continuar la vía legal en el Juzgado de Policía Local correspondiente si la mediación no resuelve el reclamo (artículos 50 y siguientes de la Ley 19.496).`
-  }
-
-  // Caso 2: no hay cargos sospechosos identificados; el reclamo es
-  // genérico (ej. el usuario detectó un problema que el parser no
-  // marcó automáticamente). Sin placeholders sin resolver.
-  return `Solicito a SERNAC mediar con la empresa para que:
-
-1. Se aclaren por escrito los cargos cuestionados de mi boleta y, si corresponde, se ajusten en una próxima facturación.
-2. Se entregue el detalle completo de las tarifas y unidades aplicadas para verificar que coinciden con las publicadas por el regulador.
-3. Se garantice que cualquier cobro sin respaldo no vuelva a aplicarse.
-
-Adjunto antecedentes de la boleta cuestionada y reservo el derecho de continuar la vía legal en el Juzgado de Policía Local correspondiente si la mediación no resuelve el reclamo (artículos 50 y siguientes de la Ley 19.496).`
+Revisaré y adjuntaré los antecedentes que respalden estos hechos antes de presentar el reclamo.`
 }
 
 export function buildLetterText(form: ReclamoFormData): string {

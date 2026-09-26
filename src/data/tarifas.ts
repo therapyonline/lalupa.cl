@@ -1,22 +1,15 @@
 /**
- * Tarifas vigentes de servicios básicos en Chile, Mayo 2026
+ * Catálogo histórico para simulaciones, NO tarifas vigentes verificadas.
  *
- * ÚLTIMA ACTUALIZACIÓN: 2026-05-06
- * PRÓXIMA REVISIÓN: 2026-08-06 (trimestral)
- * RESPONSABLE: actualizar manualmente desde sec.cl + cne.cl + siss.gob.cl + sitios oficiales de cada distribuidora.
+ * Las cifras se conservaron del dataset original (enero-mayo de 2026).
+ * Revisión de alcance: 2026-09-25. No se confirmaron importes nuevos.
+ * Faltan vigencia final, fuente archivada, zona/red y tratamiento tributario
+ * comprobados por componente. Las fechas y notas son antecedentes pendientes
+ * de cotejo, no evidencia suficiente para validar una boleta.
  *
- * Fuentes:
- *  - CGE: https://www.cge.cl/informacion-comercial/tarifas-y-procesos-tarifarios/tarifa-de-suministro/
- *  - Enel: https://www.enel.cl/es/personas/informacion-util/tarifas-y-regulacion.html
- *  - Chilquinta: https://www.chilquinta.cl/informacion-de-interes/tarifas-vigentes
- *  - SAESA/Frontel: https://www.gruposaesa.cl/saesa/tarifas-vigentes
- *  - SISS (agua): https://www.siss.gob.cl/
- *  - Gas: https://www.sec.cl/precios-de-combustibles/
- *
- * Notas críticas:
- *  - Las tarifas eléctricas en Chile dependen de la (distribuidora, comuna, sector tarifario, tipo de red).
- *    El cargo fijo es bastante constante por distribuidora; el componente $/kWh varía por sector.
- *  - Los valores marcados PENDIENTE deben completarse desde los PDFs descargados en /research/00-fuentes/.
+ * No usar estos helpers aritméticos para marcar cargos como sospechosos.
+ * Una validación requiere el documento oficial aplicable a TODO el período,
+ * sector/grupo, opción, temporada, unidades e impuestos, sin valores inferidos.
  */
 
 // ============================================================================
@@ -27,34 +20,34 @@ export type ServicioBasico = 'electricidad' | 'agua' | 'gas';
 
 export interface TarifaElectricaBT1 {
   /** Cargo fijo mensual independiente del consumo (CLP/mes, IVA incluido) */
-  cargoFijoCLP: number;
+  cargoFijoCLP: number | null;
   /** Cargo por uso del sistema de transmisión (CLP/kWh, IVA incluido) */
-  cargoTransmisionCLPKWh: number;
+  cargoTransmisionCLPKWh: number | null;
   /** Cargo por servicio público / FET (CLP/kWh, sin IVA) */
-  cargoServicioPublicoCLPKWh: number;
+  cargoServicioPublicoCLPKWh: number | null;
   /** Cargo por compras de potencia (CLP/kWh, IVA incluido) */
-  cargoComprasPotenciaCLPKWh: number;
+  cargoComprasPotenciaCLPKWh: number | null;
   /** Cargo por energía base / componente principal (CLP/kWh, IVA incluido) */
-  cargoEnergiaCLPKWh: number;
+  cargoEnergiaCLPKWh: number | null;
   /** Cargo por potencia base en su componente de distribución (CLP/kWh, IVA incluido) */
-  cargoPotenciaBaseCLPKWh: number;
+  cargoPotenciaBaseCLPKWh: number | null;
   /** Costo total estimado por kWh (suma de todos los cargos variables) */
-  precioKWhTotalCLP: number;
+  precioKWhTotalCLP: number | null;
   vigenciaDesde: string; // ISO YYYY-MM-DD
   fuente: string;
   notas?: string;
 }
 
 export interface TarifaAguaPotable {
-  cargoFijoCLP: number;
+  cargoFijoCLP: number | null;
   /** Precio agua potable fuera de período punta (CLP/m³) */
-  aguaPotableNoPuntaCLPM3: number;
+  aguaPotableNoPuntaCLPM3: number | null;
   /** Precio agua potable en período punta verano (CLP/m³) */
-  aguaPotablePuntaCLPM3: number;
+  aguaPotablePuntaCLPM3: number | null;
   /** Sobreconsumo agua potable punta, penalty (CLP/m³) */
-  sobreconsumoPuntaCLPM3: number;
+  sobreconsumoPuntaCLPM3: number | null;
   /** Cargo alcantarillado (CLP/m³) */
-  alcantarilladoCLPM3: number;
+  alcantarilladoCLPM3: number | null;
   /** Período punta del año, formato MM-MM */
   periodoPunta: string;
   vigenciaDesde: string;
@@ -79,7 +72,7 @@ export interface TarifaGasCilindro {
 
 /**
  * Cargo fijo BT-1 por distribuidora (CLP/mes, IVA incluido).
- * Es el componente más estable y útil para validación rápida.
+ * Referencia histórica; no habilita validación automática por empresa.
  */
 export const CARGO_FIJO_BT1_2026: Record<string, number> = {
   enel: 716.27, // Neto $601.908 + IVA
@@ -138,39 +131,39 @@ export const TARIFAS_BT1_2026: Record<string, TarifaElectricaBT1> = {
   },
   chilquinta_urbano: {
     cargoFijoCLP: 1225.80,
-    cargoTransmisionCLPKWh: null as unknown as number, // PENDIENTE
+    cargoTransmisionCLPKWh: null, // PENDIENTE
     cargoServicioPublicoCLPKWh: 0.855,
-    cargoComprasPotenciaCLPKWh: null as unknown as number,
-    cargoEnergiaCLPKWh: null as unknown as number,
-    cargoPotenciaBaseCLPKWh: null as unknown as number,
-    precioKWhTotalCLP: null as unknown as number,
+    cargoComprasPotenciaCLPKWh: null,
+    cargoEnergiaCLPKWh: null,
+    cargoPotenciaBaseCLPKWh: null,
+    precioKWhTotalCLP: null,
     vigenciaDesde: '2026-05-01',
     fuente: 'https://a.storyblok.com/f/82872/x/3d952e70c1/suministro_chilquinta_202605.pdf',
-    notas: 'PENDIENTE: parsear PDF Chilquinta para llenar componentes variables. Estimación total ~190-220 $/kWh.',
+    notas: 'PENDIENTE: parsear PDF Chilquinta para llenar componentes variables.',
   },
   saesa_default: {
     cargoFijoCLP: 1201.26,
-    cargoTransmisionCLPKWh: null as unknown as number,
+    cargoTransmisionCLPKWh: null,
     cargoServicioPublicoCLPKWh: 0.855,
-    cargoComprasPotenciaCLPKWh: null as unknown as number,
-    cargoEnergiaCLPKWh: null as unknown as number,
-    cargoPotenciaBaseCLPKWh: null as unknown as number,
-    precioKWhTotalCLP: null as unknown as number,
+    cargoComprasPotenciaCLPKWh: null,
+    cargoEnergiaCLPKWh: null,
+    cargoPotenciaBaseCLPKWh: null,
+    precioKWhTotalCLP: null,
     vigenciaDesde: '2026-01-01',
     fuente: 'https://www.gruposaesa.cl/saesa/tarifas-vigentes',
-    notas: 'PENDIENTE: descargar XLSX 2026.05 desde gruposaesa.cl. Recargo invierno aplica abril-septiembre.',
+    notas: 'PENDIENTE: descargar XLSX 2026.05 desde gruposaesa.cl.',
   },
   frontel_default: {
     cargoFijoCLP: 1268.82,
-    cargoTransmisionCLPKWh: null as unknown as number,
+    cargoTransmisionCLPKWh: null,
     cargoServicioPublicoCLPKWh: 0.855,
-    cargoComprasPotenciaCLPKWh: null as unknown as number,
-    cargoEnergiaCLPKWh: null as unknown as number,
-    cargoPotenciaBaseCLPKWh: null as unknown as number,
-    precioKWhTotalCLP: null as unknown as number,
+    cargoComprasPotenciaCLPKWh: null,
+    cargoEnergiaCLPKWh: null,
+    cargoPotenciaBaseCLPKWh: null,
+    precioKWhTotalCLP: null,
     vigenciaDesde: '2026-02-01',
     fuente: 'https://www.gruposaesa.cl/frontel/tarifas-vigentes',
-    notas: 'PENDIENTE: descargar XLSX más reciente. Recargo invierno aplica abril-septiembre.',
+    notas: 'PENDIENTE: descargar XLSX más reciente.',
   },
 };
 
@@ -191,22 +184,22 @@ export const TARIFAS_AGUA_2026: Record<string, TarifaAguaPotable> = {
     notas: 'Cubre Gran Santiago, Pirque, Til Til y sectores específicos La Florida/Puente Alto.',
   },
   aguas_andinas_g2: {
-    cargoFijoCLP: null as unknown as number,
-    aguaPotableNoPuntaCLPM3: null as unknown as number,
-    aguaPotablePuntaCLPM3: null as unknown as number,
-    sobreconsumoPuntaCLPM3: null as unknown as number,
-    alcantarilladoCLPM3: null as unknown as number,
+    cargoFijoCLP: null,
+    aguaPotableNoPuntaCLPM3: null,
+    aguaPotablePuntaCLPM3: null,
+    sobreconsumoPuntaCLPM3: null,
+    alcantarilladoCLPM3: null,
     periodoPunta: '12-03',
     vigenciaDesde: '2026-03-01',
     fuente: 'https://www.siss.gob.cl/589/articles-4625_Andinas_G2_Feb2026.pdf',
     notas: 'PENDIENTE: parsear PDF Grupo 2 (otras localidades RM).',
   },
   esval: {
-    cargoFijoCLP: null as unknown as number,
-    aguaPotableNoPuntaCLPM3: null as unknown as number,
-    aguaPotablePuntaCLPM3: null as unknown as number,
-    sobreconsumoPuntaCLPM3: null as unknown as number,
-    alcantarilladoCLPM3: null as unknown as number,
+    cargoFijoCLP: null,
+    aguaPotableNoPuntaCLPM3: null,
+    aguaPotablePuntaCLPM3: null,
+    sobreconsumoPuntaCLPM3: null,
+    alcantarilladoCLPM3: null,
     periodoPunta: '12-03',
     vigenciaDesde: '2025-10-01',
     fuente: 'https://www.siss.gob.cl/589/articles-4503_ESVAL_GPC_Oct2025.pdf',
@@ -258,7 +251,7 @@ export const TARIFAS_GAS_CILINDROS_2026: TarifaGasCilindro[] = [
 // ============================================================================
 
 /**
- * Devuelve la tarifa BT-1 vigente para una clave de zona/distribuidora.
+ * Devuelve una referencia BT-1 histórica, sin comprobar vigencia ni aplicabilidad.
  * Si no encuentra match, devuelve null.
  */
 export function getTarifaElectrica(claveZona: string): TarifaElectricaBT1 | null {
@@ -274,7 +267,7 @@ export function getCargoFijoBT1(distribuidora: string): number | null {
 }
 
 /**
- * Calcula la boleta esperada de electricidad BT-1 dado un consumo en kWh.
+ * Simulación con el catálogo histórico de electricidad BT-1, sin validar aplicabilidad.
  * Retorna desglose por componente y total.
  */
 export interface DesgloseBoletaElectrica {
@@ -293,9 +286,11 @@ export function calcularBoletaEsperadaElectricidad(
   kWhConsumidos: number,
 ): DesgloseBoletaElectrica | null {
   const t = getTarifaElectrica(claveZona);
-  if (!t) return null;
-  // Verificar que los componentes variables estén disponibles
+  if (!t || !Number.isFinite(kWhConsumidos) || kWhConsumidos < 0) return null;
+  // No convertir referencias ausentes a cero.
   if (
+    t.cargoFijoCLP == null ||
+    t.cargoServicioPublicoCLPKWh == null ||
     t.cargoTransmisionCLPKWh == null ||
     t.cargoComprasPotenciaCLPKWh == null ||
     t.cargoEnergiaCLPKWh == null ||
@@ -303,6 +298,9 @@ export function calcularBoletaEsperadaElectricidad(
   ) {
     return null;
   }
+  if (![t.cargoFijoCLP, t.cargoTransmisionCLPKWh, t.cargoServicioPublicoCLPKWh,
+    t.cargoComprasPotenciaCLPKWh, t.cargoEnergiaCLPKWh, t.cargoPotenciaBaseCLPKWh]
+    .every((value) => Number.isFinite(value) && value >= 0)) return null;
   const cargoFijo = t.cargoFijoCLP;
   const cargoTransmision = t.cargoTransmisionCLPKWh * kWhConsumidos;
   const cargoServicioPublico = t.cargoServicioPublicoCLPKWh * kWhConsumidos;
@@ -329,7 +327,7 @@ export function calcularBoletaEsperadaElectricidad(
 }
 
 /**
- * Calcula la boleta esperada de agua dado consumo en m³.
+ * Simulación con el catálogo histórico de agua, sin validar aplicabilidad.
  */
 export interface DesgloseBoletaAgua {
   cargoFijo: number;
@@ -347,12 +345,19 @@ export function calcularBoletaEsperadaAgua(
   esPeriodoPunta: boolean = false,
 ): DesgloseBoletaAgua | null {
   const t = TARIFAS_AGUA_2026[claveSanitaria];
-  if (!t || t.cargoFijoCLP == null) return null;
+  if (!t || t.cargoFijoCLP == null || t.alcantarilladoCLPM3 == null ||
+      t.sobreconsumoPuntaCLPM3 == null ||
+      !Number.isFinite(m3Consumidos) || m3Consumidos < 0 ||
+      !Number.isFinite(m3LimitePunta) || m3LimitePunta < 0) return null;
 
   const cargoFijo = t.cargoFijoCLP;
   const precioAgua = esPeriodoPunta ? t.aguaPotablePuntaCLPM3 : t.aguaPotableNoPuntaCLPM3;
-  const m3Normal = Math.min(m3Consumidos, m3LimitePunta || m3Consumidos);
-  const m3Sobre = esPeriodoPunta ? Math.max(0, m3Consumidos - m3LimitePunta) : 0;
+  if (precioAgua == null || ![cargoFijo, precioAgua, t.alcantarilladoCLPM3,
+    t.sobreconsumoPuntaCLPM3].every((value) => Number.isFinite(value) && value >= 0)) return null;
+  // Sin límite conocido no inferir sobreconsumo ni cobrar dos veces el volumen.
+  const aplicaLimite = esPeriodoPunta && m3LimitePunta > 0;
+  const m3Normal = aplicaLimite ? Math.min(m3Consumidos, m3LimitePunta) : m3Consumidos;
+  const m3Sobre = aplicaLimite ? Math.max(0, m3Consumidos - m3LimitePunta) : 0;
 
   const agua = precioAgua * m3Normal;
   const sobreconsumo = t.sobreconsumoPuntaCLPM3 * m3Sobre;
@@ -370,7 +375,7 @@ export function calcularBoletaEsperadaAgua(
 }
 
 /**
- * Devuelve el precio promedio de un cilindro de gas en la región dada.
+ * Promedia las entradas históricas del catálogo; no es una cotización actual.
  */
 export function getPrecioCilindroGas(
   formato: TarifaGasCilindro['formato'],
@@ -392,12 +397,12 @@ export function getPrecioCilindroGas(
 
 /**
  * Compara un cobro real contra el rango esperado.
- * Útil para el detector de sobre-cobros de lalupa.cl.
+ * Comparación aritmética: el llamador debe acreditar la aplicabilidad de la referencia.
  */
 export interface ResultadoValidacion {
   estaDentroDelRango: boolean;
   desviacionPct: number; // % de desviación del valor real vs esperado
-  alerta: 'ok' | 'sospechoso' | 'cobro_indebido_probable';
+  alerta: 'ok' | 'sospechoso' | 'diferencia_alta' | 'diferencia_a_favor' | 'sin_referencia';
   mensaje: string;
 }
 
@@ -406,12 +411,13 @@ export function validarCobro(
   valorEsperado: number,
   toleranciaPct: number = 5,
 ): ResultadoValidacion {
-  if (valorEsperado <= 0) {
+  if (!Number.isFinite(valorReal) || !Number.isFinite(valorEsperado) ||
+      !Number.isFinite(toleranciaPct) || toleranciaPct < 0 || valorEsperado <= 0) {
     return {
       estaDentroDelRango: false,
       desviacionPct: 0,
-      alerta: 'sospechoso',
-      mensaje: 'No hay valor esperado de referencia para este cobro.',
+      alerta: 'sin_referencia',
+      mensaje: 'No hay valor esperado o datos válidos para comparar este cobro.',
     };
   }
   const desviacionPct = ((valorReal - valorEsperado) / valorEsperado) * 100;
@@ -422,6 +428,14 @@ export function validarCobro(
       desviacionPct,
       alerta: 'ok',
       mensaje: `El cobro está dentro del rango esperado (±${toleranciaPct}%).`,
+    };
+  }
+  if (desviacionPct < 0) {
+    return {
+      estaDentroDelRango: false,
+      desviacionPct,
+      alerta: 'diferencia_a_favor',
+      mensaje: `El cobro está bajo la referencia en ${absDesviacion.toFixed(1)}%. No indica un sobrecobro.`,
     };
   }
   if (absDesviacion <= 20) {
@@ -435,8 +449,8 @@ export function validarCobro(
   return {
     estaDentroDelRango: false,
     desviacionPct,
-    alerta: 'cobro_indebido_probable',
-    mensaje: `El cobro está ${desviacionPct > 0 ? 'sobre' : 'bajo'} lo esperado en ${absDesviacion.toFixed(1)}%. Probable cobro indebido, generar reclamo SERNAC.`,
+    alerta: 'diferencia_alta',
+    mensaje: `El cobro está ${desviacionPct > 0 ? 'sobre' : 'bajo'} lo esperado en ${absDesviacion.toFixed(1)}%. Confirma período, zona, impuestos y tarifa antes de concluir que existe un error.`,
   };
 }
 
@@ -446,8 +460,11 @@ export function validarCobro(
 
 export const TARIFAS_METADATA = {
   ultimaActualizacion: '2026-05-06',
-  proximaRevision: '2026-08-06',
-  version: '0.1.0',
+  revisionDeAlcance: '2026-09-25',
+  estado: 'historico_no_verificado',
+  uso: 'simulacion',
+  vigenciaHasta: null,
+  version: '0.2.0',
   fuentesConsultadas: [
     'https://www.cge.cl/informacion-comercial/tarifas-y-procesos-tarifarios/tarifa-de-suministro/',
     'https://www.enel.cl/es/personas/informacion-util/tarifas-y-regulacion.html',
@@ -460,6 +477,8 @@ export const TARIFAS_METADATA = {
     'https://www.sec.cl/precios-de-combustibles/',
   ],
   pendientes: [
+    'Archivar y cotejar fuentes oficiales por componente (importes no revalidados)',
+    'Acreditar vigencia completa, zona/red/grupo, opción, temporada e impuestos antes de comparar',
     'Parsear todas las comunas RM de Enel (33 comunas × 6 áreas × 4 redes)',
     'Parsear Chilquinta completo por comuna',
     'Descargar XLSX más reciente de SAESA y Frontel',

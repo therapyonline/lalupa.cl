@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import type { ParsedBoleta } from '@/lib/parsers'
 import { guardarBoleta } from '@/lib/storage/historial'
@@ -8,7 +8,7 @@ import { guardarBoleta } from '@/lib/storage/historial'
 /**
  * Botón "Guardar en mi histórico" compartido entre los 3 result-view
  * (luz/agua/gas). Internamente llama a `guardarBoleta` que ahora usa
- * id determinístico (empresa + servicio + período + total): doble click
+ * huella del contenido y del suministro: doble click
  * o re-guardar la misma boleta no genera duplicados.
  *
  * Si IndexedDB rechaza por cuota llena, muestra mensaje accionable
@@ -21,23 +21,31 @@ export function SaveButton({
   boleta: ParsedBoleta
   onSaved?: () => void
 }) {
-  const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>(
-    'idle',
-  )
-  const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [result, setResult] = useState<{
+    boleta: ParsedBoleta
+    status: 'saving' | 'saved' | 'error'
+    error?: string
+  } | null>(null)
+  const status = result?.boleta === boleta ? result.status : 'idle'
+  const errorMsg = result?.boleta === boleta ? result.error : undefined
+  const generation = useRef(0)
 
   async function handleSave() {
-    setStatus('saving')
-    setErrorMsg(null)
+    const request = ++generation.current
+    setResult({ boleta, status: 'saving' })
     try {
       await guardarBoleta(boleta)
-      setStatus('saved')
+      if (request !== generation.current) return
+      setResult({ boleta, status: 'saved' })
       onSaved?.()
     } catch (err) {
-      setErrorMsg(
-        err instanceof Error ? err.message : 'Error guardando en histórico.',
-      )
-      setStatus('error')
+      if (request !== generation.current) return
+      setResult({
+        boleta,
+        status: 'error',
+        error:
+          err instanceof Error ? err.message : 'Error guardando en histórico.',
+      })
     }
   }
 

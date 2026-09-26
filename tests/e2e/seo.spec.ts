@@ -1,3 +1,4 @@
+import { PARSER_ASSETS } from '../../src/generated/parser-assets'
 import { expect, test } from '@playwright/test'
 
 interface RouteSpec {
@@ -315,11 +316,11 @@ test.describe('SEO metadata', () => {
   test('Tesseract OCR assets are self-hosted and served from same origin', async ({
     request,
   }) => {
-    const worker = await request.get('/tesseract/worker.min.js')
+    const worker = await request.get(`${PARSER_ASSETS.ocrBase}/worker.min.js`)
     expect(worker.ok()).toBe(true)
     expect(worker.headers()['content-type']).toMatch(/javascript/)
 
-    const lang = await request.get('/tesseract/lang/spa.traineddata.gz')
+    const lang = await request.get(`${PARSER_ASSETS.ocrBase}/lang/spa.traineddata.gz`)
     expect(lang.ok()).toBe(true)
     // Spanish traineddata is a gzipped binary (~8MB)
     const buf = await lang.body()
@@ -348,9 +349,8 @@ test.describe('SEO metadata', () => {
     const body = await res.text()
     expect(body).toMatch(/User-Agent:\s*\*/i)
     expect(body).toMatch(/Allow:\s*\//i)
-    // Private routes should be disallowed
-    expect(body).toMatch(/Disallow:\s*\/tracker/i)
-    expect(body).toMatch(/Disallow:\s*\/boleta-(luz|agua|gas)/i)
+    // El crawler debe poder leer el noindex de resultados y tracker.
+    expect(body).not.toMatch(/Disallow:\s*\/(?:tracker|boleta-)/i)
     // Sitemap reference
     expect(body).toMatch(/Sitemap:\s*https:\/\/lalupa\.cl\/sitemap\.xml/i)
   })

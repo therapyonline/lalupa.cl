@@ -81,3 +81,19 @@ describe('aguasandinasParser.parse', () => {
     expect(r.servicio).toBe('agua')
   })
 })
+
+
+describe('alerta de reposición: no usar el propio nombre del cargo como contexto', () => {
+  it('pide desglose cuando no hay referencia a corte', () => {
+    const result = parseAguasAndinas(AGUASANDINAS_NORMAL + '\nReposición de servicio $ 8.000\n')
+    const charge = result.cargos.find((item) => item.concepto === 'Reposición')
+    expect(charge?.monto).toBe(8000)
+    expect(charge?.sospechoso).toBe(true)
+  })
+  it('no marca la reposición cuando el documento informa un corte', () => {
+    const result = parseAguasAndinas(AGUASANDINAS_NORMAL + '\nCorte de suministro 10/03/2026\nReposición de servicio $ 8.000\n')
+    const charge = result.cargos.find((item) => item.concepto === 'Reposición')
+    expect(charge?.monto).toBe(8000)
+    expect(charge?.sospechoso).toBeFalsy()
+  })
+})

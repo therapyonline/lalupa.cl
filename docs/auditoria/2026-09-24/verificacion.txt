@@ -1,0 +1,304 @@
+Fecha: 2026-09-24
+Commit: 7976a8d
+Node: 22.22.1; pnpm: 10.33.4
+
+## build
+
+> lalupa@0.1.0 build /Users/estebanlorca/Projects/lalupa.cl
+> next build
+
+Warning: Custom Cache-Control headers detected for the following routes:
+  - /_next/static/media/:path*
+
+Setting a custom Cache-Control header can break Next.js development behavior.
+▲ Next.js 16.2.5 (Turbopack)
+- Experiments (use with caution):
+  ✓ inlineCss
+  · optimizePackageImports
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 2.2s
+  Running TypeScript ...
+  Finished TypeScript in 2.6s ...
+  Collecting page data using 9 workers ...
+⚠ Using edge runtime on a page currently disables static generation for that page
+  Generating static pages using 9 workers (0/41) ...
+  Generating static pages using 9 workers (10/41)
+  Generating static pages using 9 workers (20/41)
+  Generating static pages using 9 workers (30/41)
+✓ Generating static pages using 9 workers (41/41) in 517ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /api/health
+├ ƒ /api/og
+├ ○ /boleta-agua
+├ ƒ /boleta-agua/[empresa]
+├ ○ /boleta-gas
+├ ƒ /boleta-gas/[empresa]
+├ ○ /boleta-luz
+├ ƒ /boleta-luz/[empresa]
+├ ○ /como-funciona
+├ ○ /comparador-internet-hogar
+├ ○ /contacto
+├ ○ /guias
+├ ● /guias/[slug]
+│ ├ /guias/calefont-gas-elegir-potencia-ahorrar
+│ ├ /guias/cambiar-comercializadora-electrica-chile
+│ ├ /guias/como-leer-boleta-agua
+│ └ [+13 more paths]
+├ ● /guias/categoria/[categoria]
+│ ├ /guias/categoria/luz
+│ ├ /guias/categoria/agua
+│ ├ /guias/categoria/gas
+│ └ [+2 more paths]
+├ ƒ /guias/rss.xml
+├ ○ /manifest.webmanifest
+├ ○ /privacidad
+├ ○ /reclamar-sernac
+├ ○ /robots.txt
+├ ○ /sitemap.xml
+├ ○ /sobre
+├ ○ /subsidio-electrico
+├ ○ /terminos
+└ ○ /tracker
+
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand
+
+
+## lint
+
+> lalupa@0.1.0 lint /Users/estebanlorca/Projects/lalupa.cl
+> eslint
+
+
+## coverage
+
+> lalupa@0.1.0 test:coverage /Users/estebanlorca/Projects/lalupa.cl
+> vitest run --coverage
+
+
+ RUN  v4.1.5 /Users/estebanlorca/Projects/lalupa.cl
+      Coverage enabled with v8
+
+
+ Test Files  38 passed (38)
+      Tests  705 passed (705)
+   Start at  15:48:29
+   Duration  1.25s (transform 1.68s, setup 0ms, import 2.90s, tests 483ms, environment 3ms)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   78.99 |    70.87 |   83.13 |   79.82 |
+ parsers           |   67.98 |    67.57 |   77.57 |   67.33 |
+  ...is-legales.ts |   97.36 |     92.3 |     100 |   98.61 | 269,318
+  _helpers.ts      |   94.73 |       79 |   94.73 |   98.44 | 58,171
+  ...preprocess.ts |   31.19 |    19.44 |      50 |   29.47 | 47-107,115-167
+  ocr.ts           |    9.61 |     4.54 |    8.33 |    10.2 | ...83-111,133-187
+  telemetry.ts     |   91.89 |    83.33 |     100 |     100 | 49,71-79,117
+  ...eta-upload.ts |       0 |        0 |       0 |       0 | 1-221
+ parsers/agua      |   88.65 |    68.75 |   85.71 |   89.06 |
+  _siss-family.ts  |   88.75 |    71.73 |     100 |   89.74 | ...08,224,240,271
+  ...-del-valle.ts |   85.71 |      100 |      50 |   85.71 | 37
+  esval.ts         |   88.88 |    61.76 |     100 |   88.88 | 78,98,117-118
+  index.ts         |   61.53 |        0 |       0 |   61.53 | 37-44,57
+  smapa.ts         |   91.89 |       65 |     100 |   91.89 | 86,140-141
+ ...s/electricidad |   94.58 |    84.67 |     100 |   95.02 |
+  _saesa-family.ts |   88.88 |    76.19 |     100 |   88.88 | 88,96,127
+  cge.ts           |   96.92 |    85.41 |     100 |   98.41 | 123
+  chilquinta.ts    |   83.87 |    66.66 |     100 |   83.87 | 82,85,105,121-122
+  enel.ts          |     100 |    95.23 |     100 |     100 | 148
+  index.ts         |   91.66 |       50 |     100 |   91.66 | 37
+ parsers/gas       |   89.94 |    69.75 |   90.47 |    90.3 |
+  abastible.ts     |   86.66 |    68.18 |     100 |   86.66 | 75,95,114-115
+  gasco.ts         |   96.87 |    65.51 |     100 |   96.66 | 97
+  gassur.ts        |   95.23 |       70 |     100 |   95.23 | 65
+  gasvalpo.ts      |   96.55 |    76.92 |     100 |   96.55 | 94
+  index.ts         |   61.53 |        0 |       0 |   61.53 | 34-41,54
+  lipigas.ts       |   86.66 |       64 |     100 |   86.66 | 68,88,107-108
+  metrogas.ts      |    90.9 |    76.31 |     100 |   93.02 | 114,128,168
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 78.99% ( 989/1252 )
+Branches     : 70.87% ( 623/879 )
+Functions    : 83.13% ( 143/172 )
+Lines        : 79.82% ( 910/1140 )
+================================================================================
+ERROR: Coverage for lines (79.82%) does not meet global threshold (80%)
+ERROR: Coverage for statements (78.99%) does not meet global threshold (80%)
+ERROR: Coverage for branches (70.87%) does not meet global threshold (75%)
+ ELIFECYCLE  Command failed with exit code 1.
+
+## e2e
+
+> lalupa@0.1.0 test:e2e /Users/estebanlorca/Projects/lalupa.cl
+> playwright test --workers=2
+
+[WebServer] (node:14764) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:14777) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 89 tests using 2 workers
+
+(node:14784) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:14783) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:14783) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:14784) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [chromium] › tests/e2e/a11y.spec.ts:21:7 › A11y essentials › active nav link has aria-current="page" (174ms)
+  ✓   2 [chromium] › tests/e2e/a11y.spec.ts:4:7 › A11y essentials › skip-to-content link exists, is hidden by default and visible on focus (180ms)
+  ✓   3 [chromium] › tests/e2e/a11y.spec.ts:30:7 › A11y essentials › FileDrop is keyboard reachable and has aria-label (138ms)
+  ✓   5 [chromium] › tests/e2e/a11y.spec.ts:59:7 › A11y essentials › html lang is es-CL on every public route (236ms)
+  ✓   6 [chromium] › tests/e2e/a11y.spec.ts:67:7 › A11y essentials › unknown route returns 404 with branded not-found page (105ms)
+  ✓   7 [chromium] › tests/e2e/a11y.spec.ts:79:7 › A11y essentials › not-found page is noindex (95ms)
+  ✓   8 [chromium] › tests/e2e/a11y.spec.ts:88:7 › A11y essentials › tracker empty state shows CTA + links to the 3 boleta tools (224ms)
+  ✓   9 [chromium] › tests/e2e/a11y.spec.ts:108:7 › A11y essentials › tracker page shows aria-live "Cargando" status while IndexedDB loads (106ms)
+  ✓  10 [chromium] › tests/e2e/a11y.spec.ts:120:7 › A11y essentials › no placeholder href="#" links anywhere in the document (201ms)
+  ✓  11 [chromium] › tests/e2e/all-empresas.spec.ts:161:9 › Result view: 14 empresas con sus fixtures reales › CGE: fixture real → result page renderiza sin error (214ms)
+  ✓  12 [chromium] › tests/e2e/all-empresas.spec.ts:161:9 › Result view: 14 empresas con sus fixtures reales › Enel: fixture real → result page renderiza sin error (179ms)
+  ✓  13 [chromium] › tests/e2e/all-empresas.spec.ts:161:9 › Result view: 14 empresas con sus fixtures reales › SAESA: fixture real → result page renderiza sin error (196ms)
+  ✓  14 [chromium] › tests/e2e/all-empresas.spec.ts:161:9 › Result view: 14 empresas con sus fixtures reales › Frontel: fixture real → result page renderiza sin error (173ms)
+  ✓  15 [chromium] › tests/e2e/all-empresas.spec.ts:161:9 › Result view: 14 empresas con sus fixtures reales › Chilquinta: fixture real → result page renderiza sin error (178ms)
+  ✓  16 [chromium] › tests/e2e/all-empresas.spec.ts:161:9 › Result view: 14 empresas con sus fixtures reales › Aguas Andinas: fixture real → result page renderiza sin error (205ms)
+  ✓  17 [chromium] › tests/e2e/all-empresas.spec.ts:161:9 › Result view: 14 empresas con sus fixtures reales › Esval: fixture real → result page renderiza sin error (168ms)
+  ✓  18 [chromium] › tests/e2e/all-empresas.spec.ts:161:9 › Result view: 14 empresas con sus fixtures reales › ESSBio: fixture real → result page renderiza sin error (175ms)
+  ✓  19 [chromium] › tests/e2e/all-empresas.spec.ts:161:9 › Result view: 14 empresas con sus fixtures reales › Nuevosur: fixture real → result page renderiza sin error (188ms)
+  ✓  20 [chromium] › tests/e2e/all-empresas.spec.ts:161:9 › Result view: 14 empresas con sus fixtures reales › SMAPA: fixture real → result page renderiza sin error (169ms)
+  ✓  21 [chromium] › tests/e2e/all-empresas.spec.ts:161:9 › Result view: 14 empresas con sus fixtures reales › Metrogas: fixture real → result page renderiza sin error (180ms)
+  ✓  22 [chromium] › tests/e2e/all-empresas.spec.ts:161:9 › Result view: 14 empresas con sus fixtures reales › Lipigas: fixture real → result page renderiza sin error (181ms)
+  ✓  23 [chromium] › tests/e2e/all-empresas.spec.ts:161:9 › Result view: 14 empresas con sus fixtures reales › Abastible: fixture real → result page renderiza sin error (175ms)
+  ✓  24 [chromium] › tests/e2e/all-empresas.spec.ts:161:9 › Result view: 14 empresas con sus fixtures reales › Gasco GLP: fixture real → result page renderiza sin error (179ms)
+  ✓  25 [chromium] › tests/e2e/axe.spec.ts:35:9 › axe-core a11y audit › /: zero violaciones WCAG 2.1 AA (860ms)
+  ✓  26 [chromium] › tests/e2e/axe.spec.ts:35:9 › axe-core a11y audit › /boleta-luz: zero violaciones WCAG 2.1 AA (857ms)
+  ✓  27 [chromium] › tests/e2e/axe.spec.ts:35:9 › axe-core a11y audit › /boleta-agua: zero violaciones WCAG 2.1 AA (860ms)
+  ✓  28 [chromium] › tests/e2e/axe.spec.ts:35:9 › axe-core a11y audit › /boleta-gas: zero violaciones WCAG 2.1 AA (853ms)
+  ✓   4 [chromium] › tests/e2e/a11y.spec.ts:37:7 › A11y essentials › every page has a single <main> element (7.9s)
+  ✓  29 [chromium] › tests/e2e/axe.spec.ts:35:9 › axe-core a11y audit › /comparador-internet-hogar: zero violaciones WCAG 2.1 AA (943ms)
+  ✓  30 [chromium] › tests/e2e/axe.spec.ts:35:9 › axe-core a11y audit › /subsidio-electrico: zero violaciones WCAG 2.1 AA (861ms)
+  ✓  31 [chromium] › tests/e2e/axe.spec.ts:35:9 › axe-core a11y audit › /reclamar-sernac: zero violaciones WCAG 2.1 AA (842ms)
+  ✓  32 [chromium] › tests/e2e/axe.spec.ts:35:9 › axe-core a11y audit › /guias: zero violaciones WCAG 2.1 AA (893ms)
+  ✓  33 [chromium] › tests/e2e/axe.spec.ts:35:9 › axe-core a11y audit › /como-funciona: zero violaciones WCAG 2.1 AA (845ms)
+  ✓  34 [chromium] › tests/e2e/axe.spec.ts:35:9 › axe-core a11y audit › /sobre: zero violaciones WCAG 2.1 AA (850ms)
+  ✓  35 [chromium] › tests/e2e/axe.spec.ts:35:9 › axe-core a11y audit › /privacidad: zero violaciones WCAG 2.1 AA (820ms)
+  ✓  36 [chromium] › tests/e2e/axe.spec.ts:35:9 › axe-core a11y audit › /terminos: zero violaciones WCAG 2.1 AA (857ms)
+  ✓  37 [chromium] › tests/e2e/axe.spec.ts:35:9 › axe-core a11y audit › /contacto: zero violaciones WCAG 2.1 AA (821ms)
+  ✓  38 [chromium] › tests/e2e/axe.spec.ts:35:9 › axe-core a11y audit › /tracker: zero violaciones WCAG 2.1 AA (828ms)
+  ✓  39 [chromium] › tests/e2e/ocr.spec.ts:122:9 › OCR pipeline › CGE (luz): PNG sintético , detect , redirect (911ms)
+  ✓  40 [chromium] › tests/e2e/ocr.spec.ts:122:9 › OCR pipeline › Aguas Andinas (agua): PNG sintético , detect , redirect (970ms)
+  ✓  41 [chromium] › tests/e2e/ocr.spec.ts:122:9 › OCR pipeline › Metrogas (gas): PNG sintético , detect , redirect (905ms)
+  ✓  42 [chromium] › tests/e2e/ocr.spec.ts:132:7 › OCR pipeline › CGE: JPG con compresión (calidad 0.85) detecta correctamente (896ms)
+  ✓  43 [chromium] › tests/e2e/ocr.spec.ts:142:7 › OCR pipeline › Aguas Andinas: WebP detecta correctamente (816ms)
+  ✓  45 [chromium] › tests/e2e/ocr.spec.ts:171:7 › OCR pipeline › imagen blanca sin texto: error útil para el usuario (1.0s)
+  ✓  46 [chromium] › tests/e2e/ocr.spec.ts:206:7 › OCR pipeline › archivo no decodificable: error claro (486ms)
+  ✓  47 [chromium] › tests/e2e/ocr.spec.ts:228:7 › OCR pipeline › happy path completo: CGE PNG llega a result page (parsed o parser-error, no skeleton infinito) (1.1s)
+  ✓  48 [chromium] › tests/e2e/ocr.spec.ts:254:7 › OCR pipeline › multi-página: 2 PNGs sintéticos se procesan y combinan (1.0s)
+  ✓  49 [chromium] › tests/e2e/ocr.spec.ts:324:7 › OCR pipeline › boleta de empresa desconocida: alerta + selector manual visible (1.1s)
+  ✓  50 [chromium] › tests/e2e/result-view.spec.ts:46:7 › Boleta result view › CGE: payload válido renderiza cargos, período y total (273ms)
+  ✓  51 [chromium] › tests/e2e/result-view.spec.ts:92:7 › Boleta result view › payload con slug distinto al de la URL: limpia y redirige al upload (154ms)
+  ✓  52 [chromium] › tests/e2e/result-view.spec.ts:121:7 › Boleta result view › sin payload en sessionStorage: redirige al upload (148ms)
+  ✓  53 [chromium] › tests/e2e/result-view.spec.ts:131:7 › Boleta result view › payload con JSON corrupto: redirige al upload (146ms)
+  ✓  54 [chromium] › tests/e2e/result-view.spec.ts:141:7 › Boleta result view › payload con shape inválido (rawText no string): redirige (151ms)
+  ✓  55 [chromium] › tests/e2e/result-view.spec.ts:162:7 › Boleta result view › boleta con período no extraíble renderiza sin crash (256ms)
+  ✓  56 [chromium] › tests/e2e/result-view.spec.ts:208:7 › Boleta result view › result view es noindex (privacidad: ruta del usuario) (147ms)
+  ✓  57 [chromium] › tests/e2e/security.spec.ts:10:7 › Security headers › headers críticos presentes en / (16ms)
+  ✓  58 [chromium] › tests/e2e/security.spec.ts:24:7 › Security headers › CSP base configurada correctamente (6ms)
+  ✓  59 [chromium] › tests/e2e/security.spec.ts:38:7 › Security headers › headers también presentes en assets dinámicos (/api/og) (114ms)
+  ✓  60 [chromium] › tests/e2e/security.spec.ts:47:7 › Security headers › Tesseract worker se sirve same-origin con headers de seguridad (5ms)
+  ✓  61 [chromium] › tests/e2e/security.spec.ts:58:7 › Health check › GET /api/health responde 200 con status ok (7ms)
+  ✓  62 [chromium] › tests/e2e/security.spec.ts:67:7 › Health check › respuesta de health no se cachea (3ms)
+  ✓  63 [chromium] › tests/e2e/seo.spec.ts:137:7 › SEO metadata › layout exposes Organization + WebSite JSON-LD on every page (108ms)
+  ✓  64 [chromium] › tests/e2e/seo.spec.ts:145:7 › SEO metadata › html lang is es-CL (107ms)
+  ✓  65 [chromium] › tests/e2e/seo.spec.ts:152:9 › SEO metadata › / has correct title, description, canonical, OG image and Twitter card (121ms)
+  ✓  66 [chromium] › tests/e2e/seo.spec.ts:152:9 › SEO metadata › /boleta-luz has correct title, description, canonical, OG image and Twitter card (119ms)
+  ✓  67 [chromium] › tests/e2e/seo.spec.ts:152:9 › SEO metadata › /boleta-agua has correct title, description, canonical, OG image and Twitter card (123ms)
+  ✓  68 [chromium] › tests/e2e/seo.spec.ts:152:9 › SEO metadata › /boleta-gas has correct title, description, canonical, OG image and Twitter card (118ms)
+  ✓  69 [chromium] › tests/e2e/seo.spec.ts:152:9 › SEO metadata › /reclamar-sernac has correct title, description, canonical, OG image and Twitter card (125ms)
+  ✓  70 [chromium] › tests/e2e/seo.spec.ts:152:9 › SEO metadata › /subsidio-electrico has correct title, description, canonical, OG image and Twitter card (117ms)
+  ✓  71 [chromium] › tests/e2e/seo.spec.ts:152:9 › SEO metadata › /comparador-internet-hogar has correct title, description, canonical, OG image and Twitter card (139ms)
+  ✓  72 [chromium] › tests/e2e/seo.spec.ts:152:9 › SEO metadata › /guias has correct title, description, canonical, OG image and Twitter card (120ms)
+  ✓  73 [chromium] › tests/e2e/seo.spec.ts:152:9 › SEO metadata › /guias/por-que-subio-mi-cuenta-de-luz has correct title, description, canonical, OG image and Twitter card (118ms)
+  ✓  74 [chromium] › tests/e2e/seo.spec.ts:152:9 › SEO metadata › /como-funciona has correct title, description, canonical, OG image and Twitter card (116ms)
+  ✓  75 [chromium] › tests/e2e/seo.spec.ts:152:9 › SEO metadata › /guias/categoria/luz has correct title, description, canonical, OG image and Twitter card (109ms)
+  ✓  76 [chromium] › tests/e2e/seo.spec.ts:152:9 › SEO metadata › /privacidad has correct title, description, canonical, OG image and Twitter card (116ms)
+  ✓  77 [chromium] › tests/e2e/seo.spec.ts:152:9 › SEO metadata › /terminos has correct title, description, canonical, OG image and Twitter card (112ms)
+  ✓  78 [chromium] › tests/e2e/seo.spec.ts:152:9 › SEO metadata › /contacto has correct title, description, canonical, OG image and Twitter card (109ms)
+  ✓  79 [chromium] › tests/e2e/seo.spec.ts:152:9 › SEO metadata › /sobre has correct title, description, canonical, OG image and Twitter card (114ms)
+  ✓  80 [chromium] › tests/e2e/seo.spec.ts:224:7 › SEO metadata › OG image route returns 200 with PNG (21ms)
+  ✓  81 [chromium] › tests/e2e/seo.spec.ts:232:7 › SEO metadata › private routes (tracker, dynamic resultados) are noindex (109ms)
+  ✓  82 [chromium] › tests/e2e/seo.spec.ts:241:7 › SEO metadata › sitemap.xml lists all indexable routes (8ms)
+  ✓  83 [chromium] › tests/e2e/seo.spec.ts:266:7 › SEO metadata › home page surfaces 3 guides linking to /guias/[slug] (108ms)
+  ✓  84 [chromium] › tests/e2e/seo.spec.ts:276:7 › SEO metadata › guide page shows "Sigue leyendo" with related guide cards (107ms)
+  ✓  85 [chromium] › tests/e2e/seo.spec.ts:290:7 › SEO metadata › guides RSS feed is valid XML with channel + items (10ms)
+  ✓  86 [chromium] › tests/e2e/seo.spec.ts:307:7 › SEO metadata › layout exposes RSS auto-discovery link (105ms)
+  ✓  87 [chromium] › tests/e2e/seo.spec.ts:315:7 › SEO metadata › Tesseract OCR assets are self-hosted and served from same origin (9ms)
+  ✓  88 [chromium] › tests/e2e/seo.spec.ts:329:7 › SEO metadata › manifest.webmanifest is valid JSON with required fields (4ms)
+  ✓  89 [chromium] › tests/e2e/seo.spec.ts:345:7 › SEO metadata › robots.txt allows crawlers and points to sitemap (3ms)
+  ✘  44 [chromium] › tests/e2e/ocr.spec.ts:150:7 › OCR pipeline › HEIC (iPhone): mensaje claro en vez de fallar silencioso (10.1s)
+
+
+  1) [chromium] › tests/e2e/ocr.spec.ts:150:7 › OCR pipeline › HEIC (iPhone): mensaje claro en vez de fallar silencioso
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('main [role="alert"]:has([data-slot="alert-title"])')
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for locator('main [role="alert"]:has([data-slot="alert-title"])')
+
+
+      164 |     // de Next que también usa role=alert).
+      165 |     const alert = page.locator('main [role="alert"]:has([data-slot="alert-title"])')
+    > 166 |     await expect(alert).toBeVisible({ timeout: 10_000 })
+          |                         ^
+      167 |     await expect(alert).toContainText(/HEIC|JPEG|JPG/i)
+      168 |   })
+      169 |
+        at tests/e2e/ocr.spec.ts:166:25
+
+    Error Context: test-results/ocr-OCR-pipeline-HEIC-iPho-dc924-en-vez-de-fallar-silencioso-chromium/error-context.md
+
+  1 failed
+    [chromium] › tests/e2e/ocr.spec.ts:150:7 › OCR pipeline › HEIC (iPhone): mensaje claro en vez de fallar silencioso
+  88 passed (26.6s)
+ ELIFECYCLE  Command failed with exit code 1.
+
+## perf
+
+🔍 Auditando http://localhost:3100
+
+✓ /
+✓ /boleta-luz
+✓ /guias
+✓ /comparador-internet-hogar
+
+📊 Core Web Vitals (ms / count / kB):
+
+route                              FCP    LCP    CLS     TTFB   JS     CSS   img
+-----------------------------------------------------------------------------
+/                                     68     68   0.0000     17   713.1kB   0.0kB   0.0kB
+/boleta-luz                           56     56   0.0000      5   713.1kB   0.0kB   0.0kB
+/guias                                60     60   0.0002      6   715.6kB   0.0kB   0.0kB
+/comparador-internet-hogar            64     64   0.0006      6   715.6kB   0.0kB   0.0kB
+
+Umbrales (Web.dev / Lighthouse mobile):
+  LCP < 2500ms (good)  < 1500ms (excellent)
+  CLS < 0.1   (good)  < 0.05   (excellent)
+  FCP < 1800ms (good)  < 1000ms (excellent)
+
+✓ Within all perf budgets

@@ -7,18 +7,9 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: ['/'],
-        // Rutas privadas que renderizan datos del usuario:
-        //  - /tracker es su histórico personal
-        //  - /boleta-{servicio}/[empresa]/resultado o /boleta-{servicio}/[empresa]
-        //    son los resultados de parsing
-        // /api/og se mantiene accesible (lo necesitan los crawlers para
-        // generar previews de redes sociales).
-        disallow: [
-          '/tracker',
-          '/boleta-luz/*',
-          '/boleta-agua/*',
-          '/boleta-gas/*',
-        ],
+        // Permitir leer el noindex de las pantallas de resultados y tracker.
+        // Los datos de boletas se leen del almacenamiento local del navegador;
+        // robots.txt no es un mecanismo de privacidad o autorización.
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,

@@ -34,6 +34,8 @@ const STATUS_LABELS: Record<string, string> = {
 }
 
 function formatOcrStatus(p: OcrProgress): string {
+  if (p.status.startsWith('Página '))
+    return `${p.status.split(':')[0]}: ${Math.round(p.progress * 100)}% del documento`
   const label = STATUS_LABELS[p.status] ?? 'Procesando…'
   if (p.status === 'recognizing text') {
     return `${label} ${Math.round(p.progress * 100)}%`
@@ -127,10 +129,8 @@ export function useBoletaUpload(servicio: 'luz' | 'agua' | 'gas') {
 
     let extractedText: string | undefined
     try {
-      const isMultiImage =
-        files.length > 1 && files.every((f) => f.type.startsWith('image/'))
-      const isSingleImage =
-        files.length === 1 && files[0].type.startsWith('image/')
+      if (!files.length) throw new Error('Selecciona un archivo.')
+      const isMultiImage = files.length > 1
 
       if (isMultiImage) {
         // Multi-imagen: OCR cada una y concatena.
@@ -147,13 +147,11 @@ export function useBoletaUpload(servicio: 'luz' | 'agua' | 'gas') {
         extractedText = await extractTextFromImages(files, onMultiProgress)
       } else {
         const file = files[0]
-        const onProgress = isSingleImage
-          ? (p: OcrProgress) => {
-              if (generationRef.current !== myGeneration) return
-              if (!mountedRef.current) return
-              setOcrStatus(formatOcrStatus(p))
-            }
-          : undefined
+        const onProgress = (p: OcrProgress) => {
+          if (generationRef.current !== myGeneration) return
+          if (!mountedRef.current) return
+          setOcrStatus(formatOcrStatus(p))
+        }
         extractedText = await extractTextFromBoleta(file, onProgress)
       }
 
@@ -191,10 +189,15 @@ export function useBoletaUpload(servicio: 'luz' | 'agua' | 'gas') {
       try {
         safeSessionSet(SESSION_KEY, JSON.stringify(payload))
       } catch (e) {
-        if (e instanceof StorageQuotaError || e instanceof StorageBlockedError) {
+        if (
+          e instanceof StorageQuotaError ||
+          e instanceof StorageBlockedError
+        ) {
           throw e
         }
-        throw new Error('No pudimos guardar la boleta para mostrarte el resultado. Reintenta refrescando la pestaña.')
+        throw new Error(
+          'No pudimos guardar la boleta para mostrarte el resultado. Reintenta refrescando la pestaña.',
+        )
       }
 
       // Si el componente se desmontó mientras serializábamos, no navegar.

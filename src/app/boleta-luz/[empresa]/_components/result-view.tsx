@@ -1,5 +1,6 @@
 'use client'
 
+import { ResultSummary } from '@/components/parsers/ResultSummary'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -274,25 +275,7 @@ export function ResultView({ empresaSlug }: { empresaSlug: string }) {
               ? `Tu boleta de ${formatPeriod(boleta.periodo)}.`
               : `Tu última boleta de ${boleta.empresa}.`}
           </h1>
-          {hasFlags ? (
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-body">
-              Encontramos{' '}
-              <strong className="font-medium text-accent-deep">
-                {flags.length}{' '}
-                {flags.length === 1
-                  ? 'cargo que merece tu atención'
-                  : 'cargos que merecen tu atención'}
-              </strong>
-              .{' '}
-              {flags.length === 1 ? 'Revísalo' : 'Revísalos'} abajo y, si
-              quieres, genera un reclamo formal.
-            </p>
-          ) : (
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-body">
-              Revisamos cada línea contra las tarifas SEC vigentes. No
-              encontramos cargos sospechosos esta vez.
-            </p>
-          )}
+          <ResultSummary boleta={boleta} />
         </Container>
       </section>
 

@@ -1,0 +1,3 @@
+Recursos verificados: PDF.js 6.3.289, Tesseract 7.0.0/7.0.0. src/generated/parser-assets-manifest.json
+Recursos verificados: PDF.js 6.3.289, Tesseract 7.0.0/7.0.0. src/generated/parser-assets-manifest.json
+Verificados 213 archivos: preparación limpia con descarga, SHA-256, manifiesto reproducible y segunda ejecución idéntica.

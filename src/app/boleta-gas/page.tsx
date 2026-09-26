@@ -45,8 +45,8 @@ const FLAGS = [
     body: 'En cilindros, a veces aparece un cargo por "cambio" o "manipulación" que no debería estar incluido si compraste un cilindro nuevo a precio publicado.',
   },
   {
-    title: 'Diferencia con tarifa pública SEC',
-    body: 'La SEC publica precios diariamente. Si la boleta tiene un valor por kilo o m³ muy distinto del rango publicado para tu región, es flag.',
+    title: 'Precio y formato de la compra',
+    body: 'Revisa cantidad, unidad, formato y precio contra tu contrato o comprobante. La herramienta no compara automáticamente con precios publicados.',
   },
   {
     title: 'Cargo de seguridad domiciliaria duplicado',
@@ -65,7 +65,7 @@ const FAQ_ITEMS = [
   },
   {
     q: '¿Funciona para cilindros y para gas por red?',
-    a: 'Sí, con cobertura distinta. Para gas por red analizamos boletas de Metrogas, Lipigas y Abastible. Para cilindros GLP, hoy solo cubrimos Gasco GLP. Estamos trabajando en agregar Lipigas y Abastible cilindro pronto.',
+    a: 'Sí, con cobertura distinta. Para gas por red analizamos boletas de Metrogas, Lipigas, Abastible, Gasvalpo y Gas Sur. Para cilindros GLP, hoy solo cubrimos Gasco GLP. Estamos trabajando en agregar Lipigas y Abastible cilindro pronto.',
   },
   {
     q: '¿De dónde saco una boleta de cilindro o gas por red en PDF?',
@@ -89,7 +89,7 @@ export default function BoletaGasPage() {
           webApplicationSchema({
             name: 'Revisor de boleta de gas',
             description:
-              'Sube tu boleta de gas (red o cilindro) y la lupa la analiza contra los precios SEC vigentes.',
+              'Sube tu boleta de gas para leer sus cargos y revisar los conceptos detectados. El precio del contrato o de la compra no se verifica automáticamente.',
             path: '/boleta-gas',
           }),
           breadcrumbsSchema([

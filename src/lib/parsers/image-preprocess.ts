@@ -124,17 +124,19 @@ export async function preprocessImageForOcr(file: File): Promise<Blob> {
   const lowCount = totalPixels * 0.05
   const highCount = totalPixels * 0.95
   let cumulative = 0
-  let lowCut = 0
+  let lowCut = -1
   let highCut = 255
   for (let v = 0; v < 256; v++) {
     cumulative += histogram[v]
-    if (cumulative >= lowCount && lowCut === 0) lowCut = v
+    if (cumulative >= lowCount && lowCut === -1) lowCut = v
     if (cumulative >= highCount) {
       highCut = v
       break
     }
   }
-  const range = Math.max(1, highCut - lowCut)
+  // Una imagen uniforme no ofrece contraste que recuperar.
+  if (highCut <= lowCut) return file
+  const range = highCut - lowCut
 
   // Pasada 2: stretch in-place + recalcular histograma para Otsu
   const stretchedHist = new Uint32Array(256)
@@ -155,7 +157,7 @@ export async function preprocessImageForOcr(file: File): Promise<Blob> {
   // global óptimo separando 2 clases (texto vs papel) por varianza.
   const otsuThreshold = computeOtsuThreshold(stretchedHist, totalPixels)
   for (let i = 0; i < data.length; i += 4) {
-    const bin = data[i] >= otsuThreshold ? 255 : 0
+    const bin = data[i] > otsuThreshold ? 255 : 0
     data[i] = data[i + 1] = data[i + 2] = bin
   }
 

@@ -70,7 +70,7 @@ const FAQ_ITEMS = [
   },
   {
     q: '¿Las tarifas de agua son distintas en cada región?',
-    a: 'Sí. Cada sanitaria tiene su propia fórmula tarifaria aprobada por SISS, con tramos de consumo y temporadas (verano vs invierno). La lupa compara contra las tarifas vigentes de tu sanitaria específica.',
+    a: 'Las tarifas dependen de la sanitaria, el grupo tarifario y el período. La lupa extrae cargos, pero no confirma esos datos ni verifica automáticamente la tarifa aplicable. Contrasta los precios con la publicación oficial correspondiente.',
   },
   {
     q: '¿Qué hago si la lupa encuentra un problema?',
@@ -90,7 +90,7 @@ export default function BoletaAguaPage() {
           webApplicationSchema({
             name: 'Revisor de boleta de agua',
             description:
-              'Sube tu boleta de agua y la lupa la analiza contra las tarifas SISS vigentes de tu sanitaria.',
+              'Sube tu boleta de agua para leer sus cargos y revisar los conceptos detectados. La tarifa aplicable no se verifica automáticamente.',
             path: '/boleta-agua',
           }),
           breadcrumbsSchema([

@@ -1,8 +1,81 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   computeOtsuThreshold,
   preprocessImageForOcr,
 } from './image-preprocess'
+
+afterEach(() => vi.unstubAllGlobals())
+
+function browserImage(levels: number[], width = 1600, height = 800) {
+  const data = Uint8ClampedArray.from(levels.flatMap((v) => [v, v, v, 255]))
+  const bitmap = { width, height, close: vi.fn() }
+  const ctx = { drawImage: vi.fn(), getImageData: () => ({ data }), putImageData: vi.fn() }
+  const output = new Blob(['processed'], { type: 'image/png' })
+  const canvas = { width: 0, height: 0, getContext: vi.fn(() => ctx),
+    toBlob: vi.fn((callback: (blob: Blob | null) => void) => callback(output)) }
+  vi.stubGlobal('window', {})
+  vi.stubGlobal('document', { createElement: () => canvas })
+  const decode = vi.fn().mockResolvedValue(bitmap)
+  vi.stubGlobal('createImageBitmap', decode)
+  const file = new File(['image'], 'foto.png', { type: 'image/png' })
+  return { file, data, bitmap, canvas, ctx, output, decode }
+}
+
+describe('pipeline de imagen en navegador', () => {
+  it('conserva tinta negra al binarizar una boleta en blanco y negro', async () => {
+    const fixture = browserImage([0, 0, 255, 255, 255, 255, 255, 255, 255, 255])
+    expect(await preprocessImageForOcr(fixture.file)).toBe(fixture.output)
+    expect(fixture.data[0]).toBe(0)
+    expect(fixture.data[8]).toBe(255)
+    expect(fixture.ctx.putImageData).toHaveBeenCalledOnce()
+    expect(fixture.bitmap.close).toHaveBeenCalledOnce()
+  })
+  it('mejora contraste manteniendo texto y fondo separados', async () => {
+    const { file, data } = browserImage([40, 40, 180, 180, 180, 180])
+    await preprocessImageForOcr(file)
+    expect(data[0]).toBe(0)
+    expect(data[8]).toBe(255)
+  })
+  it.each([0, 255])('no invierte una imagen uniforme de intensidad %s', async (value) => {
+    const { file } = browserImage([value, value, value])
+    expect(await preprocessImageForOcr(file)).toBe(file)
+  })
+  it.each([[4000, 2000, 2400, 1200], [1000, 500, 1500, 750]])(
+    'redimensiona %s × %s a %s × %s', async (width, height, targetW, targetH) => {
+      const f = browserImage([0, 255], width, height)
+      const resized = { width: targetW, height: targetH, close: vi.fn() }
+      f.decode.mockResolvedValueOnce(f.bitmap).mockResolvedValueOnce(resized)
+      await preprocessImageForOcr(f.file)
+      expect(f.decode).toHaveBeenLastCalledWith(f.bitmap, {
+        resizeWidth: targetW, resizeHeight: targetH, resizeQuality: 'high',
+      })
+      expect(f.canvas.width).toBe(targetW)
+      expect(resized.close).toHaveBeenCalledOnce()
+    },
+  )
+  it('devuelve original si no decodifica', async () => {
+    const f = browserImage([0, 255])
+    f.decode.mockRejectedValueOnce(new Error('decode'))
+    expect(await preprocessImageForOcr(f.file)).toBe(f.file)
+  })
+  it('conserva original si canvas no genera un blob', async () => {
+    const f = browserImage([0, 255])
+    f.canvas.toBlob.mockImplementation((callback) => callback(null))
+    expect(await preprocessImageForOcr(f.file)).toBe(f.file)
+  })
+  it('no procesa PDFs por el pipeline de imagen', async () => {
+    const f = browserImage([0, 255])
+    const file = new File(['pdf'], 'document.pdf', { type: 'application/pdf' })
+    expect(await preprocessImageForOcr(file)).toBe(file)
+    expect(f.decode).not.toHaveBeenCalled()
+  })
+  it('libera una miniatura que sigue bajo el mínimo después del intento de resize', async () => {
+    const f = browserImage([0, 255], 100, 100)
+    f.decode.mockResolvedValueOnce(f.bitmap).mockRejectedValueOnce(new Error('resize'))
+    expect(await preprocessImageForOcr(f.file)).toBe(f.file)
+    expect(f.bitmap.close).toHaveBeenCalledOnce()
+  })
+})
 
 describe('preprocessImageForOcr', () => {
   it('devuelve el archivo original cuando window no existe (SSR / node test)', async () => {

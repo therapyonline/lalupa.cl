@@ -54,6 +54,7 @@ export async function generateMetadata({
     description: guia.frontmatter.description,
     path: `/guias/${slug}`,
     ogKind: 'guide',
+    ogTitle: guia.frontmatter.ogTitle,
     ogCategory: CATEGORY_LABEL[guia.frontmatter.category],
     keywords: guia.frontmatter.keywords,
     publishedTime: guia.frontmatter.publishedAt,
@@ -94,9 +95,8 @@ export default async function GuiaPage({
   const wasUpdated =
     guia.frontmatter.updatedAt !== guia.frontmatter.publishedAt
 
-  // Schemas JSON-LD: siempre Article + Breadcrumbs. Si la guía declara
-  // `faqs` en su frontmatter, sumamos FAQPage para que Google genere
-  // rich results.
+  // Datos estructurados que reflejan contenido visible; no garantizan
+  // resultados enriquecidos de ningún buscador.
   const schemas: Record<string, unknown>[] = [
     articleSchema({
       title: guia.frontmatter.title,
@@ -122,9 +122,7 @@ export default async function GuiaPage({
   ) {
     schemas.push(faqPageSchema(guia.frontmatter.faqs))
   }
-  // HowTo opcional: guías que tienen instrucciones paso a paso
-  // (verificar cobertura, completar wizard, etc.) declaran `howTo`
-  // en el frontmatter y obtienen rich result HowTo en Google.
+  // HowTo opcional para describir los pasos visibles en el artículo.
   if (
     guia.frontmatter.howTo &&
     Array.isArray(guia.frontmatter.howTo.steps) &&
@@ -168,13 +166,28 @@ export default async function GuiaPage({
               </span>
             )}
             <span>{guia.readingTime}</span>
-            {guia.frontmatter.author && <span>{guia.frontmatter.author}</span>}
+            {guia.frontmatter.author && (
+              <Link href="/sobre#criterio-editorial" className="underline underline-offset-4">
+                {guia.frontmatter.author}
+              </Link>
+            )}
           </div>
         </Container>
       </section>
 
       <section className="bg-cream pb-20">
         <Container>
+          <div className="mb-8 space-y-4 lg:hidden">
+            {guia.toc.length > 0 && (
+              <details className="rounded-2xl border border-border bg-white p-5">
+                <summary className="cursor-pointer font-medium text-ink">En esta guía</summary>
+                <Toc entries={guia.toc} title="Secciones" className="mt-4" />
+              </details>
+            )}
+            {!!guia.frontmatter.relatedTools?.length && (
+              <RelatedToolsList tools={guia.frontmatter.relatedTools} />
+            )}
+          </div>
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_280px]">
             <article className="prose-guia">
               {content}
@@ -290,7 +303,7 @@ function Footer({ updatedAt, author }: { updatedAt: string; author?: string }) {
             {author && (
               <>
                 {' '}
-                por <strong className="text-ink">{author}</strong>
+                por <Link href="/sobre#criterio-editorial" className="text-ink underline underline-offset-4">{author}</Link>
               </>
             )}
             . Si encuentras un error o algo desactualizado, escríbenos.

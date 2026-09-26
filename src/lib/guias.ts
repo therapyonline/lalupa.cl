@@ -1,6 +1,7 @@
 import 'server-only'
 import fs from 'node:fs/promises'
 import path from 'node:path'
+import { validateGuiaFrontmatter } from './guias-frontmatter'
 import {
   type CategoriaGuia,
   extractToc,
@@ -19,21 +20,13 @@ export {
 
 const GUIAS_DIR = path.join(process.cwd(), 'src', 'content', 'guias')
 
-/**
- * Una pregunta-respuesta del bloque FAQPage al final de una guía.
- * Se renderiza como sección visible en el body de la página Y como
- * structured data JSON-LD para que Google muestre rich results.
- */
+/** Preguntas visibles en la guía y representadas en JSON-LD. */
 export interface GuiaFaqItem {
   q: string
   a: string
 }
 
-/**
- * Un paso del bloque HowTo. Los steps se exponen como JSON-LD para
- * Google Rich Results. El contenido visible vive en el MDX como una
- * lista normal; este array es solo el espejo estructurado para SEO.
- */
+/** Pasos visibles en el MDX y representados en JSON-LD. */
 export interface GuiaHowToStep {
   name: string
   text: string
@@ -57,20 +50,8 @@ export interface GuiaFrontmatter {
   keywords: string[]
   relatedTools?: string[]
   author?: string
-  /**
-   * Lista opcional de Q&A. Si está presente, la página genera
-   * automáticamente FAQPage JSON-LD para rich results en Google.
-   * NOTA: el contenido visible de las FAQ todavía vive en el MDX
-   * dentro de un H2 "Preguntas frecuentes"; este array es solo el
-   * espejo estructurado para SEO.
-   */
   faqs?: GuiaFaqItem[]
-  /**
-   * Bloque HowTo opcional. Si está presente, la página genera HowTo
-   * JSON-LD para rich results de instrucciones paso a paso. El
-   * contenido visible vive en el MDX; este objeto es el espejo
-   * estructurado.
-   */
+  /** Datos estructurados, sin promesa de resultados enriquecidos. */
   howTo?: GuiaHowTo
 }
 
@@ -88,53 +69,23 @@ export const TOOL_LABELS: Record<string, string> = {
   '/tracker': 'Tracker de boletas',
 }
 
-function isFrontmatterComplete(fm: Partial<GuiaFrontmatter>): fm is GuiaFrontmatter {
-  return Boolean(
-    fm.title &&
-      fm.slug &&
-      fm.description &&
-      fm.publishedAt &&
-      fm.updatedAt &&
-      fm.category &&
-      Array.isArray(fm.keywords),
-  )
-}
-
 async function readGuiaFile(filename: string) {
   const filePath = path.join(GUIAS_DIR, filename)
   const source = await fs.readFile(filePath, 'utf-8')
   const matter = (await import('gray-matter')).default
   const { data, content } = matter(source)
-  return { source, data: data as Partial<GuiaFrontmatter>, content }
+  return { source, data: validateGuiaFrontmatter(data, filename), content }
 }
 
 export async function getAllGuias(): Promise<GuiaMeta[]> {
-  let files: string[] = []
-  try {
-    files = await fs.readdir(GUIAS_DIR)
-  } catch {
-    return []
-  }
-  const mdxFiles = files.filter((f) => f.endsWith('.mdx'))
-
+  const files = await fs.readdir(GUIAS_DIR)
   const metas = await Promise.all(
-    mdxFiles.map(async (filename) => {
-      try {
-        const { data, content } = await readGuiaFile(filename)
-        if (!isFrontmatterComplete(data)) return null
-        return {
-          ...data,
-          readingTime: formatReadingTime(content),
-        } satisfies GuiaMeta
-      } catch {
-        return null
-      }
+    files.filter((f) => f.endsWith('.mdx')).map(async (filename) => {
+      const { data, content } = await readGuiaFile(filename)
+      return { ...data, readingTime: formatReadingTime(content) } satisfies GuiaMeta
     }),
   )
-
-  return metas
-    .filter((g): g is GuiaMeta => g !== null)
-    .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
+  return metas.sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
 }
 
 export interface GuiaCompiled {
@@ -145,17 +96,18 @@ export interface GuiaCompiled {
 }
 
 export async function getGuiaBySlug(slug: string): Promise<GuiaCompiled | null> {
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) return null
   try {
     const { source, data, content } = await readGuiaFile(`${slug}.mdx`)
-    if (!isFrontmatterComplete(data)) return null
     return {
       frontmatter: data,
       source,
       toc: extractToc(source),
       readingTime: formatReadingTime(content),
     }
-  } catch {
-    return null
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return null
+    throw error
   }
 }
 
@@ -172,11 +124,5 @@ export async function getRelatedGuias(
 }
 
 export async function getAllGuiaSlugs(): Promise<string[]> {
-  let files: string[] = []
-  try {
-    files = await fs.readdir(GUIAS_DIR)
-  } catch {
-    return []
-  }
-  return files.filter((f) => f.endsWith('.mdx')).map((f) => f.replace('.mdx', ''))
+  return (await getAllGuias()).map((g) => g.slug)
 }

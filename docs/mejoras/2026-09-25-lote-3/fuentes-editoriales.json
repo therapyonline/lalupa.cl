@@ -1,0 +1,50 @@
+{
+  "revisadoEl": "2026-09-25",
+  "fuentes": [
+    {
+      "url": "https://www.cne.cl/tarificacion/electrica/valor-agregado-de-distribucion/opciones-tarifarias-a-usuarios-finales/",
+      "uso": "Diferencias BT-1/BT-2 y duración de opciones. No usar su introducción de 500 kW para el umbral actual de cliente libre.",
+      "estado": "consultada"
+    },
+    {
+      "url": "https://energia.gob.cl/iniciativas/rebaja-del-umbral-para-optar-al-regimen-de-clientes-libres",
+      "uso": "Cambio del umbral. Resultado de búsqueda oficial; apertura directa falló. Cotejado con resolución CNE.",
+      "estado": "extracto oficial consultado"
+    },
+    {
+      "url": "https://www.cne.cl/archivos_bajar/REX%20628-2025.PDF",
+      "uso": "Sección 2.4, página física 17: umbral y condiciones de cambio de régimen.",
+      "estado": "consultada"
+    },
+    {
+      "url": "https://www.bcn.cl/leychile/navegar?idNorma=124102",
+      "uso": "Decreto 327, artículo 129: facturación provisoria. No reutilizar medidas temporales de pandemia como reglas generales.",
+      "estado": "consultada"
+    },
+    {
+      "url": "https://sucursalvirtual.cge.cl/convenio-de-pago",
+      "uso": "Opciones residenciales y excepciones de atención. No acredita condonación, interés cero ni disponibilidad continua del canal.",
+      "estado": "consultada"
+    },
+    {
+      "url": "https://www.bcn.cl/leychile/navegar?idNorma=141599&idVersion=2023-05-09",
+      "uso": "Ley 19.628, artículo 17. Se evitó citar como vigente el texto diferido al 2026-12-01.",
+      "estado": "consultada"
+    },
+    {
+      "url": "https://www.sernac.cl/portal/607/w3-article-1524.html",
+      "uso": "Corroboración institucional histórica de la exclusión de servicios básicos en información comercial; la base normativa se cita aparte.",
+      "estado": "consultada"
+    },
+    {
+      "url": "https://www.sec.cl/area-ciudadana/reclamos-y-la-sec/",
+      "uso": "Canal y requisitos de escalamiento de reclamos.",
+      "estado": "consultada"
+    },
+    {
+      "url": "https://www.cge.cl/wp-content/uploads/2026/04/Tarifas_de_Suministro_Electrico_vigentes_a_partir_del_1_de_mayo_2026.pdf",
+      "uso": "Referencia heredada del dataset; importes NO revalidados.",
+      "estado": "HTTP 403"
+    }
+  ]
+}

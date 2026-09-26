@@ -5,7 +5,7 @@ import { extractTextFromImage } from './ocr'
 function makeFile(type: string): File {
   // The constructor doesn't run anything that needs a real binary, File is
   // available in modern Node test envs.
-  return new File([new Uint8Array(0)], 'boleta', { type })
+  return new File([new Uint8Array([1])], 'boleta', { type })
 }
 
 describe('extractTextFromBoleta', () => {
@@ -15,9 +15,9 @@ describe('extractTextFromBoleta', () => {
     ).rejects.toThrow(/Formato no soportado/)
   })
 
-  it('rejects empty MIME with "desconocido" hint', async () => {
+  it('rejects empty MIME when the extension is also unknown', async () => {
     await expect(extractTextFromBoleta(makeFile(''))).rejects.toThrow(
-      /desconocido/,
+      /Formato no soportado/,
     )
   })
 })

@@ -10,7 +10,7 @@ export const metadata = buildMetadata({
   ogKind: 'guide',
 })
 
-const ULTIMA_ACTUALIZACION = '12 de mayo de 2026'
+const ULTIMA_ACTUALIZACION = '25 de septiembre de 2026'
 
 const PROSE_LEGAL = 'mx-auto max-w-[65ch] text-[17px] leading-[1.65]'
 const SECTION = 'mt-12'
@@ -102,8 +102,8 @@ export default function TerminosPage() {
                 Las distribuidoras chilenas cambian el formato de sus boletas
                 sin aviso. Un cargo que el parser marca como sospechoso puede
                 ser correcto, y uno que pasa sin alertas puede tener un
-                error. Las tarifas SEC/SISS que usamos para validar pueden
-                quedar desactualizadas frente a un decreto reciente.
+                error. La herramienta no verifica automáticamente los importes
+                contra la tarifa oficial aplicable a tu suministro.
               </p>
               <p className={P}>
                 Antes de usar cualquier alerta de lalupa como base de un
@@ -167,10 +167,11 @@ export default function TerminosPage() {
             <div className={SECTION} id="datos-regulatorios">
               <h2 className={H2}>6. Tarifas y datos regulatorios</h2>
               <p className={P}>
-                Las tarifas SEC, SISS y SUBTEL que usamos para validar cargos
-                son de fuentes oficiales públicas, pero pueden estar
-                desactualizadas con respecto a un decreto reciente. La fuente
-                autoritativa siempre es la publicación oficial vigente.
+                Las referencias históricas del proyecto no acreditan la tarifa
+                aplicable a una boleta. Para contrastar un importe, revisa la
+                publicación oficial correspondiente a la empresa, zona, período,
+                opción contratada e impuestos. Las alertas no certifican que
+                un precio sea correcto ni que exista un sobrecobro.
               </p>
               <p className={P}>
                 El simulador del subsidio Ley 21.667 es referencial. La

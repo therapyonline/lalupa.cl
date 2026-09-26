@@ -11,7 +11,7 @@ export const metadata = buildMetadata({
   ogKind: 'guide',
 })
 
-const ULTIMA_ACTUALIZACION = '12 de mayo de 2026'
+const ULTIMA_ACTUALIZACION = '25 de septiembre de 2026'
 
 /** Clases compartidas para tipografía legal cómoda. */
 const PROSE_LEGAL = 'mx-auto max-w-[65ch] text-[17px] leading-[1.65]'
@@ -25,11 +25,10 @@ const LI = 'leading-[1.65] text-body'
 export default function PrivacidadPage() {
   // Analytics se cargan via env vars opt-in. Si no están seteadas en el
   // deploy actual, este copy refleja la realidad (ningún script de
-  // tracking corre) en lugar de prometer Cloudflare/Clarity que no
+  // tracking corre) en lugar de prometer Cloudflare que no
   // existen.
   const analyticsActive =
-    Boolean(process.env.NEXT_PUBLIC_CLOUDFLARE_WA_TOKEN) ||
-    Boolean(process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID)
+    Boolean(process.env.NEXT_PUBLIC_CLOUDFLARE_WA_TOKEN)
 
   return (
     <main className="flex-1">
@@ -114,7 +113,7 @@ export default function PrivacidadPage() {
               <h2 className={H2}>Qué SÍ hacemos</h2>
               <p className={P}>
                 {analyticsActive
-                  ? 'Tres cosas, todas declaradas y bypaseables.'
+                  ? 'Métricas agregadas y almacenamiento local, descritos a continuación.'
                   : 'Una sola cosa, declarada y bajo tu control.'}
               </p>
 
@@ -132,19 +131,9 @@ export default function PrivacidadPage() {
                     visitas tuyas, ni saber qué hiciste dentro de la app.
                   </p>
 
-                  <h3 className={H3}>Heatmaps y grabaciones de sesión</h3>
                   <p className={P}>
-                    Usamos{' '}
-                    <strong className="text-ink">Microsoft Clarity</strong>{' '}
-                    en modo cookie-less, configurado para{' '}
-                    <strong className="text-ink">
-                      enmascarar todos los inputs
-                    </strong>{' '}
-                    de formularios. Lo que vemos es por dónde se mueve el
-                    cursor y dónde la gente se atasca, útil para mejorar la
-                    UX. Lo que <em>no</em> vemos es: qué escribes, tu nombre,
-                    RUT, ni ningún campo de tu boleta. Nunca capturamos texto
-                    de inputs.
+                    No cargamos herramientas de grabación de sesiones ni mapas
+                    de interacción que capturen el contenido de las boletas.
                   </p>
                 </>
               )}
@@ -153,8 +142,7 @@ export default function PrivacidadPage() {
                 <>
                   <h3 className={H3}>Sin analytics, por ahora</h3>
                   <p className={P}>
-                    Hoy no cargamos ningún script de analytics, ni de
-                    Google, ni de Cloudflare, ni de Microsoft Clarity. Si en
+                    En este despliegue no cargamos scripts de analytics. Si en
                     algún momento agregamos métricas (para entender qué
                     funcionalidades usar más), va a ser con proveedores{' '}
                     <strong className="text-ink">cookie-less</strong> y{' '}
@@ -217,27 +205,6 @@ export default function PrivacidadPage() {
                   </>
                 )}
               </p>
-              <ul className={UL}>
-                <li className={LI}>
-                  <strong className="text-ink">uBlock Origin</strong> (Firefox
-                  / Chrome): listas EasyPrivacy bloquean Cloudflare WA y
-                  Clarity por defecto.
-                </li>
-                <li className={LI}>
-                  <strong className="text-ink">Brave Browser</strong>: Shields
-                  on (default) bloquea ambos.
-                </li>
-                <li className={LI}>
-                  <strong className="text-ink">
-                    Firefox con Enhanced Tracking Protection en modo “Strict”
-                  </strong>
-                  : bloquea ambos.
-                </li>
-                <li className={LI}>
-                  <strong className="text-ink">Safari con Private Mode</strong>
-                  : bloquea ambos.
-                </li>
-              </ul>
               <p className={P}>
                 No hay banner de cookies pidiéndote consentimiento porque no
                 usamos cookies de tracking. Las métricas son cookie-less por

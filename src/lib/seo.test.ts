@@ -82,7 +82,7 @@ describe('buildMetadata', () => {
       path: '/g',
       ogKind: 'guide',
     })
-    expect(m.openGraph?.type).toBe('article')
+    expect(m.openGraph).toHaveProperty('type', 'article')
   })
 
   it('uses og type=website when ogKind=tool', () => {
@@ -92,7 +92,7 @@ describe('buildMetadata', () => {
       path: '/t',
       ogKind: 'tool',
     })
-    expect(m.openGraph?.type).toBe('website')
+    expect(m.openGraph).toHaveProperty('type', 'website')
   })
 
   it('respects explicit type override', () => {
@@ -103,7 +103,7 @@ describe('buildMetadata', () => {
       ogKind: 'guide',
       type: 'website',
     })
-    expect(m.openGraph?.type).toBe('website')
+    expect(m.openGraph).toHaveProperty('type', 'website')
   })
 
   it('adds noindex robots when noindex=true', () => {
@@ -123,7 +123,7 @@ describe('buildMetadata', () => {
 
   it('twitter card is summary_large_image', () => {
     const m = buildMetadata({ title: 'X', description: 'd', path: '/x' })
-    expect(m.twitter?.card).toBe('summary_large_image')
+    expect(m.twitter).toHaveProperty('card', 'summary_large_image')
   })
 
   it('threads ogCategory through to og:image URL', () => {
@@ -190,7 +190,7 @@ describe('JSON-LD schemas', () => {
     expect(s.url).toBe(`${SITE_URL}/guias/x`)
   })
 
-  it('articleSchema uses Person author when given, Organization fallback otherwise', () => {
+  it('articleSchema identifies the editorial team as an organization', () => {
     const a = articleSchema({
       title: 'T',
       description: 'd',
@@ -199,7 +199,7 @@ describe('JSON-LD schemas', () => {
       updatedAt: '2026-01-02',
       author: 'Equipo lalupa',
     })
-    expect(a.author).toEqual({ '@type': 'Person', name: 'Equipo lalupa' })
+    expect(a.author).toEqual({ '@type': 'Organization', name: 'Equipo lalupa', url: 'https://lalupa.cl/sobre#criterio-editorial' })
     const b = articleSchema({
       title: 'T',
       description: 'd',

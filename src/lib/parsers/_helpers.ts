@@ -138,6 +138,13 @@ export function parseChileanNumber(s: string): number {
  *   "13/08/2024", "13-08-24", "21 SEP 2024", "21 sep 2024",
  *   "12 Jun 2024", "23 May 2024".
  */
+function validCalendarDate(year: number, month: number, day: number): Date | null {
+  const date = new Date(year, month, day)
+  return date.getFullYear() === year && date.getMonth() === month && date.getDate() === day
+    ? date
+    : null
+}
+
 export function parseChileanDate(input: string): Date | null {
   const s = input.trim()
   if (!s) return null
@@ -148,7 +155,7 @@ export function parseChileanDate(input: string): Date | null {
     const month = parseInt(slash[2], 10) - 1
     const yearRaw = parseInt(slash[3], 10)
     const year = yearRaw < 100 ? 2000 + yearRaw : yearRaw
-    return new Date(year, month, day)
+    return validCalendarDate(year, month, day)
   }
 
   const named = s.match(/^(\d{1,2})[\s/-]([a-záéíóúñ]+)[\s/-](\d{2,4})$/i)
@@ -158,7 +165,7 @@ export function parseChileanDate(input: string): Date | null {
     if (monthIdx === undefined) return null
     const yearRaw = parseInt(named[3], 10)
     const year = yearRaw < 100 ? 2000 + yearRaw : yearRaw
-    return new Date(year, monthIdx, day)
+    return validCalendarDate(year, monthIdx, day)
   }
 
   return null

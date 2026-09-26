@@ -14,6 +14,19 @@ export interface TocEntry {
   slug: string
 }
 
+const EDITORIAL_RELATED: Record<string, string[]> = {
+  'gas-red-vs-cilindro-cual-conviene': [
+    'calefont-gas-elegir-potencia-ahorrar',
+    'reclamar-cobro-indebido-paso-a-paso',
+    'derechos-consumidor-chile-servicios-basicos',
+  ],
+  'como-leer-boleta-cge': [
+    'por-que-subio-mi-cuenta-de-luz',
+    'lectura-estimada-medidor-luz-cuando-es-legal',
+    'tarifa-bt1-vs-bt2-cual-conviene',
+  ],
+}
+
 /** Pure: filter a guide list to those matching the given tool path. */
 export function filterGuiasForTool<T extends GuiaListItem>(
   all: T[],
@@ -24,7 +37,7 @@ export function filterGuiasForTool<T extends GuiaListItem>(
 
 /**
  * Pure: pick guides related to the given (currentSlug, category).
- * Prefers same-category, falls back to other categories if short of `limit`.
+ * Prefers editorial selection, then category, then remaining guides.
  */
 export function pickRelatedGuias<T extends GuiaListItem>(
   all: T[],
@@ -32,14 +45,21 @@ export function pickRelatedGuias<T extends GuiaListItem>(
   category: CategoriaGuia,
   limit = 3,
 ): T[] {
+  const curated = (EDITORIAL_RELATED[currentSlug] ?? []).flatMap((slug) =>
+    all.filter((g) => g.slug === slug && g.slug !== currentSlug),
+  )
   const sameCategory = all.filter(
     (g) => g.slug !== currentSlug && g.category === category,
   )
-  if (sameCategory.length >= limit) return sameCategory.slice(0, limit)
   const others = all.filter(
     (g) => g.slug !== currentSlug && g.category !== category,
   )
-  return [...sameCategory, ...others].slice(0, limit)
+  const seen = new Set<string>()
+  return [...curated, ...sameCategory, ...others].filter((g) => {
+    if (seen.has(g.slug)) return false
+    seen.add(g.slug)
+    return true
+  }).slice(0, limit)
 }
 
 export function formatReadingTime(text: string): string {

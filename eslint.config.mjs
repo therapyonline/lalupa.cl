@@ -14,6 +14,7 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Vendored assets (Tesseract worker, pdfjs worker, copiados via postinstall):
     "public/tesseract/**",
+    "public/parser-assets/**",
     "public/pdf.worker.min.mjs",
     // Reportes de coverage generados por vitest:
     "coverage/**",

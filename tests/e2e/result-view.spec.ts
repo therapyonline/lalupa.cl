@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { PDFDocument, StandardFonts } from 'pdf-lib'
 
 /**
  * Tests del flujo result-view inyectando directamente texto de fixture
@@ -43,6 +44,23 @@ Total a pagar ................ $ 111.543
 const SESSION_KEY = 'lalupa:lastParsed'
 
 test.describe('Boleta result view', () => {
+  test('PDF nativo conserva líneas del detalle al pasar por PDF.js', async ({ page }) => {
+    const pdf = await PDFDocument.create()
+    const sheet = pdf.addPage([595, 842])
+    const font = await pdf.embedFont(StandardFonts.Helvetica)
+    CGE_SAMPLE_TEXT.trim().split('\n').forEach((line, index) => {
+      sheet.drawText(line, { x: 30, y: 810 - index * 20, font, size: 10 })
+    })
+    await page.goto('/boleta-luz')
+    await page.locator('input[type="file"]').setInputFiles({
+      name: 'cge-sintetica.pdf', mimeType: 'application/pdf', buffer: Buffer.from(await pdf.save()),
+    })
+    await page.waitForURL('/boleta-luz/cge', { timeout: 30000 })
+    await expect(page.getByText('Cargo por energía', { exact: true }).first()).toBeVisible()
+    await expect(page.getByText('Cargo fijo', { exact: true }).first()).toBeVisible()
+    await expect(page.getByText('Lectura parcial', { exact: true })).not.toBeVisible()
+    await expect(page.getByText(/Esto no confirma que la facturación sea correcta/)).toBeVisible()
+  })
   test('CGE: payload válido renderiza cargos, período y total', async ({
     page,
   }) => {
@@ -203,6 +221,8 @@ Cargo por energía ............ $ 30.000
     await expect(page.getByText(/Invalid time value|invalid date/i)).not.toBeVisible()
     // Debe mostrar "Período no detectado" o un fallback razonable.
     await expect(page.getByText(/no detectado|Resultado/i).first()).toBeVisible()
+    await expect(page.getByText(/La lectura está incompleta/)).toBeVisible()
+    await expect(page.getByText(/Revisamos cada línea contra/)).not.toBeVisible()
   })
 
   test('result view es noindex (privacidad: ruta del usuario)', async ({

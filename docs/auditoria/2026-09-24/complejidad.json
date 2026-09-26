@@ -1,0 +1,67 @@
+[
+  {
+    "file": "src/app/boleta-agua/[empresa]/_components/result-view.tsx",
+    "line": 63,
+    "message": "Arrow function has a complexity of 16. Maximum allowed is 15."
+  },
+  {
+    "file": "src/app/boleta-gas/[empresa]/_components/result-view.tsx",
+    "line": 63,
+    "message": "Arrow function has a complexity of 16. Maximum allowed is 15."
+  },
+  {
+    "file": "src/components/parsers/PartialExtractionAlert.tsx",
+    "line": 36,
+    "message": "Function 'PartialExtractionAlert' has a complexity of 17. Maximum allowed is 15."
+  },
+  {
+    "file": "src/data/internet-planes.ts",
+    "line": 374,
+    "message": "Arrow function has a complexity of 25. Maximum allowed is 15."
+  },
+  {
+    "file": "src/lib/parsers/agua/_siss-family.ts",
+    "line": 176,
+    "message": "Function 'detectarSospecha' has a complexity of 29. Maximum allowed is 15."
+  },
+  {
+    "file": "src/lib/parsers/agua/_siss-family.ts",
+    "line": 253,
+    "message": "Function 'parseSissFamily' has a complexity of 27. Maximum allowed is 15."
+  },
+  {
+    "file": "src/lib/parsers/agua/esval.ts",
+    "line": 83,
+    "message": "Function 'parseEsval' has a complexity of 18. Maximum allowed is 15."
+  },
+  {
+    "file": "src/lib/parsers/agua/smapa.ts",
+    "line": 91,
+    "message": "Function 'parseSmapa' has a complexity of 21. Maximum allowed is 15."
+  },
+  {
+    "file": "src/lib/parsers/engine.ts",
+    "line": 57,
+    "message": "Function 'countAlphanumeric' has a complexity of 22. Maximum allowed is 15."
+  },
+  {
+    "file": "src/lib/parsers/gas/gasco.ts",
+    "line": 82,
+    "message": "Function 'parseGasco' has a complexity of 17. Maximum allowed is 15."
+  },
+  {
+    "file": "src/lib/parsers/gas/lipigas.ts",
+    "line": 73,
+    "message": "Function 'parseLipigas' has a complexity of 16. Maximum allowed is 15."
+  },
+  {
+    "file": "src/lib/parsers/image-preprocess.ts",
+    "line": 45,
+    "message": "Async function 'preprocessImageForOcr' has a complexity of 25. Maximum allowed is 15."
+  },
+  {
+    "file": "src/lib/parsers/use-boleta-upload.ts",
+    "line": 121,
+    "message": "Async function 'handleFiles' has a complexity of 19. Maximum allowed is 15."
+  }
+]

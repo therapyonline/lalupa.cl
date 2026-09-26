@@ -45,15 +45,12 @@ const SECURITY_HEADERS = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self'",
-      // Cloudflare Web Analytics + MS Clarity son cookie-less. Whitelisteamos
-      // sus dominios para el caso opt-in (env vars `NEXT_PUBLIC_CLOUDFLARE_WA_TOKEN`
-      // y `NEXT_PUBLIC_CLARITY_PROJECT_ID`). Si el usuario tiene blocker, no
-      // cargan y la app funciona igual.
-      "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://static.cloudflareinsights.com https://*.clarity.ms",
+      // Métricas agregadas opcionales; no habilitar grabación de sesiones.
+      "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://static.cloudflareinsights.com",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://*.clarity.ms",
+      "img-src 'self' data: blob:",
       "font-src 'self' data:",
-      "connect-src 'self' https://static.cloudflareinsights.com https://cloudflareinsights.com https://*.clarity.ms",
+      "connect-src 'self' https://static.cloudflareinsights.com https://cloudflareinsights.com",
       "worker-src 'self' blob:",
       "frame-ancestors 'none'",
       "base-uri 'self'",
@@ -106,32 +103,22 @@ const nextConfig: NextConfig = {
         source: '/:path*',
         headers: SECURITY_HEADERS,
       },
-      // Logo: contenido inmutable, cache largo.
+      // Solo los recursos identificados por contenido reciben caché inmutable.
       {
-        source: '/icon.svg',
+        source: '/parser-assets/:bundle/:path*',
         headers: CACHE_IMMUTABLE,
       },
-      // Tesseract assets (worker, core wasm, traineddata): nunca cambian
-      // entre deploys salvo upgrade de tesseract.js.
-      {
-        source: '/tesseract/:path*',
-        headers: CACHE_IMMUTABLE,
-      },
-      // PDF.js worker.
-      {
-        source: '/pdf.worker.min.mjs',
-        headers: CACHE_IMMUTABLE,
-      },
+      // URLs históricas sin hash: deben revalidarse si permanecen en el deploy.
+      ...['/icon.svg', '/pdf.worker.min.mjs', '/tesseract/:path*'].map((source) => ({
+        source,
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=0, must-revalidate' }],
+      })),
       // OG image: regenerable, cache 24h con stale-while-revalidate.
       {
         source: '/api/og',
         headers: CACHE_24H_REVALIDATE,
       },
-      // Fuentes Google self-hosted por next/font: hash en filename, immutable.
-      {
-        source: '/_next/static/media/:path*',
-        headers: CACHE_IMMUTABLE,
-      },
+
     ]
   },
 }

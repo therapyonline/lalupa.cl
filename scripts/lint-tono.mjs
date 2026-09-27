@@ -17,7 +17,7 @@
  *      node scripts/lint-tono.mjs --quiet  # solo exit code, sin output
  */
 
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { execSync } from 'node:child_process'
 import { resolve } from 'node:path'
 
@@ -100,16 +100,15 @@ const VOSEO_REGEX = new RegExp(
 )
 
 function listFiles() {
-  // Files versionados: solo lo que está en git para evitar caches y node_modules.
+  // Incluye archivos nuevos y omite eliminados; respeta los ignores de Git.
   const out = execSync(
-    'git ls-files src/',
+    'git ls-files --cached --others --exclude-standard -z src/',
     { cwd: ROOT, encoding: 'utf8' },
   )
-  return out
-    .trim()
-    .split('\n')
+  return [...new Set(out.split('\0'))]
     .filter((f) => /\.(ts|tsx|mdx|md|json)$/.test(f))
     .filter((f) => !/(test|spec|fixture|__tests__|__fixtures__)/.test(f))
+    .filter((f) => existsSync(resolve(ROOT, f)))
 }
 
 function lintFile(relPath) {

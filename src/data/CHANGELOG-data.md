@@ -1,3 +1,11 @@
+## 2026-09-26 · Comparador de internet y fuentes por oferta
+
+- Sustituido el catálogo de mayo/junio y sus estimaciones por siete observaciones de WOM, Movistar, GTD y Mundo, con fuente y fecha individual.
+- Los tramos de precio, instalación desconocida y vencimiento ya son datos estructurados. No se completa una cotización con importes supuestos.
+- Retirado `internet-fibra-2026.ts`: duplicaba precios y estadísticas que ya no se publican en la página. El historial permanece en Git.
+- Enlaces de Entel, Claro y VTR disponibles para consulta; no se simulan ofertas ni cobertura. Mundo usa su sitio oficial `tumundo.cl`.
+- Detalle de selección, limitaciones de fuentes y validación: `docs/MEJORAS_LOTE_6_ONSITE_2026-09-26.md`.
+
 # CHANGELOG-data
 
 Registro de actualizaciones de los datasets en `src/data/`. Cada fila refleja el origen y la fecha en que el archivo fue extraído de fuentes primarias.

@@ -1,0 +1,9 @@
+
+> lalupa@0.1.0 lint /Users/estebanlorca/Projects/lalupa.cl
+> eslint
+
+
+> lalupa@0.1.0 lint:tono /Users/estebanlorca/Projects/lalupa.cl
+> node scripts/lint-tono.mjs
+
+✓ Lint tono OK (157 archivos revisados)

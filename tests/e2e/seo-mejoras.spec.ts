@@ -13,6 +13,8 @@ const guides = [
   'reclamar-cobro-indebido-paso-a-paso',
   'derechos-consumidor-chile-servicios-basicos',
   'subsidio-agua-potable-sap-chile',
+  'fibra-vs-cable-internet-chile',
+  'reclamar-subtel-internet-paso-a-paso',
 ]
 
 const revisadasEl26 = new Set(guides.slice(7))

@@ -56,7 +56,7 @@ const TOOLS = [
     badge: null,
     title: 'Comparador de planes de internet',
     description:
-      'WOM, Movistar, Entel, Claro, VTR, Mundo, GTD. Filtros por velocidad, presupuesto y comuna.',
+      'Compara mensualidades e instalación a 12 o 24 meses. Precios con fuentes y enlaces para consultar cobertura.',
   },
 ] as const
 

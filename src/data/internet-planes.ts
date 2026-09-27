@@ -1,486 +1,170 @@
-/**
- * Planes de Internet Hogar Chile, Mayo 2026
- *
- * DATOS REFERENCIALES, última actualización 2026-05-06
- * Verificar antes de usar en producción contra páginas oficiales.
- * No hay API pública unificada; el dataset se actualiza manualmente.
- *
- * Fuentes: páginas oficiales de cada empresa + Google snippets a 2026-05-06
- */
+import type { PlanInternet } from '@/lib/internet/comparacion'
 
-// ============================================================================
-// TIPOS
-// ============================================================================
+/** Observaciones editoriales, no cotizaciones ni catálogo completo del mercado. */
+export const INTERNET_REVISION = '2026-09-26'
+const wom = 'https://store.wom.cl/hogar/internet-hogar/'
+const movistar = 'https://ww2.movistar.cl/hogar/internet-hogar/'
+const mundo = 'https://www.tumundo.cl/hogar/1-mundo/'
+const gtd =
+  'https://www.gtd.cl/hogar/productos-hogar/internet-fibra-optica/internet-hogar-giga'
+const base = {
+  tecnologia: 'Fibra (FTTH)',
+  observadaEl: INTERNET_REVISION,
+  revisarEl: '2026-10-26',
+  instalacionCLP: 0,
+} as const
 
-export type Tecnologia = 'fibra' | 'cable' | 'inalambrica' | '5g';
-export type ServicioIncluido = 'internet' | 'tv' | 'telefonia' | 'streaming';
-
-export interface PlanInternet {
-  id: string;
-  empresa: string;
-  plan: string;
-  velocidad: { bajada: number; subida: number }; // Mbps
-  tecnologia: Tecnologia;
-  precio: {
-    mes1a12: number;
-    mes13plus: number; // post-promoción
-  };
-  promoDuraMeses: number; // duración de la promo (Movistar = 6, resto típico = 12)
-  compromisoMeses: number; // 0 = sin compromiso
-  servicios: ServicioIncluido[];
-  coberturaRegiones: string[]; // o ['nacional']
-  alertas: string[];
-  fuente: string;
-}
-
-// ============================================================================
-// DATASET
-// ============================================================================
-
-export const PLANES_INTERNET_2026: PlanInternet[] = [
-  // ───────── WOM HOGAR ─────────
+export const PLANES_INTERNET: readonly PlanInternet[] = [
   {
-    id: 'wom-fibra-600',
-    empresa: 'WOM',
-    plan: 'Fibra 600',
-    velocidad: { bajada: 600, subida: 600 },
-    tecnologia: 'fibra',
-    precio: { mes1a12: 9990, mes13plus: 21990 },
-    promoDuraMeses: 12,
-    compromisoMeses: 0,
-    servicios: ['internet'],
-    coberturaRegiones: ['nacional'], // verificar factibilidad
-    alertas: ['Precio sube +120% al mes 13.', 'Cobertura limitada en zonas rurales.'],
-    fuente: 'https://www.wom.cl/hogar/internet/',
-  },
-  {
-    id: 'wom-fibra-800',
-    empresa: 'WOM',
-    plan: 'Fibra 800',
-    velocidad: { bajada: 800, subida: 800 },
-    tecnologia: 'fibra',
-    precio: { mes1a12: 13990, mes13plus: 24000 },
-    promoDuraMeses: 12,
-    compromisoMeses: 0,
-    servicios: ['internet'],
-    coberturaRegiones: ['nacional'],
-    alertas: ['Precio post-promo estimado.'],
-    fuente: 'https://www.wom.cl/hogar/internet/',
-  },
-  {
-    id: 'wom-fibra-940',
-    empresa: 'WOM',
-    plan: 'Fibra 940',
-    velocidad: { bajada: 940, subida: 940 },
-    tecnologia: 'fibra',
-    precio: { mes1a12: 15990, mes13plus: 26000 },
-    promoDuraMeses: 12,
-    compromisoMeses: 0,
-    servicios: ['internet'],
-    coberturaRegiones: ['nacional'],
-    alertas: ['Precio post-promo estimado.'],
-    fuente: 'https://www.wom.cl/hogar/internet/',
-  },
-
-  // ───────── ENTEL HOGAR ─────────
-  {
-    id: 'entel-fibra-600',
-    empresa: 'Entel',
-    plan: 'Fibra 600 con WiFi 6',
-    velocidad: { bajada: 600, subida: 600 },
-    tecnologia: 'fibra',
-    precio: { mes1a12: 13990, mes13plus: 22990 },
-    promoDuraMeses: 12,
-    compromisoMeses: 0,
-    servicios: ['internet'],
-    coberturaRegiones: ['nacional'],
-    alertas: ['Incluye Club Entel.'],
-    fuente: 'https://www.entel.cl/hogar/',
-  },
-  {
-    id: 'entel-fibra-800',
-    empresa: 'Entel',
-    plan: 'Fibra 800 con WiFi 6',
-    velocidad: { bajada: 800, subida: 800 },
-    tecnologia: 'fibra',
-    precio: { mes1a12: 18990, mes13plus: 28000 },
-    promoDuraMeses: 12,
-    compromisoMeses: 0,
-    servicios: ['internet'],
-    coberturaRegiones: ['nacional'],
-    alertas: ['Precio post-promo estimado.'],
-    fuente: 'https://www.entel.cl/hogar/',
-  },
-
-  // ───────── MOVISTAR HOGAR ─────────
-  // Precios reconciliados con internet-fibra-2026.ts (verificado contra
-  // sitio oficial 2026-06-04), que es la fuente de verdad.
-  {
-    id: 'movistar-fibra-600',
-    empresa: 'Movistar',
-    plan: 'Fibra 600',
-    velocidad: { bajada: 600, subida: 600 },
-    tecnologia: 'fibra',
-    precio: { mes1a12: 13990, mes13plus: 18990 },
-    promoDuraMeses: 6, // ⚠️ Movistar 600 tiene la promo más corta
-    compromisoMeses: 0,
-    servicios: ['internet'],
-    coberturaRegiones: ['nacional'],
-    alertas: [
-      'Promoción dura solo 6 meses (la más corta del mercado).',
-      'Repetidor WiFi NO incluido, costo adicional $2.990/mes.',
-    ],
-    fuente: 'https://ww2.movistar.cl/hogar/internet-fibra-optica/',
-  },
-  {
-    id: 'movistar-fibra-800',
-    empresa: 'Movistar',
-    plan: 'Fibra 800',
-    velocidad: { bajada: 800, subida: 800 },
-    tecnologia: 'fibra',
-    precio: { mes1a12: 18990, mes13plus: 27990 },
-    promoDuraMeses: 12,
-    compromisoMeses: 0,
-    servicios: ['internet'],
-    coberturaRegiones: ['nacional'],
-    alertas: [
-      'Precio post-promo estimado (no publicado en sitio oficial).',
-      'Repetidor WiFi NO incluido.',
-    ],
-    fuente: 'https://ww2.movistar.cl/hogar/internet-fibra-optica/',
-  },
-  {
-    id: 'movistar-fibra-940',
-    empresa: 'Movistar',
-    plan: 'Fibra Giga (940)',
-    velocidad: { bajada: 940, subida: 940 },
-    tecnologia: 'fibra',
-    precio: { mes1a12: 28990, mes13plus: 36990 },
-    promoDuraMeses: 12,
-    compromisoMeses: 0,
-    servicios: ['internet'],
-    coberturaRegiones: ['nacional'],
-    alertas: ['Repetidor WiFi NO incluido.'],
-    fuente: 'https://ww2.movistar.cl/hogar/internet-fibra-optica/',
-  },
-
-  // ───────── MUNDO ─────────
-  {
-    id: 'mundo-fibra-1g',
+    ...base,
+    id: 'mundo-800',
     empresa: 'Mundo',
-    plan: 'Fibra 1 Giga',
-    velocidad: { bajada: 1000, subida: 1000 },
-    tecnologia: 'fibra',
-    // mes13plus refleja el precio EFECTIVO del tramo mes 13-24 ($15.990),
-    // no el del mes 25+ ($21.990), para que el costo real a 24 meses sea
-    // honesto. El tercer escalón queda documentado en la alerta.
-    precio: { mes1a12: 14990, mes13plus: 15990 },
-    promoDuraMeses: 12,
-    compromisoMeses: 24, // ⚠️ Mundo tiene 24 meses de compromiso
+    nombre: 'Plan 1 Mundo 800',
+    bajadaMbps: 800,
+    subidaMbps: 800,
     servicios: ['internet'],
-    coberturaRegiones: ['nacional'], // limitada en algunas zonas
-    alertas: [
-      '⚠️ Compromiso 24 meses, multa por término anticipado.',
-      'Precio escalado: $14.990 (mes 4-12) → $15.990 (mes 13-24) → $21.990 (mes 25+).',
-      'Promoción inicial de 3 meses puede tener precio aún menor.',
+    tramos: [
+      { desde: 1, hasta: 3, mensualCLP: 12990 },
+      { desde: 4, hasta: 12, mensualCLP: 14990 },
+      { desde: 13, hasta: 24, mensualCLP: 15990 },
+      { desde: 25, hasta: null, mensualCLP: 21990 },
     ],
-    fuente: 'https://www.mundo.cl/personas/',
+    instalacionCLP: null,
+    ofertaHasta: '2026-09-30',
+    fuente: mundo,
+    condiciones:
+      'Nuevas contrataciones sujetas a factibilidad y reajuste anual por IPC. La fuente consultada no permite confirmar el cargo de instalación; pide una cotización completa.',
   },
-
-  // ───────── GTD ─────────
   {
-    id: 'gtd-doblepack-600',
-    empresa: 'GTD',
-    plan: 'Doble Pack Fibra 600 + GTD TV',
-    velocidad: { bajada: 600, subida: 600 },
-    tecnologia: 'fibra',
-    precio: { mes1a12: 20980, mes13plus: 28000 },
-    promoDuraMeses: 12,
-    compromisoMeses: 12,
+    ...base,
+    id: 'wom-600',
+    empresa: 'WOM',
+    nombre: 'Fibra 600',
+    bajadaMbps: 600,
+    subidaMbps: 600,
+    servicios: ['internet'],
+    tramos: [
+      { desde: 1, hasta: 12, mensualCLP: 11990 },
+      { desde: 13, hasta: null, mensualCLP: 21990 },
+    ],
+    ofertaHasta: '2026-09-28',
+    fuente: wom,
+    condiciones:
+      'Oferta flash publicada para el 15 al 28 de septiembre. Instalación sin costo; extensor opcional no incluido en la proyección.',
+  },
+  {
+    ...base,
+    id: 'wom-800',
+    empresa: 'WOM',
+    nombre: 'Fibra 800',
+    bajadaMbps: 800,
+    subidaMbps: 800,
+    servicios: ['internet'],
+    tramos: [
+      { desde: 1, hasta: 12, mensualCLP: 14990 },
+      { desde: 13, hasta: null, mensualCLP: 24990 },
+    ],
+    ofertaHasta: '2026-09-28',
+    fuente: wom,
+    condiciones:
+      'Oferta publicada hasta el 28 de septiembre. Instalación sin costo; extensor opcional no incluido en la proyección.',
+  },
+  {
+    ...base,
+    id: 'movistar-800',
+    empresa: 'Movistar',
+    nombre: 'Fibra 800',
+    bajadaMbps: 800,
+    subidaMbps: 800,
+    servicios: ['internet'],
+    tramos: [{ desde: 1, hasta: null, mensualCLP: 19990 }],
+    fuente: movistar,
+    condiciones:
+      'Precio único anunciado. Instalación gratuita contratando por web. No equivale a precio congelado: confirma reajustes y equipos adicionales.',
+  },
+  {
+    ...base,
+    id: 'movistar-giga',
+    empresa: 'Movistar',
+    nombre: 'Fibra Giga',
+    bajadaMbps: 940,
+    subidaMbps: 940,
+    servicios: ['internet'],
+    tramos: [
+      { desde: 1, hasta: 12, mensualCLP: 18990 },
+      { desde: 13, hasta: null, mensualCLP: 26990 },
+    ],
+    fuente: movistar,
+    condiciones:
+      'Promoción de 12 meses e instalación gratuita por web. Confirma los equipos incluidos: la página contiene condiciones distintas sobre repetidores.',
+  },
+  {
+    ...base,
+    id: 'movistar-duo-600',
+    empresa: 'Movistar',
+    nombre: 'Fibra 600 + TV + HBO',
+    bajadaMbps: 600,
+    subidaMbps: 600,
     servicios: ['internet', 'tv'],
-    coberturaRegiones: ['nacional'],
-    alertas: ['Incluye 86 canales TV nacional.', 'Precio post-promo estimado.'],
-    fuente: 'https://www.gtd.cl/hogar/',
-  },
-
-  // ───────── CLARO ─────────
-  {
-    id: 'claro-internet-600',
-    empresa: 'Claro',
-    plan: 'Solo Internet 600',
-    velocidad: { bajada: 600, subida: 600 },
-    tecnologia: 'fibra',
-    precio: { mes1a12: 14990, mes13plus: 22000 },
-    promoDuraMeses: 12,
-    compromisoMeses: 0,
-    servicios: ['internet'],
-    coberturaRegiones: ['nacional'],
-    alertas: ['Incluye apps Claro Video.'],
-    fuente: 'https://www.clarochile.cl/personas/internet/',
-  },
-  {
-    id: 'claro-doblepack-600',
-    empresa: 'Claro',
-    plan: 'Doble Pack Internet 600 + TV HD',
-    velocidad: { bajada: 600, subida: 600 },
-    tecnologia: 'fibra',
-    precio: { mes1a12: 26990, mes13plus: 36990 },
-    promoDuraMeses: 12,
-    compromisoMeses: 0,
-    servicios: ['internet', 'tv', 'streaming'],
-    coberturaRegiones: ['nacional'],
-    alertas: ['Precio sube +37% al terminar la promoción.'],
-    fuente: 'https://www.clarochile.cl/personas/',
-  },
-
-  // ───────── VTR / DIRECTV ─────────
-  // PENDIENTE: precios reales requieren ingresar dirección en vtr.com.
-  // Los valores acá son estimaciones conservadoras basadas en rangos
-  // públicos. Validar antes de cada release.
-  {
-    id: 'vtr-internet-600',
-    empresa: 'VTR',
-    plan: 'Internet 600 (VTR/DirecTV)',
-    velocidad: { bajada: 600, subida: 100 },
-    tecnologia: 'cable',
-    precio: { mes1a12: 19990, mes13plus: 28990 },
-    promoDuraMeses: 12,
-    compromisoMeses: 18,
-    servicios: ['internet'],
-    coberturaRegiones: ['nacional'],
-    alertas: [
-      'Disponibilidad limitada por comuna, verificar factibilidad técnica.',
-      'Subida asimétrica (cable, no fibra simétrica).',
-      'Datos referenciales (verificar precios actuales en vtr.com).',
+    tramos: [
+      { desde: 1, hasta: 12, mensualCLP: 28990 },
+      { desde: 13, hasta: null, mensualCLP: 36990 },
     ],
-    fuente: 'https://www.vtr.com/personas/internet',
+    fuente: movistar,
+    condiciones:
+      'Pack con televisión; instalación gratuita por web. Confirma canales, condiciones del streaming y equipos adicionales antes de contratar.',
   },
   {
-    id: 'vtr-triple-pack',
-    empresa: 'VTR',
-    plan: 'Triple Pack Internet + TV + Telefonía',
-    velocidad: { bajada: 600, subida: 100 },
-    tecnologia: 'cable',
-    precio: { mes1a12: 29990, mes13plus: 41990 },
-    promoDuraMeses: 12,
-    compromisoMeses: 18,
-    servicios: ['internet', 'tv', 'telefonia'],
-    coberturaRegiones: ['nacional'],
-    alertas: [
-      'Disponibilidad limitada por comuna.',
-      'Requiere TV digital adicional para el receptor.',
-      'Datos referenciales.',
-    ],
-    fuente: 'https://www.vtr.com/personas/triple-pack',
-  },
-
-  // ───────── PLANES AGREGADOS RESEARCH JUNIO 2026 ─────────
-  // Verificados contra sitios oficiales en 2026-06-04. Datos
-  // consolidados en src/data/internet-fibra-2026.ts.
-
-  {
-    // VTR ahora ofrece fibra simétrica nueva además del HFC legacy.
-    // Diferencial único: sin permanencia explícito.
-    id: 'vtr-fibra-600-sin-permanencia',
-    empresa: 'VTR',
-    plan: 'VTR Fibra Hogar 600 (sin permanencia)',
-    velocidad: { bajada: 600, subida: 600 },
-    tecnologia: 'fibra',
-    precio: { mes1a12: 26990, mes13plus: 33990 },
-    promoDuraMeses: 12,
-    compromisoMeses: 0,
-    servicios: ['internet'],
-    coberturaRegiones: ['nacional'],
-    alertas: [
-      'Único operador con plan sin permanencia explícito.',
-      'Migración activa de clientes HFC a FTTH simétrica.',
-    ],
-    fuente: 'https://vtr.com/productos/hogar-packs/internet-hogar/',
-  },
-  {
-    // Mundo es el único con 10 Gbps masivo en Chile 2026.
-    id: 'mundo-fibra-800',
-    empresa: 'Mundo',
-    plan: 'Fibra 800',
-    velocidad: { bajada: 800, subida: 800 },
-    tecnologia: 'fibra',
-    precio: { mes1a12: 15990, mes13plus: 21990 },
-    promoDuraMeses: 12,
-    compromisoMeses: 12,
-    servicios: ['internet'],
-    coberturaRegiones: ['nacional'],
-    alertas: [
-      'Sin multa por terminación tras los 12 meses.',
-      'Llega a zonas rurales que Movistar y Entel no cubren.',
-    ],
-    fuente: 'https://mundointernet.cl/p/td/mundo-internet-planes.html',
-  },
-  {
-    id: 'gtd-fibra-600',
+    ...base,
+    id: 'gtd-940',
     empresa: 'GTD',
-    plan: 'Fibra Hogar 600',
-    velocidad: { bajada: 600, subida: 600 },
-    tecnologia: 'fibra',
-    precio: { mes1a12: 17990, mes13plus: 26000 },
-    promoDuraMeses: 12,
-    compromisoMeses: 12,
+    nombre: 'Fibra 940',
+    bajadaMbps: 940,
+    subidaMbps: null,
     servicios: ['internet'],
-    coberturaRegiones: ['nacional'],
-    alertas: [
-      'Instalación $ 29.990 con cargo aparte.',
-      'Precio sube 30-45% al terminar promoción.',
-      'Cobertura limitada vs Movistar/Entel.',
+    tramos: [
+      { desde: 1, hasta: 12, mensualCLP: 20990 },
+      { desde: 13, hasta: null, mensualCLP: 31990 },
     ],
-    fuente: 'https://www.gtd.cl/hogar/productos-hogar-internet-fibra',
+    ofertaHasta: '2026-09-30',
+    fuente: gtd,
+    condiciones:
+      'Nuevas contrataciones residenciales del 1 al 30 de septiembre. Instalación $0, IVA incluido y reajuste por IPC. Subida por confirmar.',
   },
-];
+]
 
-// ============================================================================
-// HELPERS
-// ============================================================================
+/** Estos enlaces no acreditan cobertura ni precios en una dirección. */
+export const PROVEEDORES_INTERNET = [
+  { nombre: 'WOM', url: wom },
+  { nombre: 'Movistar', url: movistar },
+  { nombre: 'GTD', url: gtd },
+  { nombre: 'Entel', url: 'https://www.entel.cl/hogar/internet' },
+  {
+    nombre: 'Claro',
+    url: 'https://www.clarochile.cl/personas/servicios/servicios-hogar/internet/planes-y-precios/',
+  },
+  {
+    nombre: 'VTR',
+    url: 'https://vtr.com/productos/hogar-packs/internet-hogar/',
+  },
+  { nombre: 'Mundo', url: mundo },
+] as const
 
-export interface CriteriosBusqueda {
-  velocidadMin?: number; // Mbps mínimos requeridos
-  presupuestoMaxPromo?: number; // CLP máximos precio promo
-  presupuestoMaxPostPromo?: number; // CLP máximos precio post-promo
-  /**
-   * Presupuesto máximo en CLP del COSTO PROMEDIO MENSUAL a 24 meses
-   * (incluye promo + post-promo). Cifra honesta para comparar planes
-   * con duración de promo distinta (Movistar 6 meses vs Entel/Mundo 12).
-   */
-  presupuestoMaxCostoVerdadero?: number
-  region?: string; // 'nacional' o nombre de región
-  servicios?: ServicioIncluido[]; // requerimientos
-  evitarCompromisoLargo?: boolean; // si true, excluir planes con compromiso >12 meses
-  /** Si true, solo planes con compromiso 0 meses (cancelable en cualquier momento). */
-  sinPermanencia?: boolean
-  /** Filtro por tecnología (fibra incluye 'fibra'; cable incluye HFC). */
-  tecnologia?: Tecnologia
-  /** Empresa específica si el usuario tiene preferencia. */
-  empresa?: string
-}
-
-export interface PlanScored extends PlanInternet {
-  score: number; // 0-100
-  motivosScore: string[];
-}
-
-/**
- * Compara y ordena planes según los criterios. Retorna los planes con score
- * (más alto = mejor match).
- */
-export function compararPlanes(criterios: CriteriosBusqueda): PlanScored[] {
-  return PLANES_INTERNET_2026
-    .filter((plan) => {
-      // Filtros duros
-      if (criterios.velocidadMin && plan.velocidad.bajada < criterios.velocidadMin) return false;
-      if (criterios.presupuestoMaxPromo && plan.precio.mes1a12 > criterios.presupuestoMaxPromo) return false;
-      if (criterios.presupuestoMaxPostPromo && plan.precio.mes13plus > criterios.presupuestoMaxPostPromo) return false;
-      if (criterios.presupuestoMaxCostoVerdadero) {
-        const costoVerdadero = costoVerdaderoPromedioMensual(plan)
-        if (costoVerdadero > criterios.presupuestoMaxCostoVerdadero) return false
-      }
-      if (criterios.evitarCompromisoLargo && plan.compromisoMeses > 12) return false;
-      if (criterios.sinPermanencia && plan.compromisoMeses > 0) return false
-      if (criterios.tecnologia && plan.tecnologia !== criterios.tecnologia) return false
-      if (criterios.empresa && plan.empresa.toLowerCase() !== criterios.empresa.toLowerCase()) {
-        return false
-      }
-      if (criterios.servicios?.length) {
-        for (const s of criterios.servicios) {
-          if (!plan.servicios.includes(s)) return false;
-        }
-      }
-      if (criterios.region && criterios.region !== 'nacional') {
-        if (!plan.coberturaRegiones.includes('nacional') && !plan.coberturaRegiones.includes(criterios.region)) {
-          return false;
-        }
-      }
-      return true;
-    })
-    .map((plan) => {
-      const motivos: string[] = [];
-      let score = 0;
-
-      // 30%, COSTO REAL a 24 meses dentro del presupuesto (más bajo = mejor).
-      // Usamos el costo verdadero promedio (promo + post-promo), no solo el
-      // precio promo, para que el orden "Score (recomendado)" sea coherente
-      // con la métrica honesta que el sitio muestra. Así un plan con promo
-      // corta que luego sube fuerte NO premia por encima de uno estable.
-      const costoReal = costoVerdaderoPromedioMensual(plan);
-      const techo = criterios.presupuestoMaxPromo ?? 26000; // techo de mercado si no hay presupuesto
-      const ratioCosto = costoReal / techo;
-      const subscorePrecio = Math.round((1 - Math.min(ratioCosto, 1)) * 30);
-      score += subscorePrecio;
-      if (subscorePrecio >= 20)
-        motivos.push(
-          `Costo real promedio a 24 meses $${costoReal.toLocaleString('es-CL')}/mes, conveniente.`,
-        );
-
-      // 30%, velocidad cumple/supera mínimo
-      if (criterios.velocidadMin) {
-        const exceso = plan.velocidad.bajada / criterios.velocidadMin;
-        const subscore = Math.round(Math.min(exceso, 2) * 15); // hasta 30 puntos si dobla la velocidad
-        score += subscore;
-        if (subscore >= 25) motivos.push(`Velocidad ${plan.velocidad.bajada} Mbps supera tu mínimo de ${criterios.velocidadMin}.`);
-      } else {
-        score += 15;
-      }
-
-      // 20%, pocas alertas (precio estable)
-      const subscoreAlertas = Math.max(0, 20 - plan.alertas.length * 5);
-      score += subscoreAlertas;
-      if (plan.alertas.length === 0) motivos.push('Sin alertas de letra chica.');
-
-      // 20%, match exacto de servicios
-      if (criterios.servicios?.length) {
-        const cumpleTodos = criterios.servicios.every((s) => plan.servicios.includes(s));
-        score += cumpleTodos ? 20 : 0;
-        if (cumpleTodos) motivos.push('Incluye todos los servicios solicitados.');
-      } else {
-        score += 10;
-      }
-
-      return { ...plan, score, motivosScore: motivos };
-    })
-    .sort((a, b) => b.score - a.score);
-}
-
-export function calcularCostoTotal12Meses(plan: PlanInternet): number {
-  const mesesPromo = Math.min(plan.promoDuraMeses, 12);
-  const mesesPostPromo = 12 - mesesPromo;
-  return mesesPromo * plan.precio.mes1a12 + mesesPostPromo * plan.precio.mes13plus;
-}
-
-export function calcularCostoTotal24Meses(plan: PlanInternet): number {
-  const mesesPromo = Math.min(plan.promoDuraMeses, 24);
-  const mesesPostPromo = 24 - mesesPromo;
-  return mesesPromo * plan.precio.mes1a12 + mesesPostPromo * plan.precio.mes13plus;
-}
-
-/**
- * Devuelve el "costo verdadero" promedio mensual normalizado a 24 meses.
- * Útil para comparar planes con promociones de duración distinta.
- */
-export function costoVerdaderoPromedioMensual(plan: PlanInternet): number {
-  return Math.round(calcularCostoTotal24Meses(plan) / 24);
-}
-
-// ============================================================================
-// METADATA
-// ============================================================================
-
-export const INTERNET_PLANES_METADATA = {
-  version: '0.2.0',
-  ultimaActualizacion: '2026-06-20',
-  proximaRevision: '2026-08-20', // bimestral
-  totalPlanes: PLANES_INTERNET_2026.length,
-  empresasCubiertas: ['WOM', 'Entel', 'Movistar', 'Mundo', 'GTD', 'Claro', 'VTR'],
-  empresasPendientes: ['Pacífico Cable', 'DirecTV'],
-  notasActualizacion: [
-    'Verificar precios en sitios oficiales antes de cada release.',
-    'Promociones cambian en cyber/cyberday. Considerar dataset estacional.',
-    'Precios Movistar reconciliados con internet-fibra-2026.ts (verificado 2026-06-04).',
-    'Mundo 1G: mes13plus refleja el tramo mes 13-24 ($15.990), no el mes 25+.',
-  ],
-} as const;
+export const INTERNET_FAQS = [
+  {
+    q: '¿Cuál es el internet hogar más barato para mi casa?',
+    a: 'Depende de los planes disponibles en tu dirección y de sus condiciones. Este catálogo es una selección con fecha de revisión. Compara mensualidades, instalación y precio posterior a la promoción; luego confirma la cotización con la empresa.',
+  },
+  {
+    q: '¿Qué incluye la proyección a 12 o 24 meses?',
+    a: 'Suma los precios mensuales de cada tramo y la instalación publicada. No anticipa reajustes ni incluye equipos opcionales, consumos extra o cargos por término. Si falta un precio o la instalación, no mostramos un total completo.',
+  },
+  {
+    q: '¿El comparador confirma cobertura por comuna?',
+    a: 'No. La disponibilidad se consulta con tu dirección directamente en la empresa. No necesitas dejar tu dirección, RUT ni teléfono en lalupa para comparar.',
+  },
+  {
+    q: '¿Por qué puede desaparecer una oferta?',
+    a: 'Dejamos de incluir su precio al vencer la campaña publicada o el plazo de revisión editorial. Eso no significa que la empresa haya dejado de prestar el servicio; consulta sus condiciones actuales en el enlace oficial.',
+  },
+] as const

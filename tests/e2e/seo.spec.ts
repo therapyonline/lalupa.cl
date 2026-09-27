@@ -59,7 +59,7 @@ const ROUTES: RouteSpec[] = [
   },
   {
     path: '/comparador-internet-hogar',
-    expectedTitle: /Comparador internet/,
+    expectedTitle: /Compara internet hogar/,
     expectsCanonical: true,
     expectsBreadcrumbs: true,
     expectsWebApplication: true,

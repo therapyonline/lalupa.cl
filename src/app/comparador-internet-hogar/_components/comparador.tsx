@@ -1,805 +1,369 @@
 'use client'
 
-import Link from 'next/link'
-import { useMemo, useState } from 'react'
+import { useState, useSyncExternalStore } from 'react'
 import { Container } from '@/components/layout/Container'
-import { Alert } from '@/components/ui/Alert'
-import { Button } from '@/components/ui/Button'
-import { Pill } from '@/components/ui/Pill'
 import { Input } from '@/components/ui/Input'
-import { COMUNAS } from '@/data/comunas'
+import { Button } from '@/components/ui/Button'
 import {
-  MARKET_SHARE_INTERNET_FIJO_Q1_2026,
-  PENETRACION_FIBRA_CHILE,
-} from '@/data/internet-fibra-2026'
-import {
-  type PlanScored,
-  type ServicioIncluido,
-  type Tecnologia,
-  compararPlanes,
-  costoVerdaderoPromedioMensual,
-} from '@/data/internet-planes'
-import { cn } from '@/lib/utils'
+  fechaSantiago,
+  filtrarPlanes,
+  precioDisponible,
+  proyectarCosto,
+  type PlanInternet,
+  type Horizonte,
+  type OrdenInternet,
+} from '@/lib/internet/comparacion'
 
-type Servicios = 'solo' | 'tv' | 'completo'
-type FiltroTecnologia = 'cualquiera' | 'fibra' | 'cable'
-type Orden = 'score' | 'precio' | 'velocidad' | 'costo24m'
+const selectClass =
+  'min-h-12 w-full rounded-md border border-border bg-white px-3 py-2 text-base text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
+const clp = (n: number) => `$ ${Math.round(n).toLocaleString('es-CL')}`
+const fechaVisible = (s: string) => s.split('-').reverse().join('/')
 
-const SERVICIOS_MAP: Record<Servicios, ServicioIncluido[]> = {
-  solo: ['internet'],
-  tv: ['internet', 'tv'],
-  completo: ['internet', 'tv', 'telefonia'],
+// Actualiza también una pestaña abierta al cambiar la fecha de Santiago.
+function suscribirFecha(notify: () => void) {
+  const timer = window.setInterval(notify, 60_000)
+  document.addEventListener('visibilitychange', notify)
+  return () => {
+    window.clearInterval(timer)
+    document.removeEventListener('visibilitychange', notify)
+  }
 }
+const fechaActual = () => fechaSantiago(new Date())
 
-const SERVICIOS_LABEL: Record<Servicios, string> = {
-  solo: 'Solo internet',
-  tv: 'Internet + TV',
-  completo: 'Internet + TV + Telefonía',
-}
-
-function formatCLP(n: number): string {
-  return `$ ${Math.round(n).toLocaleString('es-CL')}`
-}
-
-function deltaPct(precioPromo: number, precioPost: number): number {
-  if (precioPromo <= 0) return 0
-  return Math.round(((precioPost - precioPromo) / precioPromo) * 100)
-}
-
-interface Preset {
-  label: string
-  description: string
-  velocidad: number
-  presupuesto: number
-  tipo: Servicios
-}
-
-const PRESETS: ReadonlyArray<Preset> = [
-  {
-    label: 'Internet básico',
-    description: '300 Mbps · hasta $15k · solo internet',
-    velocidad: 300,
-    presupuesto: 15000,
-    tipo: 'solo',
-  },
-  {
-    label: 'Streaming + remoto',
-    description: '600 Mbps · hasta $20k · solo internet',
-    velocidad: 600,
-    presupuesto: 20000,
-    tipo: 'solo',
-  },
-  {
-    label: 'Hogar pro / gamer',
-    description: '1 Gbps · hasta $30k · solo internet',
-    velocidad: 1000,
-    presupuesto: 30000,
-    tipo: 'solo',
-  },
-  {
-    label: 'Pack familia',
-    description: '600 Mbps · hasta $30k · internet + TV',
-    velocidad: 600,
-    presupuesto: 30000,
-    tipo: 'tv',
-  },
-]
-
-export function Comparador() {
-  const [comuna, setComuna] = useState('')
-  const [velocidad, setVelocidad] = useState(600)
-  const [presupuesto, setPresupuesto] = useState(20000)
-  const [tipoServicio, setTipoServicio] = useState<Servicios>('solo')
-  const [tecnologia, setTecnologia] = useState<FiltroTecnologia>('cualquiera')
-  const [sinPermanencia, setSinPermanencia] = useState(false)
-  const [orden, setOrden] = useState<Orden>('score')
-
-  function applyPreset(p: Preset) {
-    setVelocidad(p.velocidad)
-    setPresupuesto(p.presupuesto)
-    setTipoServicio(p.tipo)
+export function Comparador({
+  planes,
+  fechaServidor,
+}: {
+  planes: readonly PlanInternet[]
+  fechaServidor: string
+}) {
+  const fechaCliente = useSyncExternalStore(
+    suscribirFecha,
+    fechaActual,
+    () => fechaServidor,
+  )
+  const hoy = fechaCliente > fechaServidor ? fechaCliente : fechaServidor
+  const [meses, setMeses] = useState<Horizonte>(24)
+  const [empresa, setEmpresa] = useState('')
+  const [velocidad, setVelocidad] = useState(0)
+  const [servicios, setServicios] = useState<'todos' | 'solo' | 'tv'>('todos')
+  const [presupuesto, setPresupuesto] = useState('')
+  const [orden, setOrden] = useState<OrdenInternet>('empresa')
+  const presupuestoInvalido =
+    presupuesto !== '' &&
+    (!/^\d+$/.test(presupuesto) || !Number.isSafeInteger(Number(presupuesto)))
+  const disponibles = planes.filter((p) => precioDisponible(p, hoy))
+  const resultados = presupuestoInvalido
+    ? []
+    : filtrarPlanes(planes, hoy, {
+        empresa,
+        bajadaMin: velocidad,
+        servicios,
+        meses,
+        orden,
+        presupuesto: presupuesto === '' ? undefined : Number(presupuesto),
+      })
+  function limpiar() {
+    setEmpresa('')
+    setVelocidad(0)
+    setServicios('todos')
+    setPresupuesto('')
+    setOrden('empresa')
   }
 
-  const planesScored = useMemo<PlanScored[]>(() => {
-    return compararPlanes({
-      velocidadMin: velocidad,
-      presupuestoMaxPromo: presupuesto,
-      servicios: SERVICIOS_MAP[tipoServicio],
-      tecnologia:
-        tecnologia === 'cualquiera' ? undefined : (tecnologia as Tecnologia),
-      sinPermanencia: sinPermanencia || undefined,
-    })
-  }, [velocidad, presupuesto, tipoServicio, tecnologia, sinPermanencia])
-
-  const planesOrdenados = useMemo<PlanScored[]>(() => {
-    const arr = [...planesScored]
-    if (orden === 'precio') {
-      arr.sort((a, b) => a.precio.mes1a12 - b.precio.mes1a12)
-    } else if (orden === 'velocidad') {
-      arr.sort((a, b) => b.velocidad.bajada - a.velocidad.bajada)
-    } else if (orden === 'costo24m') {
-      arr.sort(
-        (a, b) =>
-          costoVerdaderoPromedioMensual(a) - costoVerdaderoPromedioMensual(b),
-      )
-    } else {
-      arr.sort((a, b) => b.score - a.score)
-    }
-    return arr
-  }, [planesScored, orden])
-
-  // El plan con menor costo real a 24 meses entre los resultados: lo
-  // destacamos como "mejor costo real" sin importar el orden elegido.
-  const mejorCostoRealId = useMemo<string | null>(() => {
-    if (planesScored.length === 0) return null
-    let mejor = planesScored[0]
-    for (const p of planesScored) {
-      if (costoVerdaderoPromedioMensual(p) < costoVerdaderoPromedioMensual(mejor)) {
-        mejor = p
-      }
-    }
-    return mejor.id
-  }, [planesScored])
-
   return (
-    <>
-      <section className="bg-cream py-12 md:py-16">
-        <Container>
-          <p className="font-mono text-xs uppercase tracking-[0.1em] text-soft">
-            Comparador internet hogar 2026
-          </p>
-          <h1 className="mt-4 max-w-[22ch] text-[clamp(36px,5vw,64px)] font-medium leading-[1.05] tracking-tight text-ink">
-            ¿Cuál es el plan que más te conviene?
-          </h1>
-          <p className="mt-6 max-w-2xl text-lg leading-relaxed text-body">
-            Comparamos planes de fibra y cable de las 7 principales empresas
-            chilenas. Filtra por lo que necesitas y mira la letra chica antes
-            de firmar.
-          </p>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-soft">
-            Si quieres entender primero la diferencia técnica entre fibra
-            óptica (FTTH) y cable (HFC), lee la{' '}
-            <Link
-              href="/guias/fibra-vs-cable-internet-chile"
-              className="font-medium text-ink underline underline-offset-4 hover:no-underline"
-            >
-              guía completa de fibra vs cable en Chile 2026
-            </Link>
-            .
-          </p>
-
-          <div className="mt-8" aria-label="Filtros sugeridos">
-            <p className="font-mono text-xs uppercase tracking-[0.1em] text-soft">
-              Empieza rápido con un perfil
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {PRESETS.map((p) => (
-                <button
-                  key={p.label}
-                  type="button"
-                  onClick={() => applyPreset(p)}
-                  className="group flex flex-col items-start gap-0.5 rounded-2xl border border-border bg-white px-4 py-2 text-left transition-colors hover:border-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15"
-                >
-                  <span className="text-sm font-medium text-ink">
-                    {p.label}
-                  </span>
-                  <span className="font-mono text-[11px] text-soft group-hover:text-body">
-                    {p.description}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </Container>
-      </section>
-
-      <section className="bg-cream pb-20">
-        <Container>
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[320px_1fr]">
-            <FiltersPanel
-              comuna={comuna}
-              setComuna={setComuna}
-              velocidad={velocidad}
-              setVelocidad={setVelocidad}
-              presupuesto={presupuesto}
-              setPresupuesto={setPresupuesto}
-              tipoServicio={tipoServicio}
-              setTipoServicio={setTipoServicio}
-              tecnologia={tecnologia}
-              setTecnologia={setTecnologia}
-              sinPermanencia={sinPermanencia}
-              setSinPermanencia={setSinPermanencia}
-            />
-
-            <div>
-              <Toolbar
-                total={planesOrdenados.length}
-                orden={orden}
-                setOrden={setOrden}
-              />
-
-              {planesOrdenados.length === 0 ? (
-                <Alert variant="info" className="mt-6">
-                  <Alert.Title>Sin matches con esos filtros</Alert.Title>
-                  <Alert.Body>
-                    Prueba subir el presupuesto o bajar la velocidad mínima.
-                    Los precios promo van desde ~$10.000 (WOM) hasta ~$30.000
-                    (triple pack).
-                  </Alert.Body>
-                </Alert>
-              ) : (
-                <ul className="mt-6 flex flex-col gap-4">
-                  {planesOrdenados.map((plan) => (
-                    <PlanCard
-                      key={plan.id}
-                      plan={plan}
-                      comuna={comuna}
-                      esMejorCostoReal={plan.id === mejorCostoRealId}
-                    />
-                  ))}
-                </ul>
-              )}
-
-              <Alert variant="info" className="mt-10">
-                <Alert.Title>Datos referenciales</Alert.Title>
-                <Alert.Body>
-                  Los precios cambian seguido (típicamente bimestral) y la
-                  cobertura por comuna depende de factibilidad técnica que
-                  cada empresa valida con tu dirección. Verifica el precio
-                  vigente en el sitio oficial antes de contratar.{' '}
-                  {comuna && (
-                    <>
-                      Para tu comuna <strong>{comuna}</strong>, confirma
-                      cobertura en cada empresa.
-                    </>
-                  )}
-                </Alert.Body>
-              </Alert>
-            </div>
-          </div>
-        </Container>
-      </section>
-
-      <MercadoContexto />
-
-      <ComunasDatalist />
-    </>
-  )
-}
-
-/**
- * Panorama del mercado de internet fijo chileno con data verificada de
- * Subtel (penetración de fibra, market share). Da contexto al usuario
- * sobre dónde está parado el mercado al elegir un plan.
- */
-function MercadoContexto() {
-  const pen = PENETRACION_FIBRA_CHILE
-  const share = MARKET_SHARE_INTERNET_FIJO_Q1_2026
-  const players: Array<{ nombre: string; pct: number }> = [
-    { nombre: 'Movistar', pct: share.movistar },
-    { nombre: 'ClaroVTR', pct: share.claroVtr },
-    { nombre: 'Mundo / Pacífico', pct: share.mundoPacifico },
-    { nombre: 'Entel', pct: share.entel },
-    { nombre: 'Otros', pct: share.otros },
-  ]
-  return (
-    <section className="bg-white py-16">
+    <section
+      id="planes"
+      aria-labelledby="planes-heading"
+      className="bg-cream pb-16 scroll-mt-24"
+    >
       <Container>
-        <p className="font-mono text-xs uppercase tracking-[0.1em] text-soft">
-          Panorama del mercado
-        </p>
-        <h2 className="mt-3 max-w-2xl text-2xl font-medium tracking-tight text-ink md:text-3xl">
-          Cómo está el internet fijo en Chile
-        </h2>
-
-        <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
-          <div className="rounded-[20px] border border-border bg-cream p-6">
-            <p className="text-4xl font-medium tabular-nums text-ink">
-              {pen.porcentajeConexionesFibra}%
-            </p>
-            <p className="mt-2 text-sm text-body">
-              de las conexiones fijas ya son fibra óptica (FTTH). Creció{' '}
-              {pen.variacionInteranualFibra}% en un año, mientras el cable
-              (HFC) cayó {Math.abs(pen.variacionInteranualHFC)}%.
-            </p>
-          </div>
-          <div className="rounded-[20px] border border-border bg-cream p-6">
-            <p className="text-4xl font-medium tabular-nums text-ink">
-              {pen.porcentajeHogaresConInternetFijo}%
-            </p>
-            <p className="mt-2 text-sm text-body">
-              de los hogares chilenos tiene internet fijo. El tráfico
-              promedio es de {Math.round(pen.traficoFijoPorConexionGB)} GB por
-              conexión al mes.
-            </p>
-          </div>
-          <div className="rounded-[20px] border border-border bg-cream p-6">
-            <p className="font-mono text-[11px] uppercase tracking-wide text-soft">
-              Market share (T1 2026)
-            </p>
-            <ul className="mt-3 flex flex-col gap-1.5">
-              {players.map((p) => (
-                <li
-                  key={p.nombre}
-                  className="flex items-center justify-between text-sm text-ink"
+        <div className="grid gap-8 lg:grid-cols-[280px_1fr]">
+          <aside
+            aria-label="Filtros de planes"
+            className="rounded-[20px] border border-border bg-white p-6 lg:sticky lg:top-24 lg:self-start"
+          >
+            <h2 className="text-xl font-medium text-ink">
+              Ajusta la comparación
+            </h2>
+            <div className="mt-6 flex flex-col gap-5">
+              <div className="text-sm font-medium text-ink">
+                <label htmlFor="internet-periodo">Período a comparar</label>
+                <select
+                  id="internet-periodo"
+                  className={`mt-2 ${selectClass}`}
+                  value={meses}
+                  onChange={(e) =>
+                    setMeses(Number(e.target.value) as Horizonte)
+                  }
                 >
-                  <span>{p.nombre}</span>
-                  <span className="font-medium tabular-nums">{p.pct}%</span>
-                </li>
+                  <option value={12}>12 meses</option>
+                  <option value={24}>24 meses</option>
+                </select>
+              </div>
+              <Input
+                label="Presupuesto promedio mensual (CLP)"
+                type="number"
+                min={0}
+                step={1}
+                value={presupuesto}
+                onChange={(e) => setPresupuesto(e.target.value)}
+                placeholder="Sin límite"
+                error={
+                  presupuestoInvalido
+                    ? 'Ingresa pesos enteros, sin valores negativos.'
+                    : undefined
+                }
+                hint={`Filtra por la proyección total dividida en ${meses} meses, incluida la instalación. Solo muestra planes cuyo total se puede calcular.`}
+              />
+              <div className="text-sm font-medium text-ink">
+                <label htmlFor="internet-empresa">Empresa</label>
+                <select
+                  id="internet-empresa"
+                  className={`mt-2 ${selectClass}`}
+                  value={empresa}
+                  onChange={(e) => setEmpresa(e.target.value)}
+                >
+                  <option value="">Todas las del catálogo</option>
+                  {[...new Set(planes.map((p) => p.empresa))]
+                    .sort()
+                    .map((nombre) => (
+                      <option key={nombre}>{nombre}</option>
+                    ))}
+                </select>
+              </div>
+              <div className="text-sm font-medium text-ink">
+                <label htmlFor="internet-bajada">Bajada mínima anunciada</label>
+                <select
+                  id="internet-bajada"
+                  className={`mt-2 ${selectClass}`}
+                  value={velocidad}
+                  onChange={(e) => setVelocidad(Number(e.target.value))}
+                >
+                  <option value={0}>Cualquiera</option>
+                  <option value={600}>600 Mbps</option>
+                  <option value={800}>800 Mbps</option>
+                  <option value={940}>940 Mbps</option>
+                  <option value={1000}>1.000 Mbps</option>
+                </select>
+              </div>
+              <fieldset className="space-y-2">
+                <legend className="mb-2 text-sm font-medium text-ink">
+                  Servicios
+                </legend>
+                {(
+                  [
+                    ['todos', 'Todos'],
+                    ['solo', 'Sin pack de TV'],
+                    ['tv', 'Con televisión'],
+                  ] as const
+                ).map(([value, label]) => (
+                  <label
+                    key={value}
+                    className={`flex min-h-11 items-center gap-3 rounded-md border p-3 text-sm text-ink ${servicios === value ? 'border-primary bg-primary-soft' : 'border-border'}`}
+                  >
+                    <input
+                      type="radio"
+                      name="servicios"
+                      value={value}
+                      checked={servicios === value}
+                      onChange={() => setServicios(value)}
+                      className="h-4 w-4 accent-primary"
+                    />
+                    {label}
+                  </label>
+                ))}
+              </fieldset>
+              <Button variant="ghost" onClick={limpiar}>
+                Limpiar filtros
+              </Button>
+            </div>
+          </aside>
+
+          <div className="min-w-0">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h2
+                  id="planes-heading"
+                  className="text-2xl font-medium text-ink"
+                >
+                  Planes con precios observados
+                </h2>
+                <p
+                  role="status"
+                  aria-live="polite"
+                  aria-atomic="true"
+                  className="mt-2 text-sm text-body"
+                >
+                  {presupuestoInvalido
+                    ? 'Corrige el presupuesto para comparar.'
+                    : `${resultados.length} planes coinciden con tus filtros.`}
+                </p>
+              </div>
+              <div className="text-sm font-medium text-ink">
+                <label htmlFor="internet-orden">Ordenar por</label>
+                <select
+                  id="internet-orden"
+                  className={`mt-2 ${selectClass}`}
+                  value={orden}
+                  onChange={(e) => setOrden(e.target.value as OrdenInternet)}
+                >
+                  <option value="empresa">Empresa (A–Z)</option>
+                  <option value="promedio">
+                    Promedio proyectado: menor primero
+                  </option>
+                  <option value="velocidad">Bajada: mayor primero</option>
+                </select>
+              </div>
+            </div>
+            {disponibles.length < planes.length && (
+              <p className="mt-4 rounded-lg border border-border bg-white p-4 text-sm text-body">
+                {planes.length - disponibles.length} precios requieren una nueva
+                revisión y están fuera de la comparación.{' '}
+                <a
+                  href="#proveedores"
+                  className="font-medium text-ink underline"
+                >
+                  Consulta las empresas
+                </a>
+                .
+              </p>
+            )}
+            {!resultados.length && !presupuestoInvalido && (
+              <div className="mt-6 rounded-[20px] border border-border bg-white p-6">
+                <h3 className="text-lg font-medium text-ink">
+                  No hay planes en esta selección
+                </h3>
+                <p className="mt-2 text-body">
+                  Cambia los filtros o consulta otras ofertas con los
+                  proveedores. Este resultado no significa que no haya servicio
+                  disponible en tu domicilio.
+                </p>
+              </div>
+            )}
+            <ul className="mt-6 space-y-5" aria-label="Planes comparados">
+              {resultados.map((plan) => (
+                <PlanCard key={plan.id} plan={plan} meses={meses} />
               ))}
             </ul>
           </div>
         </div>
-
-        <p className="mt-6 text-xs text-soft">
-          Fuentes:{' '}
-          <a
-            href={pen.urlInforme}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline underline-offset-2 hover:no-underline"
-          >
-            {pen.fuente}
-          </a>{' '}
-          ·{' '}
-          <a
-            href={share.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline underline-offset-2 hover:no-underline"
-          >
-            {share.fuente}
-          </a>
-          . La fibra es simétrica y de baja latencia; el cable comparte
-          ancho de banda con tus vecinos y tiene subida más lenta.
-        </p>
       </Container>
     </section>
   )
 }
 
-function FiltersPanel({
-  comuna,
-  setComuna,
-  velocidad,
-  setVelocidad,
-  presupuesto,
-  setPresupuesto,
-  tipoServicio,
-  setTipoServicio,
-  tecnologia,
-  setTecnologia,
-  sinPermanencia,
-  setSinPermanencia,
-}: {
-  comuna: string
-  setComuna: (s: string) => void
-  velocidad: number
-  setVelocidad: (n: number) => void
-  presupuesto: number
-  setPresupuesto: (n: number) => void
-  tipoServicio: Servicios
-  setTipoServicio: (s: Servicios) => void
-  tecnologia: FiltroTecnologia
-  setTecnologia: (t: FiltroTecnologia) => void
-  sinPermanencia: boolean
-  setSinPermanencia: (b: boolean) => void
-}) {
-  return (
-    <aside className="rounded-[20px] border border-border bg-white p-6 md:p-8 lg:sticky lg:top-24 lg:self-start">
-      <p className="font-mono text-xs uppercase tracking-[0.1em] text-soft">
-        Tus criterios
-      </p>
-
-      <div className="mt-6 flex flex-col gap-6">
-        <div className="flex flex-col gap-2">
-          <label
-            htmlFor="comparador-velocidad"
-            className="text-[13px] font-bold text-ink"
-          >
-            Velocidad mínima
-          </label>
-          <input
-            id="comparador-velocidad"
-            type="range"
-            min={100}
-            max={1000}
-            step={50}
-            value={velocidad}
-            onChange={(e) => setVelocidad(parseInt(e.target.value, 10))}
-            className="h-2 w-full cursor-pointer appearance-none rounded-full bg-ink/10 accent-primary"
-            aria-valuetext={
-              velocidad >= 1000 ? '1 Gbps' : `${velocidad} Mbps`
-            }
-          />
-          <div className="flex items-center justify-between text-xs text-soft">
-            <span>100 Mbps</span>
-            <span className="font-mono text-base font-medium text-ink">
-              {velocidad >= 1000 ? '1 Gbps' : `${velocidad} Mbps`}
-            </span>
-            <span>1 Gbps</span>
-          </div>
-        </div>
-
-        <div>
-          <Input
-            label="Presupuesto mensual (CLP)"
-            type="number"
-            value={String(presupuesto)}
-            onChange={(e) => {
-              const raw = e.target.value
-              const n = parseInt(raw, 10)
-              setPresupuesto(Number.isNaN(n) ? 0 : n)
-            }}
-            min={5000}
-            max={100000}
-            hint={`${formatCLP(presupuesto)} máximo en precio promo`}
-          />
-        </div>
-
-        <fieldset className="flex flex-col gap-2">
-          <legend className="text-[13px] font-bold text-ink">
-            Servicios necesarios
-          </legend>
-          {(Object.keys(SERVICIOS_MAP) as Servicios[]).map((opt) => (
-            <label
-              key={opt}
-              className={cn(
-                'flex cursor-pointer items-center gap-3 rounded-md border-[1.5px] border-border bg-white px-4 py-3 transition-colors hover:border-ink',
-                tipoServicio === opt && 'border-primary bg-primary-soft',
-              )}
-            >
-              <input
-                type="radio"
-                name="servicios"
-                value={opt}
-                checked={tipoServicio === opt}
-                onChange={() => setTipoServicio(opt)}
-                className="h-4 w-4 accent-primary"
-              />
-              <span className="text-[14px] text-ink">
-                {SERVICIOS_LABEL[opt]}
-              </span>
-            </label>
-          ))}
-        </fieldset>
-
-        <fieldset className="flex flex-col gap-2">
-          <legend className="text-[13px] font-bold text-ink">
-            Tecnología
-          </legend>
-          {(
-            [
-              {
-                value: 'cualquiera',
-                label: 'Cualquiera',
-                description: 'Fibra o cable, lo que mejor calce.',
-              },
-              {
-                value: 'fibra',
-                label: 'Solo fibra (FTTH)',
-                description: 'Simétrica, latencia baja, sin compartir ancho de banda con vecinos.',
-              },
-              {
-                value: 'cable',
-                label: 'Solo cable (HFC)',
-                description: 'Más barato en plan de entrada en zonas legacy.',
-              },
-            ] as const
-          ).map((opt) => (
-            <label
-              key={opt.value}
-              className={cn(
-                'flex cursor-pointer items-start gap-3 rounded-md border-[1.5px] border-border bg-white px-4 py-3 transition-colors hover:border-ink',
-                tecnologia === opt.value && 'border-primary bg-primary-soft',
-              )}
-            >
-              <input
-                type="radio"
-                name="tecnologia"
-                value={opt.value}
-                checked={tecnologia === opt.value}
-                onChange={() => setTecnologia(opt.value)}
-                className="mt-1 h-4 w-4 accent-primary"
-              />
-              <span className="flex flex-col">
-                <span className="text-[14px] text-ink">{opt.label}</span>
-                <span className="text-[11px] text-soft">{opt.description}</span>
-              </span>
-            </label>
-          ))}
-        </fieldset>
-
-        <label className="flex cursor-pointer items-start gap-3 rounded-md border-[1.5px] border-border bg-white px-4 py-3 transition-colors hover:border-ink">
-          <input
-            type="checkbox"
-            checked={sinPermanencia}
-            onChange={(e) => setSinPermanencia(e.target.checked)}
-            className="mt-1 h-4 w-4 accent-primary"
-          />
-          <span className="flex flex-col">
-            <span className="text-[14px] font-bold text-ink">
-              Solo sin permanencia
-            </span>
-            <span className="text-[11px] text-soft">
-              Filtrar planes cancelables en cualquier momento sin multa.
-              VTR es el único con esta política explícita en 2026.
-            </span>
-          </span>
-        </label>
-
-        {/* La comuna NO filtra el ranking (no tenemos data de cobertura
-            por dirección). Va separada de los criterios, como recordatorio
-            informativo, para no prometer un filtro que no existe. */}
-        <div className="border-t border-border pt-6">
-          <Input
-            label="Tu comuna (solo informativo)"
-            type="text"
-            value={comuna}
-            onChange={(e) => setComuna(e.target.value)}
-            placeholder="Ej: Ñuñoa"
-            list="comunas-list"
-            hint="No filtra los resultados. Te lo recordamos al final para que confirmes cobertura en cada empresa, depende de tu dirección exacta."
-          />
-        </div>
-      </div>
-    </aside>
-  )
-}
-
-function Toolbar({
-  total,
-  orden,
-  setOrden,
-}: {
-  total: number
-  orden: Orden
-  setOrden: (o: Orden) => void
-}) {
-  return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-      <div>
-        <p className="font-mono text-xs uppercase tracking-[0.1em] text-soft">
-          Resultados
-        </p>
-        <p className="mt-1 text-2xl font-medium tracking-tight text-ink md:text-3xl">
-          {total} {total === 1 ? 'plan' : 'planes'} matchean
-        </p>
-      </div>
-      <div className="flex flex-col gap-1 sm:items-end">
-        <label
-          htmlFor="orden"
-          className="font-mono text-xs uppercase tracking-[0.1em] text-soft"
-        >
-          Ordenar por
-        </label>
-        <select
-          id="orden"
-          value={orden}
-          onChange={(e) => setOrden(e.target.value as Orden)}
-          className="rounded-md border-[1.5px] border-border bg-white px-3 py-2 text-sm font-medium text-ink focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/15"
-        >
-          <option value="score">Score (recomendado)</option>
-          <option value="precio">Precio promo (más bajo primero)</option>
-          <option value="costo24m">Costo real 24 meses (más bajo primero)</option>
-          <option value="velocidad">Velocidad (más alta primero)</option>
-        </select>
-      </div>
-    </div>
-  )
-}
-
-// Etiqueta de tecnología honesta: "simétrica" se deriva de los datos
-// (subida === bajada), no se asume por ser fibra. Si la subida es mucho
-// menor que la bajada (típico de cable HFC), lo decimos.
-function tecnologiaLabel(plan: PlanScored): string {
-  const simetrica = plan.velocidad.subida >= plan.velocidad.bajada
-  if (plan.tecnologia === 'fibra') {
-    return simetrica ? 'Fibra simétrica' : 'Fibra asimétrica'
-  }
-  if (plan.tecnologia === 'cable') return 'Cable (HFC)'
-  if (plan.tecnologia === '5g') return '5G'
-  return 'Inalámbrica'
-}
-
-function PlanCard({
-  plan,
-  comuna,
-  esMejorCostoReal,
-}: {
-  plan: PlanScored
-  comuna: string
-  esMejorCostoReal?: boolean
-}) {
-  const subePct = deltaPct(plan.precio.mes1a12, plan.precio.mes13plus)
-  // Subida muy inferior a la bajada (típico de cable): relevante para
-  // videollamadas, teletrabajo, subir archivos y gaming.
-  const asimetrica = plan.velocidad.subida < plan.velocidad.bajada * 0.5
-  // Umbral 30% (no 50%) para no esconder alzas de 30-49% que igual duelen,
-  // y el mes real del alza se deriva de promoDuraMeses (Movistar 600 sube
-  // al mes 7, no al 13). Es lo honesto y consistente con el Stat de la tarjeta.
-  const subeFlag =
-    subePct >= 30
-      ? `Sube ${subePct}% al mes ${plan.promoDuraMeses + 1}`
-      : null
-
-  const compromisoFlag =
-    plan.compromisoMeses > 12
-      ? `Compromiso ${plan.compromisoMeses} meses`
-      : null
-
+function PlanCard({ plan, meses }: { plan: PlanInternet; meses: Horizonte }) {
+  const costo = proyectarCosto(plan, meses)
   return (
     <li>
       <article
-        className={cn(
-          'rounded-[20px] border bg-white p-6 md:p-7',
-          esMejorCostoReal ? 'border-success ring-1 ring-success/30' : 'border-border',
-        )}
+        aria-labelledby={`plan-${plan.id}`}
+        className="rounded-[20px] border border-border bg-white p-6 md:p-7"
       >
-        {esMejorCostoReal && (
-          <p className="mb-3 inline-flex items-center gap-2 rounded-full bg-success-soft px-3 py-1 font-mono text-[10px] font-medium uppercase tracking-wide text-success">
-            Mejor costo real a 24 meses
-          </p>
-        )}
-        <header className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <p className="font-mono text-xs uppercase tracking-wide text-body">
+          {plan.empresa} · {plan.tecnologia}
+        </p>
+        <h3
+          id={`plan-${plan.id}`}
+          className="mt-2 text-2xl font-medium tracking-tight text-ink"
+        >
+          {plan.nombre}
+        </h3>
+        <p className="mt-2 text-sm text-body">
+          Hasta {plan.bajadaMbps} Mbps de bajada ·{' '}
+          {plan.subidaMbps === null
+            ? 'Subida por confirmar'
+            : `Hasta ${plan.subidaMbps} Mbps de subida`}
+        </p>
+        <dl className="mt-5 grid grid-cols-2 gap-4">
+          {plan.tramos.map((t) => (
+            <div key={t.desde}>
+              <dt className="text-xs text-body">
+                {t.hasta === null
+                  ? `Desde el mes ${t.desde}`
+                  : `Meses ${t.desde}–${t.hasta}`}
+              </dt>
+              <dd className="mt-1 text-xl font-medium tabular-nums text-ink">
+                {t.mensualCLP === null ? 'Por confirmar' : clp(t.mensualCLP)}
+                <span className="text-xs font-normal"> /mes</span>
+              </dd>
+            </div>
+          ))}
           <div>
-            <p className="font-mono text-xs uppercase tracking-[0.1em] text-soft">
-              {plan.empresa}
-            </p>
-            <h2 className="mt-2 text-xl font-medium leading-tight tracking-tight text-ink md:text-2xl">
-              {plan.plan}
-            </h2>
-            <p className="mt-1 text-xs uppercase tracking-wide text-soft">
-              {tecnologiaLabel(plan)}
-            </p>
+            <dt className="text-xs text-body">Instalación publicada</dt>
+            <dd className="mt-1 font-medium text-ink">
+              {plan.instalacionCLP === null
+                ? 'Por confirmar'
+                : clp(plan.instalacionCLP)}
+            </dd>
           </div>
-          <ScoreBadge score={plan.score} />
-        </header>
-
-        <div className="mt-6 grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-4">
-          <Stat label="Bajada" value={`${plan.velocidad.bajada} Mbps`} />
-          <Stat label="Subida" value={`${plan.velocidad.subida} Mbps`} />
-          <Stat
-            label={`Mes 1–${Math.min(plan.promoDuraMeses, 12)}`}
-            value={formatCLP(plan.precio.mes1a12)}
-            highlight
-          />
-          <Stat
-            label={`Mes ${plan.promoDuraMeses + 1}+`}
-            value={formatCLP(plan.precio.mes13plus)}
-          />
-        </div>
-
-        <div className="mt-4 rounded-md bg-cream-warm/40 px-4 py-3">
-          <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-soft">
-            Costo real promedio 24 meses
+        </dl>
+        <div className="mt-5 rounded-xl bg-cream p-4">
+          <p className="text-sm font-medium text-ink">
+            Proyección a {meses} meses
           </p>
-          <p className="mt-1 text-lg font-medium tabular-nums text-ink">
-            {formatCLP(costoVerdaderoPromedioMensual(plan))}
-            <span className="ml-1 text-xs font-normal text-soft">
-              por mes
-            </span>
-          </p>
-          <p className="mt-1 text-[11px] text-soft">
-            Promedio honesto incluyendo {plan.promoDuraMeses} meses de promo +{' '}
-            {24 - plan.promoDuraMeses} meses a precio normal. Útil para
-            comparar planes con duración de promo distinta.
-          </p>
-        </div>
-
-        <div className="mt-5 flex flex-wrap gap-2">
-          {compromisoFlag && (
-            <Pill variant="warning">{compromisoFlag}</Pill>
-          )}
-          {plan.compromisoMeses === 0 && (
-            <Pill variant="success">Sin permanencia</Pill>
-          )}
-          {subeFlag && <Pill variant="warning">{subeFlag}</Pill>}
-          {asimetrica && (
-            <Pill variant="warning">
-              Subida {plan.velocidad.subida} Mbps (lenta para videollamadas y subir archivos)
-            </Pill>
-          )}
-          {plan.alertas.map((a) => {
-            // Alertas de alto riesgo (multa, alza fuerte, compromiso largo,
-            // costo oculto) van en warning; las de cobertura/asimetría
-            // también warning; las puramente informativas (referencial,
-            // estimado, incluye X) en info.
-            const altoRiesgo =
-              /multa|t[ée]rmino anticipado|sube\s+\+?\d|compromiso|asim[eé]trica|requiere|limitad|disponibilidad|no incluido|costo adicional/i.test(
-                a,
-              )
-            const informativa = /referencia|estimad|incluye|club/i.test(a)
-            const variant = altoRiesgo
-              ? 'warning'
-              : informativa
-                ? 'info'
-                : 'accent'
-            return (
-              <Pill key={a} variant={variant}>
-                {a}
-              </Pill>
-            )
-          })}
-          {comuna && plan.empresa === 'VTR' && (
-            <Pill variant="warning">
-              Verifica cobertura en {comuna}
-            </Pill>
-          )}
-        </div>
-
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          {plan.motivosScore.length > 0 ? (
-            <p className="text-xs text-soft">
-              {plan.motivosScore[0]}
+          {costo.total === null ? (
+            <p className="mt-2 text-body">
+              Faltan datos para un total completo.
             </p>
           ) : (
-            <span />
+            <>
+              <p className="mt-2 text-2xl font-medium tabular-nums text-ink">
+                {clp(costo.total)}{' '}
+                <span className="text-sm font-normal">en total</span>
+              </p>
+              <p className="mt-1 text-sm text-body">
+                {clp(costo.promedio!)} promedio mensual
+              </p>
+            </>
           )}
-          <Button asChild variant="dark" size="md">
-            <a href={plan.fuente} target="_blank" rel="noopener noreferrer">
-              Contratar en {plan.empresa}
-            </a>
-          </Button>
+          <details className="mt-3 text-sm text-body">
+            <summary className="cursor-pointer font-medium text-ink underline">
+              Ver cálculo y alcance
+            </summary>
+            <p className="mt-2">
+              Mensualidades:{' '}
+              {costo.mensualidades === null
+                ? 'por confirmar'
+                : clp(costo.mensualidades)}
+              . Instalación:{' '}
+              {plan.instalacionCLP === null
+                ? 'por confirmar'
+                : clp(plan.instalacionCLP)}
+              . El promedio divide la suma por {meses} meses. No incluye
+              reajustes futuros, equipos opcionales, consumos extra ni cargos
+              por término.
+            </p>
+          </details>
         </div>
+        <p className="mt-4 text-sm leading-relaxed text-body">
+          {plan.condiciones}
+        </p>
+        <p className="mt-3 text-xs text-body">
+          Consulta editorial:{' '}
+          <time dateTime={plan.observadaEl}>
+            {fechaVisible(plan.observadaEl)}
+          </time>
+          .{' '}
+          {plan.ofertaHasta
+            ? `Campaña publicada hasta ${fechaVisible(plan.ofertaHasta)}.`
+            : 'La fuente no fija aquí un término de campaña.'}
+        </p>
+        <p className="mt-2 text-xs text-body">
+          Confirma factibilidad, cotización y condiciones de salida con la
+          empresa.
+        </p>
+        <a
+          href={plan.fuente}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-5 inline-flex min-h-11 items-center rounded-full bg-ink px-5 py-3 text-sm font-medium text-white hover:bg-primary"
+        >
+          Ver oferta y cobertura en {plan.empresa}
+          <span className="sr-only"> (abre otra pestaña)</span>
+        </a>
       </article>
     </li>
-  )
-}
-
-function Stat({
-  label,
-  value,
-  highlight,
-}: {
-  label: string
-  value: string
-  highlight?: boolean
-}) {
-  return (
-    <div>
-      <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-soft">
-        {label}
-      </p>
-      <p
-        className={cn(
-          'mt-1 text-lg font-medium tabular-nums',
-          highlight ? 'text-accent-deep' : 'text-ink',
-        )}
-      >
-        {value}
-      </p>
-    </div>
-  )
-}
-
-function ScoreBadge({ score }: { score: number }) {
-  const tone =
-    score >= 75 ? 'success' : score >= 50 ? 'info' : 'warning'
-  return (
-    <div className="flex items-center gap-3">
-      <div className="text-right">
-        <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-soft">
-          Score
-        </p>
-        <p className="text-2xl font-medium tabular-nums tracking-tight text-ink">
-          {score}
-          <span className="text-sm text-soft">/100</span>
-        </p>
-      </div>
-      <Pill variant={tone}>
-        {score >= 75 ? 'Buen match' : score >= 50 ? 'Razonable' : 'Bajo'}
-      </Pill>
-    </div>
-  )
-}
-
-function ComunasDatalist() {
-  return (
-    <datalist id="comunas-list">
-      {COMUNAS.map((c) => (
-        <option key={`${c.codigoRegion}-${c.nombre}`} value={c.nombre} />
-      ))}
-    </datalist>
   )
 }

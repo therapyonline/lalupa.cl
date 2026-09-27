@@ -1,0 +1,12 @@
+
+> lalupa@0.1.0 check:bundle-size /Users/estebanlorca/Projects/lalupa.cl
+> node scripts/check-bundle-size.mjs
+
+
+📦 Bundle size report
+   Total JS chunks:  31 archivos, 2175 kB
+   Largest chunk:    455 kB → .next/static/chunks/24c557c6ij2id.js
+   Budget total:     3500 kB
+   Budget largest:   600 kB
+
+✓ Within budget

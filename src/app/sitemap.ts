@@ -1,10 +1,12 @@
 import type { MetadataRoute } from 'next'
 import { getAllGuias } from '@/lib/guias'
 import { SITE_URL } from '@/lib/seo'
+import { INTERNET_REVISION } from '@/data/internet-planes'
 
 interface StaticEntry {
   path: string
   priority: number
+  lastModified?: string
   changeFrequency:
     | 'always'
     | 'hourly'
@@ -22,7 +24,12 @@ const STATIC_ROUTES: StaticEntry[] = [
   { path: '/boleta-gas', priority: 0.9, changeFrequency: 'monthly' },
   { path: '/reclamar-sernac', priority: 0.8, changeFrequency: 'monthly' },
   { path: '/subsidio-electrico', priority: 0.9, changeFrequency: 'weekly' },
-  { path: '/comparador-internet-hogar', priority: 0.85, changeFrequency: 'weekly' },
+  {
+    path: '/comparador-internet-hogar',
+    priority: 0.85,
+    changeFrequency: 'weekly',
+    lastModified: INTERNET_REVISION,
+  },
   { path: '/guias', priority: 0.8, changeFrequency: 'weekly' },
   { path: '/como-funciona', priority: 0.7, changeFrequency: 'monthly' },
   { path: '/sobre', priority: 0.5, changeFrequency: 'yearly' },
@@ -38,6 +45,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     url: `${SITE_URL}${r.path}`,
     changeFrequency: r.changeFrequency,
     priority: r.priority,
+    ...(r.lastModified && { lastModified: r.lastModified }),
   }))
 
   const guiaEntries: MetadataRoute.Sitemap = guias.map((g) => ({

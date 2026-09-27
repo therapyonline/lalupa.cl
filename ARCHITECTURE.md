@@ -158,3 +158,9 @@ Test sistémicos clave:
 3. `pnpm dev`
 4. Para agregar un parser nuevo: ver `src/lib/parsers/__fixtures__/README.md`
 5. Para agregar una guía: nuevo MDX en `src/content/guias/` con frontmatter completo
+
+## Comparador de internet: observaciones y proyección
+
+`src/data/internet-planes.ts` contiene una selección editorial con fuente, fecha de observación, vencimiento de campaña cuando se publica y límite de revisión. Sustituye los dos catálogos antiguos. `src/lib/internet/comparacion.ts` calcula tramos mensuales e instalación, conserva importes desconocidos como `null` y filtra precios fuera de fecha. No ofrece puntajes de calidad ni cobertura por dirección.
+
+La página espera la petición con `connection()` para evaluar la fecha en America/Santiago. Se retiran el `loading.tsx` global y los tres fallbacks de `guias/`: su fallback dejaba el contenido real oculto sin JavaScript, incluso cuando el servidor ya lo había entregado. Sin esa frontera global, la respuesta espera el contenido inicial y conserva las pantallas específicas de progreso del lector PDF/OCR. El componente interactivo recibe esa fecha y actualiza la vigencia al volver a la pestaña o cada minuto. Las guías y el resto de páginas estáticas conservan su estrategia de render. No hay consultas automáticas a proveedores, nuevas dependencias ni datos de contacto almacenados.
